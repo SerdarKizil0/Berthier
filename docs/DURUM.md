@@ -36,9 +36,14 @@ Kullanıcı başlamadan doldurur. Boş bırakılan maddede Astra varsayılanı k
 
 ## Tasarım dili
 
-Mürekkep mavisi/açık kâğıt, koyu yeşil emir defteri, serif hamleler ve sade arayüz yazısı. Açık/koyu görünüm sistemi izler; mobilde sabit dikte çubuğu, 44 px dokunma hedefleri, azaltılmış hareket desteği.
+Kullanıcı 25 Eylül'de Atlas 02'yi onayladı. Petrol tonlu topografik harita, mercan seçili durak, açık sıcak zemin; Instrument Serif, DM Sans ve IBM Plex Mono. Dil bütün uygulamaya uygulandı. Haritada durak seçmek yalnız hamleyi gösterir. Sıra “Sırayı düzenle” penceresinde sağdaki tutamacı basılı tutup sürükleyerek değiştirilir; görünür yukarı/aşağı veya “Başa al” düğmeleri yok. Değişiklik açıkça kaydedilir ve kayıt defterinden geri alınabilir. Mevcut emir onayı korunur; onaylanmamış emir kendiliğinden onaylanmaz. Eski şartnamenin renk/yazı tipi kararları geçersiz.
 
 ## Kaldığın yer
+
+- 25 Eylül Atlas uygulaması: Karargâh, Harita, cephe ayrıntısı, Ufuk, Teftiş, fikir deposu, dikte, tercihler ve kayıt defteri yenilendi. Kalıcı dikte alanı ve dört ana ekranlı alt gezinme var. Kullanıcı diğer fikirlerini sonraya bıraktı; P4/P5 kapsamına girilmedi.
+- Sürükleyerek sıralama gerçek emri koruyarak kaydolur. Dokunmatik tutuş 350 ms; fareyle doğrudan sürüklenir. Klavye desteği, iptal, uzun listede kenardan kaydırma, güncelliğini yitirmiş emri kaydetmeyi engelleme ve geri alma var; cephe sayısı sınırsız.
+- Doğrulama: 13 P1 + 5 P2 + 4 P3 + 5 davranış testi, tip denetimi ve derleme geçti. 390×844'te ekranlar görsel incelendi; 320 px Karargâh taşmıyor. Ayrı yerel QA hesabında fareyle sürükleme, kayıt sonrası yenilemede sıranın korunması, klavye sıralaması ve iptal doğrulandı. Fiziksel iPhone'da basılı tutma henüz denenmedi.
+- Kullanıcının talebiyle kökteki `berthier-sartname-v1.md` silindi. Üç yön ve Atlas 02 maketleri yerel görselleştirme klasöründe tarihçe olarak duruyor; gerçek uygulamadaki sürükleme kararı maketteki ok düğmelerinin yerini aldı.
 
 - 25 Eylül, P4 öncesi düzeltmeler: dikte penceresi cihaz kaydından hemen sonra kapanır. Hızlı sunucu kuyruğu modelden ayrıldı; arka plan işlemi diğer ekranları ve yeni dikteyi kilitlemez. Otomatik kulvar penceresi kaldırıldı. Sonuç sessiz görünür. Sekme/telefon askıya alınırsa sunucuda kalan girdi sonraki açılışta sürdürülür; sürekli bağımsız zamanlayıcı yok.
 - Yanıtla: asıl dikte/uzun kimlik kutuya konmaz. Soru ve boş cevap alanı görünür. Tarih/saat seçici, uygun sorularda Evet/Hayır ve yazıyla yanıt seçeneği var. Yanıtın soru bağı sunucuda tutulur; başarılı kayıtta eski soru kapanır, hatada kaybolmaz.
@@ -47,10 +52,10 @@ Mürekkep mavisi/açık kâğıt, koyu yeşil emir defteri, serif hamleler ve sa
 - Derlenmiş uygulama 390×844 görünümünde ayrı yerel QA hesabıyla denendi: sade soru/tarih alanı, tarih gönderimi sonrası pencerenin kapanması, model çalışırken Harita/Ufuk ve yeni dikte kullanımı geçti. Tarih sunucuya yazıldı, soru kapandı. Yerel geliştirme stil sorunu sürüyor; derlenmiş görünüm düzgün. Codex tarayıcısının yerel takvim açılır penceresi çöktü; tarih alanı doldurularak akış doğrulandı. Fiziksel iPhone testi yapılmadı.
 - P1–P3 tamam. Sırada P4 Gmail/Takvim ve dış dünya var; bu oturum P4’e başlamadı. P5 bildirimler yok. 08:30/Pazar 20:00 kayıtlı tercih; çalışan bildirim değil.
 - GitHub: `https://github.com/SerdarKizil0/Berthier` özel depoya kaynak + kökteki plan/şartname belgeleri gönderildi; `main` ve `isPrivate=true` GitHub üzerinden doğrulandı. Eski kaynak geçmişi taşınmadı. 143 dosya ve yerel bilinen anahtarlar tarandı: anahtar eşleşmesi 0, .env dosyası 0. `app/scripts/export-github.py` dosya listesini ve bilinen anahtarları denetler; `.env*` (örnek dahil), `.dev.vars*`, yerel veriler ve çalışma çıktıları dışlanır. Kopya `app/.sites-runtime/github-export`; Sites kaynağından ayrıdır. Sonraki güncellemelerde bu kopyayı da yenile/push et.
-- Yayın başarılı: sürüm 4 (25 Eylül 2026), kaynak `2ad9eca52a476f2798caa8c962b7aeddf877ff0c`, dağıtım `appgdep_6ab60ffb750c8191942ac4634680b8b6`, sürüm kimliği `appgprj_6aae680569c481919ee47ee6d8d5fb61~appgver_0797581893fc8191b8efaba4e935203e`. Canlı adres: https://berthier-serdar.serdar16.chatgpt.site . Yalnız sahibi, aynı ChatGPT hesabıyla erişir.
+- Atlas yayını başarılı (25 Eylül 2026): kaynak `ac6d53612685027cba59c763acabd7380e94ef93`, dağıtım `appgdep_6ab6a356af4081918cc0be72f11bb2c3`, sürüm kimliği `appgprj_6aae680569c481919ee47ee6d8d5fb61~appgver_d617d3f8f61081919d3dd08abdb3bead`. Canlı adres: https://berthier-serdar.serdar16.chatgpt.site . Yalnız sahibi, aynı ChatGPT hesabıyla erişir.
 - Yayın kimliği `app/.openai/hosting.json`: `appgprj_6aae680569c481919ee47ee6d8d5fb61`. Yeni site oluşturma. Claude sırrı sunucuda, ortam revizyonu 2; anahtarlar Git dışında.
 - Kullanıcı verileri korunuyor. Yerel yedek `app/.sites-runtime/preview-backup.json`; yerel Staj Defteri buluta taşınmadı. Testler yalnız ayrı QA hesaplarında; üretime test verisi gitmedi.
-- Windows: gerçek npm CLI ile derle. Derlenmiş Worker’ı derlemeden önce durdur. Paketlemede gerekirse Git Bash login kabuğu ve `/c/Users/...` yollarını kullan; yükseltilmiş izin gerekiyor. GitHub CLI girişi yalnız yükseltilmiş komutta görüldü.
+- Windows: gerçek npm CLI ile derle. Derlenmiş Worker’ı derlemeden önce durdur. Sites eklentisinin yerel paketleme betiği son oturumda artık bulunamadı; hazır `dist` (hosting.json ve migration dahil) önceki başarılı arşiv düzeniyle paketlendi ve native Sites yayın aracıyla başarıyla yayınlandı. Git aktarımında yükseltilmiş izin ve tam depo yolu için geçici `safe.directory` gerekebilir. GitHub CLI girişi yalnız yükseltilmiş komutta görüldü.
 
 ## Astra'nın kendi eklemeleri
 
