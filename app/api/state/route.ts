@@ -1,0 +1,69 @@
+import {addIdeas} from '@/lib/research';
+import {EventInput} from '@/lib/event-input';
+import {env} from 'cloudflare:workers';
+import {getChatGPTUser} from '../../chatgpt-auth';
+import {type State,type Dictation,fresh,uid,commitChanges,nextMove,replaceSlot} from '@/lib/domain';
+import {act,applyParsed,type Command} from '@/lib/reducer';
+import {parseDictation,type LlmConfig} from '@/lib/llm';
+import {z} from 'zod';
+export const dynamic='force-dynamic';
+const Input=z.object({id:z.string().uuid(),kind:z.enum(['enqueue','dictate','complete','approve','select','setup','status','edit','skipPrerequisite','undo','merge','event','cancelEvent','profile','seenConflict','reviewStart','reviewStep','reviewFinish','reviewContinue','ideaAssign','ideaDecide','importIdeas']),replyTo:z.string().uuid().optional(),frontId:z.string().optional(),ideaId:z.string().optional(),sourceId:z.string().optional(),decision:z.enum(['keep','discard','move','front']).optional(),title:z.string().max(90).optional(),step:z.number().int().min(0).max(4).optional(),text:z.string().max(20000).optional(),status:z.enum(['active','held','closed']).optional(),ids:z.array(z.string()).optional(),changeId:z.string().optional(),index:z.number().int().nonnegative().optional(),targetId:z.string().optional(),where:z.string().max(120).optional(),question:z.string().max(120).optional(),skip:z.boolean().optional(),event:EventInput.omit({dateText:true,frontTitle:true}).extend({id:z.string(),date:z.string().nullable(),frontId:z.string().nullable(),cancelled:z.boolean().optional()}).optional(),eventId:z.string().optional(),conflictId:z.string().max(500).optional(),profile:z.object({name:z.string().max(100),number:z.string().max(50),department:z.string().max(100),university:z.string().max(100)}).optional()});
+const headers={'Cache-Control':'no-store'};
+const respond=(data:unknown,status=200)=>Response.json(data,{status,headers});
+function db(){if(!env.DB)throw Error('Veri defterine ulaşılamıyor. Girdin cihazda korunuyor.');return env.DB;}
+async function read(owner:string){const row=await db().prepare('SELECT data, revision FROM notebooks WHERE owner = ?').bind(owner).first<{data:string;revision:number}>();return {state:row?JSON.parse(row.data) as State:fresh(),revision:row?.revision??-1};}
+async function list(owner:string){return (await db().prepare('SELECT id, raw, context, created_at, status, result FROM dictations WHERE owner = ? ORDER BY created_at DESC').bind(owner).all<Dictation>()).results;}
+async function save(owner:string,s:State,revision:number,dictation?:{id:string;status:string;result:string;replyTo?:string}){const statement=revision<0?db().prepare('INSERT OR IGNORE INTO notebooks(owner, revision, data) VALUES (?, 0, ?)').bind(owner,JSON.stringify(s)):db().prepare('UPDATE notebooks SET data = ?, revision = revision + 1 WHERE owner = ? AND revision = ?').bind(JSON.stringify(s),owner,revision);const batch=[statement];if(dictation)batch.push(db().prepare('UPDATE dictations SET status = ?, result = ? WHERE id = ? AND owner = ? AND changes() = 1').bind(dictation.status,dictation.result,dictation.id,owner));if(dictation?.replyTo)batch.push(db().prepare("UPDATE dictations SET status = 'answered' WHERE id = ? AND owner = ? AND status = 'question' AND EXISTS (SELECT 1 FROM dictations WHERE id = ? AND owner = ? AND status IN ('done','question'))").bind(dictation.replyTo,owner,dictation.id,owner));const results=await db().batch(batch);if(results[0].meta.changes!==1)throw Error('Başka bir işlem kaydedildi. Son durum alındı; işlemi tekrar dene.');}
+export async function GET(){const user=await getChatGPTUser();if(!user)return respond({error:'Giriş yapman gerekiyor.'},401);try{const {state,revision}=await read(user.userId);return respond({state,revision,dictations:await list(user.userId)});}catch{return respond({error:'Veri defterine ulaşılamıyor. Tekrar dene.'},503);}}
+export async function POST(req:Request){
+ const user=await getChatGPTUser();if(!user)return respond({error:'Giriş yapman gerekiyor.'},401);
+ if(req.headers.get('origin')!==new URL(req.url).origin)return respond({error:'İstek kaynağı doğrulanamadı.'},403);
+ let input:z.infer<typeof Input>;try{if(Number(req.headers.get('content-length')??0)>100000)throw Error();input=Input.parse(await req.json());}catch{return respond({error:'Geçersiz veya çok uzun girdi.'},400);}
+ let processing=false;
+ try{
+ let {state,revision}=await read(user.userId);
+ if(state.receipts.includes(input.id))return respond({state,revision,dictations:await list(user.userId)});
+ let replySource:Dictation|null=null;
+ if(input.replyTo){replySource=await db().prepare('SELECT id,raw,context,created_at,status,result FROM dictations WHERE id = ? AND owner = ?').bind(input.replyTo,user.userId).first<Dictation>();if(!replySource||!['question','answered'].includes(replySource.status))throw Error('Yanıtlanacak soru bulunamadı.');}
+ if(input.kind==='enqueue'){
+ const raw=input.text?.trim();if(!raw)throw Error('Önce söylemek istediğini yaz.');
+ const metadata=JSON.stringify({kind:'dictate',replyTo:input.replyTo??null});
+ await db().prepare('INSERT OR IGNORE INTO dictations(id,owner,raw,context,created_at,status,result) VALUES (?,?,?,?,?,?,?)').bind(input.id,user.userId,raw,input.frontId??null,new Date().toISOString(),'queued',metadata).run();
+ const row=await db().prepare('SELECT owner,raw,context,result FROM dictations WHERE id = ?').bind(input.id).first<{owner:string;raw:string;context:string|null;result:string|null}>();
+ if(!row||row.owner!==user.userId||row.raw!==raw||row.context!==(input.frontId??null)||(JSON.parse(row.result??'{}').replyTo??null)!==(input.replyTo??null))throw Error('Girdi kimliği çakıştı.');
+ return respond({queued:true,id:input.id},202);
+ }
+ let n:State=state;let summary='';
+ const runtime=env as unknown as Record<string,string>;const anthropicKey=runtime.ANTHROPIC_API_KEY||process.env.ANTHROPIC_API_KEY;
+ const config:LlmConfig=anthropicKey?{provider:'anthropic',key:anthropicKey,workspaceId:runtime.ANTHROPIC_WORKSPACE_ID||process.env.ANTHROPIC_WORKSPACE_ID,model:runtime.ANTHROPIC_MODEL||process.env.ANTHROPIC_MODEL||'claude-sonnet-5'}:{provider:'gemini',key:runtime.GEMINI_API_KEY||process.env.GEMINI_API_KEY||process.env.GOOGLE_API_KEY||'',model:runtime.GEMINI_MODEL||process.env.GEMINI_MODEL||'gemini-2.5-flash'};
+ if(input.kind==='importIdeas'){const source=await db().prepare('SELECT raw,context FROM dictations WHERE id = ? AND owner = ?').bind(input.sourceId??'',user.userId).first<{raw:string;context:string|null}>();if(!source)throw Error('Eski dikte bulunamadı.');if(state.ideaImports?.includes(input.sourceId!))return respond({state,revision,dictations:await list(user.userId),summary:'Bu dikte daha önce tarandı.'});const parsed=await parseDictation(source.raw,state,source.context,config,undefined,undefined,true);n=commitChanges(state,'Eski diktedeki fikirler depoya aktarıldı',draft=>{addIdeas(draft,parsed.ideas??[],input.sourceId!);(draft.ideaImports??=[]).push(input.sourceId!);});n.receipts.push(input.id);await save(user.userId,n,revision);return respond({state:n,revision:revision+1,dictations:await list(user.userId),summary:(parsed.ideas?.length??0)+' depo kalemi bulundu.'});}
+ if(input.kind==='dictate'||(input.kind==='complete'&&!input.skip)){
+ const f=input.frontId?state.fronts[input.frontId]:undefined;
+ if(input.kind==='complete'&&!f)throw Error('Cephe bulunamadı.');
+ const raw=input.text?.trim()||(input.kind==='complete'?'Hamleyi tamamladım.':'');if(!raw)throw Error('Önce söylemek istediğini yaz.');
+ await db().prepare('INSERT OR IGNORE INTO dictations(id,owner,raw,context,created_at,status,result) VALUES (?,?,?,?,?,?,?)').bind(input.id,user.userId,raw,input.frontId??null,new Date().toISOString(),'queued',JSON.stringify({kind:input.kind,replyTo:input.replyTo??null})).run();
+ const original=await db().prepare('SELECT owner,raw,context,result FROM dictations WHERE id = ?').bind(input.id).first<{owner:string;raw:string;context:string|null;result:string|null}>();
+ if(!original||original.owner!==user.userId||original.raw!==raw||original.context!==(input.frontId??null))throw Error('Girdi kimliği çakıştı. Yeniden gönder.');
+ if((JSON.parse(original.result??'{}').replyTo??null)!==(input.replyTo??null))throw Error('Yanıt bağlamı değiştirilemez.');
+ processing=true;
+ const modelText=replySource?JSON.stringify({previousDictation:replySource.raw,question:JSON.parse(replySource.result??'{}').question,answer:raw}):raw;
+ const parsed=await parseDictation(modelText,state,input.frontId??replySource?.context??null,config,input.kind==='complete'?f:undefined);
+ // The user may edit their map while the model is working. Apply only to a fresh revision.
+ const latest=await read(user.userId);if(latest.state.receipts.includes(input.id))return respond({state:latest.state,revision:latest.revision,dictations:await list(user.userId)});
+ if(input.kind==='complete'&&JSON.stringify(latest.state.fronts[f!.id])!==JSON.stringify(f))throw Error('Cephe bu sırada değişti. Notun saklandı; yeniden dene.');
+ state=latest.state;revision=latest.revision;
+ for(const item of parsed.items){if(item.id&&!state.fronts[item.id])throw Error('Cephe değişti; girdin saklandı. Yeniden dene.');if(item.completedMoveId&&!state.fronts[item.id!]?.moves.some(m=>m.id===item.completedMoveId&&!m.doneAt))throw Error('Hamle bu sırada değişti. Girdin saklandı; yeniden dene.');}
+
+ if(input.kind==='complete'&&f){
+ const item=parsed.items.find(x=>x.id===f.id);if(!item||parsed.question)throw Error('Sıradaki hamle netleşmedi. Notun kaydedildi; tekrar dene veya Atla ile tamamla.');
+ // A completion only changes the chosen front; model cannot complete unrelated fronts.
+ n=commitChanges(state,'Hamle tamamlandı; kaldığın yer kaydedildi',draft=>{const front=draft.fronts[f.id];const m=nextMove(front);if(m)m.doneAt=new Date().toISOString();if(item.where!==null)front.where=item.where;if(item.question!==null)front.question=item.question;
+ if(item.moves.length&&!m?.eventId){front.moves=front.moves.filter(m=>!!m.doneAt);front.moves.push(...item.moves.map(text=>({id:uid(),text})));}front.notes.push(raw);front.touched=new Date().toISOString();replaceSlot(draft,front);});
+ }else n=applyParsed(state,parsed,raw,undefined,input.id);
+ summary=parsed.question||parsed.summary;
+ n.receipts.push(input.id);await save(user.userId,n,revision,{id:input.id,status:parsed.question?'question':'done',result:JSON.stringify({summary,question:parsed.question,kind:input.kind,replyTo:input.replyTo??null}),replyTo:input.replyTo});
+ }else{n=act(state,input as Command);n.receipts.push(input.id);await save(user.userId,n,revision);summary=n.changes.at(-1)?.label??'Kaydedildi.';}
+ return respond({state:n,revision:revision+1,dictations:await list(user.userId),summary});
+ }catch(e){const message=e instanceof Error?e.message:'İşlem kaydedilemedi; tekrar dene.';try{if(processing)await db().prepare("UPDATE dictations SET status = 'failed', result = ? WHERE id = ? AND owner = ? AND status IN ('queued','failed')").bind(JSON.stringify({summary:message,kind:input.kind==='enqueue'?'dictate':input.kind,replyTo:input.replyTo??null}),input.id,user.userId).run();}catch{}return respond({error:message},503);}
+}
+

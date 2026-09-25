@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {fresh} from '../lib/domain';
+import {parseDictation} from '../lib/llm';
+import {applyParsed} from '../lib/reducer';
+import {conflicts} from '../lib/calendar';
+process.loadEnvFile('.env.local');
+const config={provider:'anthropic' as const,key:process.env.ANTHROPIC_API_KEY!,model:process.env.ANTHROPIC_MODEL||'claude-sonnet-5',workspaceId:process.env.ANTHROPIC_WORKSPACE_ID};
+const today='2026-10-12';
+const raw="İstatistik vizesi 22 Ekim'de, perşembe galiba, saat 10'da. Fizik sunumum da aynı gün saat 10'da. Erasmus başvurusu 5 Kasım'da kapanıyor, iki referans mektubu lazım, biri Ayşe Hoca'dan. Yarın 14:00'te dekanlıkta imza var, kimliğimi götürmeliyim.";
+const p=await parseDictation(raw,fresh(),null,config,undefined,today);console.log(JSON.stringify(p));let s=applyParsed(fresh(),p,raw,today);const events=Object.values(s.events!);assert.equal(events.length,4);assert.equal(events.find(e=>e.kind==='exam')?.date,'2026-10-22');assert.equal(events.find(e=>e.kind==='presentation')?.time,'10:00');assert.equal(events.find(e=>e.kind==='application')?.time,null);assert.equal(events.find(e=>e.kind==='application')?.date,'2026-11-05');assert.equal(events.find(e=>e.kind==='appointment')?.date,'2026-10-13');assert.ok(events.find(e=>e.kind==='appointment')?.bring.some(x=>/kimlik/i.test(x)));assert.equal(conflicts(events,today).length,1);assert.equal(conflicts(events,today)[0].severity,'hard');
+const edit='Fizik sunumunu 23 Ekim saat 11:00 olarak değiştirdiler. İstatistik vizesine 14 gün önce başlayalım.';const q=await parseDictation(edit,s,null,config,undefined,today);console.log(JSON.stringify(q));s=applyParsed(s,q,edit,today);assert.equal(Object.values(s.events!).length,4);assert.equal(Object.values(s.events!).find(e=>e.kind==='presentation')?.date,'2026-10-23');assert.equal(Object.values(s.events!).find(e=>e.kind==='exam')?.prepDays,14);assert.equal(conflicts(Object.values(s.events!),today).length,0);console.log('P2 live extraction and date/preparation edit passed.');

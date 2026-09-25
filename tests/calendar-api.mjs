@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+const base='http://127.0.0.1:5174',owner='berthier-p2-qa-'+crypto.randomUUID();
+const headers={'oai-authenticated-user-id':owner,'oai-authenticated-user-email':'qa@berthier.invalid','Content-Type':'application/json',Origin:base};
+async function command(body,status=200){const r=await fetch(base+'/api/state',{method:'POST',headers,body:JSON.stringify({id:crypto.randomUUID(),...body})});const d=await r.json();assert.equal(r.status,status,d.error);return d;}
+const id=crypto.randomUUID();const input={id,kind:'dictate',text:'Yarın saat 10:00’da istatistik sınavım, aynı gün 10:00’da fizik sunumum var. İki etkinlik de kampüste.'};
+let d=await command(input);assert.equal(d.dictations[0].status,'done');assert.equal(Object.keys(d.state.events).length,2);const once=JSON.stringify(d.state);d=await command(input);assert.equal(JSON.stringify(d.state),once);
+const e=Object.values(d.state.events).find(e=>e.kind==='presentation');assert.ok(e);const old=structuredClone(d.state);d=await command({kind:'event',event:{...e,time:'12:00'}});assert.equal(d.state.events[e.id].time,'12:00');d=await command({kind:'undo',changeId:d.state.changes.at(-1).id});assert.deepEqual(d.state.events,old.events);assert.deepEqual(d.state.fronts,old.fronts);
+await command({kind:'event',event:{...e,time:'28:00'}},503);
+d=await command({kind:'profile',profile:{name:'Test Kullanıcı',number:'',department:'',university:''}});assert.equal(d.state.profile.name,'Test Kullanıcı');d=await command({kind:'cancelEvent',eventId:e.id});assert.equal(d.state.events[e.id].cancelled,true);assert.ok(!Object.values(d.state.fronts).some(f=>f.moves.some(m=>m.eventId===e.id&&!m.doneAt)));d=await command({kind:'undo',changeId:d.state.changes.at(-1).id});assert.ok(!d.state.events[e.id].cancelled);
+const saved=await (await fetch(base+'/api/state',{headers})).json();assert.deepEqual(saved.state,d.state);console.log('P2 API: live dictation, atomic storage, idempotency, event edits, validation, profile, cancellation and undo passed.');
