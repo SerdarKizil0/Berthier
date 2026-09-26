@@ -42,6 +42,8 @@ Kullanıcı 25 Eylül'de Atlas 02'yi onayladı. Petrol tonlu topografik harita, 
 
 ## Kaldığın yer
 
+- P4 özel GitHub kopyası da güncellendi; `SerdarKizil0/Berthier` için `isPrivate=true` doğrulandı. Son dışa aktarım: 151 dosya, bilinen 3 yerel anahtar taraması; anahtar eşleşmesi 0, `.env*` dosyası 0.
+
 - P4 yayını başarılı (26 Eylül 2026): kaynak `b26dba413124f348ad615fb34edd20cc962b3b02`, dağıtım `appgdep_6ab78a07adf881918d2a55e053cd290c`, sürüm `appgprj_6aae680569c481919ee47ee6d8d5fb61~appgver_55f3b0a808e481918ed213f361f79b1e`. Aynı özel adres: https://berthier-serdar.serdar16.chatgpt.site . Ortam revizyonu 2 korundu.
 
 - 26 Eylül P4 medya: Atlas 02 dikte penceresinde “Ses kaydet” ve “Dosya ekle” var. Kayıt 10 dakika/10 MB; JPEG/PNG/WebP/GIF 7 MB, PDF 10 MB. Ses Gemini; görsel/PDF Claude ile çözülür. Döküm gönderilmeden önce düzenlenir; gönderince mevcut hızlı kuyrukla pencere kapanır.
