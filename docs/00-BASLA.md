@@ -87,7 +87,7 @@ Hamle, kullanıcının yapmak istediği sıradaki somut eylemdir. Söylenen iş 
 | P1 | P1-cekirdek-dongu.md | Dikte eder, haritası oluşur, günün emrini onaylar, hamleleri bitirir. Uygulama her gün kullanılabilir. |
 | P2 | P2-tarihler.md | Sınav, sunum, başvuru ve randevular önceden görünür; çakışmalar yakalanır; hazırlık kendiliğinden başlar. |
 | P3 | P3-kulvarlar-ve-teftis.md | Kulvarlar aktif ya da bekletilen olur, fikirler depoya düşer, haftalık teftiş yapılır. |
-| P4 | P4-dis-dunya.md | Google Takvim ve Gmail bağlanır; ses kaydı ve ekran görüntüsü işlenir. |
+| P4 | P4-dis-dunya.md | Ses kaydı, ekran görüntüsü ve PDF işlenir. Google Takvim/Gmail kullanıcının 26 Eylül kararıyla ertelendi. |
 | P5 | P5-ritim-ve-motivasyon.md | Sabah raporu ve bildirimler gelir; motivasyon katmanı tamamlanır. |
 
 ## Çalışma düzeni (kota dostu)

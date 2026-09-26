@@ -8,9 +8,11 @@ Berthier'in her sabah raporla kapıyı çalması ve uygulamanın kullanıcıyı 
 
 ## Kapsam
 
+26 Eylül kullanıcı kararı: Gmail/Takvim bağlantıları ertelendiği için sabah raporunda gelen evrak bölümü şimdilik olmayacak.
+
 ### Sabah raporu
 
-- Her sabah aynı yapıda gelen rapor: günün emri önerisi (gerekçeleriyle), uyarılar (çakışmalar, süresi daralan hazırlıklar), bugün ve yarın olunması gereken yerler (yanına alınacaklarla), gelen evrak özeti ve kullanıcının kararını bekleyenler.
+- Her sabah aynı yapıda gelen rapor: günün emri önerisi (gerekçeleriyle), uyarılar (çakışmalar, süresi daralan hazırlıklar), bugün ve yarın olunması gereken yerler (yanına alınacaklarla), kullanıcının kararını bekleyenler.
 - Yapının sabit olması önemli: kullanıcı neyin nerede olduğunu aramasın. Görünüm senin.
 - Hedef: raporu okuyup emri onaylamak birkaç dakikadan kısa sürsün.
 - Rapor, bildirim saatinden önce hazır olsun.

@@ -23,6 +23,8 @@ Kullanıcı başlamadan doldurur. Boş bırakılan maddede Astra varsayılanı k
 | Mail taslakları için ad soyad, öğrenci no, bölüm, üniversite | İlk taslakta sorulacak | İlk taslakta sorulsun |
 | "Kilitlendim" düğmesi olsun mu? | Olmasın | Hayır |
 | Yapay zekâ sağlayıcısı | Claude Sonnet 5 seçildi; canlı kabul testleri geçti | Anahtarlar yalnız sunucuda |
+| Gmail ve Google Takvim | Şimdilik bağlanmayacak; OAuth kurulumu yapılmayacak (26 Eylül kararı) | Ertelendi |
+| Sabah raporunda gelen evrak | Şimdilik olmayacak (26 Eylül kararı) | Ertelendi |
 
 ## İlerleme
 
@@ -31,7 +33,7 @@ Kullanıcı başlamadan doldurur. Boş bırakılan maddede Astra varsayılanı k
 | P1 Çekirdek döngü | tamamlandı ve özel yayında | Claude ile canlı senaryolar ve derlenmiş API kaydı geçti. |
 | P2 Tarihler | tamamlandı ve özel yayında | Ufuk, tarih çıkarma/düzenleme, çakışmalar, mail taslağı, hazırlıklar ve başvuru belgeleri. |
 | P3 Kulvarlar ve teftiş | tamamlandı ve özel yayında | Fikir deposu, sınırsız aktif kulvar, kalıcı beş adımlı teftiş. |
-| P4 Dış dünya | başlamadı | |
+| P4 Ses ve belge girişi | tamamlandı ve özel yayında | Ses, ekran görüntüsü ve PDF hazır. Gmail/Takvim kullanıcı kararıyla ertelendi. |
 | P5 Ritim ve motivasyon | başlamadı | |
 
 ## Tasarım dili
@@ -39,6 +41,17 @@ Kullanıcı başlamadan doldurur. Boş bırakılan maddede Astra varsayılanı k
 Kullanıcı 25 Eylül'de Atlas 02'yi onayladı. Petrol tonlu topografik harita, mercan seçili durak, açık sıcak zemin; Instrument Serif, DM Sans ve IBM Plex Mono. Dil bütün uygulamaya uygulandı. Haritada durak seçmek yalnız hamleyi gösterir. Sıra “Sırayı düzenle” penceresinde sağdaki tutamacı basılı tutup sürükleyerek değiştirilir; görünür yukarı/aşağı veya “Başa al” düğmeleri yok. Değişiklik açıkça kaydedilir ve kayıt defterinden geri alınabilir. Mevcut emir onayı korunur; onaylanmamış emir kendiliğinden onaylanmaz. Eski şartnamenin renk/yazı tipi kararları geçersiz.
 
 ## Kaldığın yer
+
+- P4 yayını başarılı (26 Eylül 2026): kaynak `b26dba413124f348ad615fb34edd20cc962b3b02`, dağıtım `appgdep_6ab78a07adf881918d2a55e053cd290c`, sürüm `appgprj_6aae680569c481919ee47ee6d8d5fb61~appgver_55f3b0a808e481918ed213f361f79b1e`. Aynı özel adres: https://berthier-serdar.serdar16.chatgpt.site . Ortam revizyonu 2 korundu.
+
+- 26 Eylül P4 medya: Atlas 02 dikte penceresinde “Ses kaydet” ve “Dosya ekle” var. Kayıt 10 dakika/10 MB; JPEG/PNG/WebP/GIF 7 MB, PDF 10 MB. Ses Gemini; görsel/PDF Claude ile çözülür. Döküm gönderilmeden önce düzenlenir; gönderince mevcut hızlı kuyrukla pencere kapanır.
+- Sesin geçici cihaz yedeği 5 saniyede bir alınır; uygulama arka plana geçince kayıt durdurulur. Döküm ve belge kaynak bilgisi tek cihaz işlemiyle saklanıp geçici dosya kaldırılır. Sunucu dosyayı kalıcı depolamaz. HEIC için ekran görüntüsü kullanılabilir; iPhone Paylaş menüsünden doğrudan alma yok.
+- Belge kaynağı kuyruk, hata/tekrar deneme, soru yanıtı ve eski fikir taramasında korunur. Belgeler hamle bitiremez, kulvar/tercih/kaldığı yer değiştiremez; belge içindeki asistana yönelik talimatlar işleme alınmaz.
+- Doğrulama: 13 P1 + 5 P2 + 4 P3 + 5 davranış + 4 P4 testi, tip kontrolü ve derleme geçti. Gerçek Claude/Gemini: PNG lab saati değişimi ve çakışması, PDF’den iki haftalık ders, Türkçe WAV ve AAC/M4A ses dökümü, kötü niyetli belge talimatının değişiklik üretmemesi geçti. Yerel API’de giriş/kaynak koruması, dökümden önce haritaya yazılmaması ve kaynak değiştirilememesi geçti.
+- 390×844 yerel tarayıcıda dosya seçimi → döküm → elle düzeltme → yenilemede koruma → gönderip pencerenin kapanması → sunucuda tarih/yer ve belge kaynağı doğrulandı. Geçici dosya yeniden görünmedi. Fiziksel iPhone mikrofon izni/kayıt testi henüz yapılmadı.
+
+- 26 Eylül anahtar hatası araştırması: Codex yerel günlüğünde 401, `https://chatgpt.com/backend-api/codex/responses` isteğinde ve `codex_core::session::turn` kaydında görüldü. Berthier kaynaklarında/OpenAI ortam değişkenlerinde bu anahtar yok; uygulama yalnız Anthropic/Gemini çağırıyor. Codex sağlayıcı ayarı değiştirilmemiş. Codex hizmetinin tekrar hata vermemesi uygulama koduyla garanti edilemez; uygulama anahtarları bu hata nedeniyle değiştirilmedi.
+- 26 Eylül kapsam kararı: Gmail ve Google Takvim/OAuth kurulumu yapılmayacak. Sabah raporundaki gelen evrak bölümü de şimdilik yok. P5 uygulanmıyor.
 
 - 25 Eylül Atlas uygulaması: Karargâh, Harita, cephe ayrıntısı, Ufuk, Teftiş, fikir deposu, dikte, tercihler ve kayıt defteri yenilendi. Kalıcı dikte alanı ve dört ana ekranlı alt gezinme var. Kullanıcı diğer fikirlerini sonraya bıraktı; P4/P5 kapsamına girilmedi.
 - Sürükleyerek sıralama gerçek emri koruyarak kaydolur. Dokunmatik tutuş 350 ms; fareyle doğrudan sürüklenir. Klavye desteği, iptal, uzun listede kenardan kaydırma, güncelliğini yitirmiş emri kaydetmeyi engelleme ve geri alma var; cephe sayısı sınırsız.
@@ -50,16 +63,16 @@ Kullanıcı 25 Eylül'de Atlas 02'yi onayladı. Petrol tonlu topografik harita, 
 - Hamle: zaten yapılabilir eylem aynen korunur; kelime alt sınırı ve kapalı fiil listesi kaldırıldı. Büyük/belirsiz iş için gerekçeli ön adım ve “Ön adıma gerek yok” var. Elle düzeltme/ret tercihleri sunucuda tutulur, benzer işlerin model bağlamına girer, topluca geri alınır. Eski kısa eylem dikteleri için de uygun ön adım atlama desteklenir. `00-BASLA.md` Hamle nedir bölümü güncellendi.
 - Doğrulama: tip denetimi, 10 P1 + 5 P2 + 4 P3 + 5 yeni davranış testi ve derleme geçti. Gerçek Claude: “Reuteri yoğurt yap” ön adımsız kaldı; benzer işte düzeltme hatırlandı. API: kalıcı kuyruğa alma yaklaşık 100 ms (yerel ölçüm), tekrar/kimlik çakışması, eşzamanlı düzenleme korunması ve yanıt sahipliği geçti.
 - Derlenmiş uygulama 390×844 görünümünde ayrı yerel QA hesabıyla denendi: sade soru/tarih alanı, tarih gönderimi sonrası pencerenin kapanması, model çalışırken Harita/Ufuk ve yeni dikte kullanımı geçti. Tarih sunucuya yazıldı, soru kapandı. Yerel geliştirme stil sorunu sürüyor; derlenmiş görünüm düzgün. Codex tarayıcısının yerel takvim açılır penceresi çöktü; tarih alanı doldurularak akış doğrulandı. Fiziksel iPhone testi yapılmadı.
-- P1–P3 tamam. Sırada P4 Gmail/Takvim ve dış dünya var; bu oturum P4’e başlamadı. P5 bildirimler yok. 08:30/Pazar 20:00 kayıtlı tercih; çalışan bildirim değil.
+- P1–P3 tamam. P4 ses ve belge girişleri tamamlandı; Gmail/Takvim ertelendi. Sırada kullanıcının onayıyla P5 var. P5 bildirimler yok. 08:30/Pazar 20:00 kayıtlı tercih; çalışan bildirim değil.
 - GitHub: `https://github.com/SerdarKizil0/Berthier` özel depoya kaynak + kökteki plan/şartname belgeleri gönderildi; `main` ve `isPrivate=true` GitHub üzerinden doğrulandı. Eski kaynak geçmişi taşınmadı. 143 dosya ve yerel bilinen anahtarlar tarandı: anahtar eşleşmesi 0, .env dosyası 0. `app/scripts/export-github.py` dosya listesini ve bilinen anahtarları denetler; `.env*` (örnek dahil), `.dev.vars*`, yerel veriler ve çalışma çıktıları dışlanır. Kopya `app/.sites-runtime/github-export`; Sites kaynağından ayrıdır. Sonraki güncellemelerde bu kopyayı da yenile/push et.
 - Atlas yayını başarılı (25 Eylül 2026): kaynak `ac6d53612685027cba59c763acabd7380e94ef93`, dağıtım `appgdep_6ab6a356af4081918cc0be72f11bb2c3`, sürüm kimliği `appgprj_6aae680569c481919ee47ee6d8d5fb61~appgver_d617d3f8f61081919d3dd08abdb3bead`. Canlı adres: https://berthier-serdar.serdar16.chatgpt.site . Yalnız sahibi, aynı ChatGPT hesabıyla erişir.
 - Yayın kimliği `app/.openai/hosting.json`: `appgprj_6aae680569c481919ee47ee6d8d5fb61`. Yeni site oluşturma. Claude sırrı sunucuda, ortam revizyonu 2; anahtarlar Git dışında.
 - Kullanıcı verileri korunuyor. Yerel yedek `app/.sites-runtime/preview-backup.json`; yerel Staj Defteri buluta taşınmadı. Testler yalnız ayrı QA hesaplarında; üretime test verisi gitmedi.
-- Windows: gerçek npm CLI ile derle. Derlenmiş Worker’ı derlemeden önce durdur. Sites eklentisinin yerel paketleme betiği son oturumda artık bulunamadı; hazır `dist` (hosting.json ve migration dahil) önceki başarılı arşiv düzeniyle paketlendi ve native Sites yayın aracıyla başarıyla yayınlandı. Git aktarımında yükseltilmiş izin ve tam depo yolu için geçici `safe.directory` gerekebilir. GitHub CLI girişi yalnız yükseltilmiş komutta görüldü.
+- Windows: gerçek npm CLI ile derle. Derlenmiş Worker’ı derlemeden önce durdur. Sites 0.1.71 yönergesi okundu, fakat yayın sırasında eklenti betik dizini artık bulunamadı. Önceki Atlas arşiv düzeni kullanıldı; uzaktaki kaynak SHA doğrulandı, sır eklemeden commit/push yapıldı ve dist + hosting.json + migration arşivi native Sites aracıyla yayınlandı. Yerel Worker anahtar dosyalarını `--env-file` ile tam dosya yolundan alır; göreli yol dist/server içine çözülür. Git aktarımında yükseltilmiş izin ve tam depo yolu için geçici `safe.directory` gerekebilir. GitHub CLI girişi yalnız yükseltilmiş komutta görüldü.
 
 ## Astra'nın kendi eklemeleri
 
 - Çakışan geri alma daha yeni veriyi ezmez; emre bağlı cephe değişikliği gerektiğinde birlikte geri alınır.
 - Son bilinen hamle bitince aynı işi tekrar üreten döngü yok; sonraki hamle bilinmiyorsa açıkça gösterilir.
-- Giriş P1'de Sites'in yalnız sahibine açık ChatGPT oturumuyla sağlanır. Google bağlantıları P4'e bırakıldı.
+- Giriş P1'de Sites'in yalnız sahibine açık ChatGPT oturumuyla sağlanır. Google bağlantıları kullanıcının 26 Eylül kararıyla ertelendi.
 - Cihaz önbelleği ve kuyruk ana verinin yerini almaz; sunucu D1 kaydı esastır.

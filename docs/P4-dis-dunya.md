@@ -1,6 +1,7 @@
 # P4: Dış dünya
 
 > Önce 00-BASLA.md ve DURUM.md.
+> 26 Eylül kullanıcı kararı: Gmail ve Google Takvim/OAuth şimdilik kapsam dışında. Bu paketin teslimi ses, ekran görüntüsü ve PDF girişidir. Aşağıdaki Google/mail bölümleri ertelenmiş kapsam olarak tutulur.
 
 ## Amaç
 

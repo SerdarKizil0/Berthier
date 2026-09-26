@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+const base='http://127.0.0.1:5174';const owner='media-api-qa-20260926';const headers={'oai-authenticated-user-id':owner,'oai-authenticated-user-email':'qa@berthier.invalid',origin:base};
+assert.equal((await fetch(base+'/api/media',{method:'POST'})).status,401);
+assert.equal((await fetch(base+'/api/media',{method:'POST',headers:{...headers,origin:'https://foreign.invalid'}})).status,403);
+const before=await (await fetch(base+'/api/state',{headers})).json();const file=await readFile('.sites-runtime/media-fixtures/notice.png');
+const media=await fetch(base+'/api/media',{method:'POST',headers:{...headers,'content-type':'image/png'},body:file});const result=await media.json();assert.equal(media.status,200,JSON.stringify(result));assert.match(result.text,/13:00/);
+const after=await (await fetch(base+'/api/state',{headers})).json();assert.deepEqual(before,after);console.log('Media route: auth, origin and reviewed-only transcript passed; notebook unchanged.');
+const id=crypto.randomUUID(),payload={id,kind:'enqueue',source:'document',text:'Test belge metni'};
+const post=body=>fetch(base+'/api/state',{method:'POST',headers:{...headers,'content-type':'application/json'},body:JSON.stringify(body)});
+assert.equal((await post(payload)).status,202);assert.equal((await post({...payload,source:'dictation'})).status,503);
+const queued=await(await fetch(base+'/api/state',{headers})).json();assert.equal(JSON.parse(queued.dictations.find(d=>d.id===id).result).source,'document');console.log('Document provenance saved and immutable across queue retry.');

@@ -2,3 +2,6 @@
 function database():Promise<IDBDatabase>{return new Promise((resolve,reject)=>{const req=indexedDB.open('berthier-offline',1);req.onupgradeneeded=()=>req.result.createObjectStore('local');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});}
 export async function localRead<T>(key:string):Promise<T|undefined>{const db=await database();return new Promise((resolve,reject)=>{const t=db.transaction('local','readonly');const r=t.objectStore('local').get(key);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);t.oncomplete=()=>db.close();});}
 export async function localWrite(key:string,value:unknown){const db=await database();return new Promise<void>((resolve,reject)=>{const t=db.transaction('local','readwrite');t.objectStore('local').put(value,key);t.oncomplete=()=>{db.close();resolve();};t.onerror=()=>{db.close();reject(t.error);};});}
+
+// Commit the reviewed transcript and remove its temporary binary together.
+export async function localWriteMany(entries:[string,unknown][]){const db=await database();return new Promise<void>((resolve,reject)=>{const t=db.transaction('local','readwrite');for(const [key,value] of entries)t.objectStore('local').put(value,key);t.oncomplete=()=>{db.close();resolve();};t.onabort=t.onerror=()=>{db.close();reject(t.error??Error('Cihaz kaydı tamamlanamadı.'));};});}
