@@ -1,0 +1,743 @@
+/* Expedition map (Grafit Gece). Values follow design-reference/project/Berthier Harita v7.dc.html;
+   colours come from the tokens in atlas.css. */
+
+.expedition-map {
+  position: relative;
+  overflow: hidden;
+  background: var(--map-ground);
+  color: var(--map-ink);
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.expedition-map.is-home {
+  margin-top: 8px;
+  height: 360px;
+  touch-action: pan-y;
+}
+.expedition-map.is-atlas {
+  height: calc(100dvh - 88px);
+  min-height: 520px;
+  border-radius: 24px;
+  touch-action: none;
+}
+
+.xm-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+}
+.xm-ground {
+  fill: var(--map-ground);
+}
+.xm-stipple {
+  fill: var(--map-stipple);
+}
+.xm-contour {
+  fill: none;
+  stroke: var(--map-contour);
+  stroke-width: 0.7;
+  vector-effect: non-scaling-stroke;
+}
+.xm-contour.is-index {
+  stroke: var(--map-contour-index);
+  stroke-width: 1.15;
+}
+.xm-river {
+  fill: none;
+  stroke: var(--map-river);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.xm-peak {
+  fill: var(--map-label);
+  opacity: 0.8;
+  stroke: var(--map-halo);
+  stroke-width: 1.5px;
+  paint-order: stroke;
+}
+.xm-ring {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.3;
+}
+
+/* Route: dark casing, the next leg dashed, later legs dotted; captured legs become the seal line. */
+.xm-leg-casing,
+.xm-leg,
+.xm-seal {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.xm-leg-casing {
+  stroke: var(--map-casing);
+  stroke-width: 6;
+}
+.xm-leg {
+  stroke: var(--map-route-dim);
+  stroke-width: 2.2;
+  stroke-dasharray: 0.1 6.5;
+}
+.xm-leg.is-next {
+  stroke: var(--map-route);
+  stroke-width: 2.4;
+  stroke-dasharray: 7 5;
+}
+.xm-seal.is-1 {
+  stroke: var(--map-seal-1);
+  stroke-width: 13;
+}
+.xm-seal.is-2 {
+  stroke: var(--map-seal-2);
+  stroke-width: 7;
+}
+.xm-seal.is-3 {
+  stroke: var(--map-seal-3);
+  stroke-width: 3.6;
+}
+.xm-seal.is-4 {
+  stroke: var(--map-seal-core);
+  stroke-width: 1.7;
+}
+
+/* Region names: italic serif, letter-spaced, with a halo. */
+.xm-region {
+  font: italic 400 13px var(--atlas-display);
+  letter-spacing: 0.22em;
+  fill: var(--map-label);
+  paint-order: stroke;
+  stroke: var(--map-halo);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.xm-region.is-small {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+}
+.xm-region.is-arc {
+  text-anchor: start;
+}
+.xm-region.is-arc textPath {
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.xm-summit circle {
+  fill: var(--gold);
+}
+.xm-summit {
+  animation:
+    xm-summit-in 0.9s ease-out both,
+    xm-summit-pulse 2.8s ease-in-out 0.9s infinite;
+}
+
+.xm-vignette,
+.xm-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.xm-vignette {
+  background: var(--map-vignette);
+}
+.xm-grain {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode: soft-light;
+  opacity: 0.35;
+}
+
+/* Headquarters */
+.xm-hq {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.xm-hq-pin {
+  position: absolute;
+  left: -15px;
+  top: -15px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--map-camp);
+  border: 1px solid var(--map-camp-border);
+  color: var(--brand);
+  font: 400 1.1rem/1 var(--atlas-sans);
+}
+.xm-hq-name {
+  position: absolute;
+  left: -50px;
+  top: 19px;
+  width: 100px;
+  text-align: center;
+  font: 500 10px var(--atlas-mono);
+  letter-spacing: 0.12em;
+  color: var(--map-ink);
+  text-shadow:
+    0 0 3px var(--map-ground),
+    0 0 6px var(--map-ground);
+}
+
+/* Camps on the route: 44 px touch area, 38 px disc, clearing and dashed palisade. */
+.xm-stop,
+.xm-other {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  display: grid;
+  place-items: center;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  -webkit-touch-callout: none;
+}
+.xm-stop {
+  touch-action: none;
+  user-select: none;
+}
+.xm-stop:hover:not(:disabled),
+.xm-other:hover:not(:disabled) {
+  filter: none;
+}
+.xm-stop-clear {
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+  background: var(--map-clear);
+  pointer-events: none;
+}
+.xm-stop-fence {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px dashed var(--map-palisade);
+  pointer-events: none;
+}
+.xm-stop-disc {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  font: 400 0.8125rem var(--atlas-mono);
+}
+.xm-stop-disc svg {
+  width: 16px;
+  height: 16px;
+}
+.xm-other-disc {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.xm-other-disc > span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+}
+
+.xm-plate {
+  position: absolute;
+  padding: 3px 8px 4px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: var(--map-plate);
+  color: var(--map-ink);
+  white-space: nowrap;
+  text-align: left;
+  line-height: 1.3;
+  pointer-events: none;
+}
+.xm-plate.is-small {
+  padding: 3px 7px;
+  opacity: 0.96;
+}
+.xm-plate-title {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+}
+.xm-plate.is-small .xm-plate-title {
+  font-size: 12px;
+}
+.xm-plate-tag {
+  display: block;
+  font: 400 10.5px/1.35 var(--atlas-mono);
+  letter-spacing: 0.05em;
+}
+.xm-plate.is-small .xm-plate-tag {
+  font-size: 10px;
+}
+
+/* Urgent camps pulse with a slow sonar; with reduced motion a single still ring stays. */
+.xm-sonar-wrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.xm-sonar {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  pointer-events: none;
+  box-sizing: border-box;
+  border: 1.5px solid var(--hot);
+  opacity: 0;
+  animation: xm-sonar 3.6s cubic-bezier(0.22, 0.61, 0.36, 1) 0s infinite;
+}
+.xm-sonar.is-late {
+  animation-delay: 1.8s;
+}
+.xm-sonar.is-still {
+  opacity: 1;
+  animation: none;
+  transform: scale(1.45);
+  border: 1px solid var(--hot-border);
+}
+
+.xm-ghost {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font: 400 0.875rem var(--atlas-mono);
+  box-shadow:
+    0 12px 26px -6px rgba(0, 0, 0, 0.5),
+    0 0 0 6px var(--map-route-glow);
+  pointer-events: none;
+}
+
+/* Zoom group */
+.xm-zoom {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--map-control);
+  border: 1px solid var(--map-control-border);
+  color: var(--map-ink);
+}
+.is-atlas .xm-zoom {
+  top: 16px;
+}
+.xm-zoom > button {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+}
+.xm-zoom > span {
+  height: 1px;
+  background: var(--map-control-border);
+}
+
+.xm-bubble,
+.xm-toast {
+  position: absolute;
+  z-index: 4;
+  max-width: 260px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  box-shadow: 0 8px 20px -8px rgba(4, 22, 24, 0.5);
+  pointer-events: none;
+}
+.xm-bubble {
+  left: 14px;
+  top: 12px;
+  max-width: 250px;
+  background: var(--card);
+  color: var(--foreground);
+  font-weight: 500;
+}
+.xm-toast {
+  left: 14px;
+  bottom: 12px;
+  max-width: 300px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.is-atlas .xm-bubble,
+.is-atlas .xm-toast {
+  left: 20px;
+  top: 150px;
+  bottom: auto;
+}
+
+.xm-pending {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 5px 5px 14px;
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 30px -10px rgba(4, 22, 24, 0.55);
+  cursor: auto;
+}
+.is-atlas .xm-pending {
+  bottom: 186px;
+  z-index: 6;
+}
+.xm-pending > span {
+  flex: 1;
+  font-size: 0.875rem;
+}
+.xm-pending > button {
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 0;
+  background: none;
+  font-size: 0.875rem;
+  color: var(--foreground);
+}
+.xm-pending > button.primary {
+  padding: 8px 14px;
+  white-space: nowrap;
+  border: 1px solid var(--primary-border);
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* Atlas: title over a dark scrim, legend, card and the chips above the dock. */
+.xm-head {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 2;
+  padding: 10px 20px 44px;
+  background: var(--map-scrim);
+  pointer-events: none;
+}
+.xm-head > button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--map-muted);
+  font-size: 0.875rem;
+  pointer-events: auto;
+}
+.xm-head h1 {
+  margin: 0;
+  font: 400 2.7rem/1.05 var(--atlas-display);
+  letter-spacing: -0.025em;
+  color: var(--map-ink);
+}
+.xm-head p {
+  margin: 8px 0 0;
+  /* Design width; on narrow screens it wraps before reaching the zoom group. */
+  max-width: min(250px, calc(100% - 46px));
+  font: 400 0.75rem/1.5 var(--atlas-mono);
+  letter-spacing: 0.06em;
+  color: var(--map-muted);
+}
+
+.xm-chip {
+  position: absolute;
+  bottom: 186px;
+  z-index: 3;
+  min-height: 44px;
+  padding: 0 14px;
+  white-space: nowrap;
+  border-radius: 12px;
+  background: var(--map-control);
+  border: 1px solid var(--map-control-border);
+  color: var(--map-ink);
+  font: 400 0.75rem var(--atlas-mono);
+  letter-spacing: 0.05em;
+}
+.xm-chip.is-right {
+  right: 12px;
+}
+.xm-chip.is-left {
+  left: 12px;
+}
+
+.xm-legend {
+  position: absolute;
+  right: 12px;
+  bottom: 186px;
+  z-index: 3;
+  width: 262px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--map-control);
+  border: 1px solid var(--map-control-border);
+  color: var(--map-muted);
+  font: 400 0.6875rem/1.3 var(--atlas-mono);
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+.xm-legend > span {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.xm-legend > span.xm-legend-lead {
+  display: block;
+  padding-bottom: 3px;
+  font: 400 0.8125rem/1.45 var(--atlas-sans);
+  letter-spacing: 0;
+  color: var(--map-ink);
+  text-wrap: pretty;
+}
+.xm-legend > i {
+  height: 1px;
+  margin: 2px 0;
+  background: var(--map-control-border);
+}
+.xm-legend svg {
+  width: 16px;
+  height: 12px;
+  flex-shrink: 0;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.xm-legend svg.is-dots {
+  stroke-width: 2;
+  stroke-dasharray: 0.1 4;
+}
+.xm-legend svg.is-solid {
+  stroke: none;
+}
+.xm-legend > span:last-child svg {
+  width: 16px;
+  height: 14px;
+  fill: currentColor;
+  stroke-width: 2;
+}
+.xm-legend .is-hot {
+  color: var(--hot-ink);
+}
+.xm-legend .is-gold {
+  color: var(--gold);
+}
+.xm-key-ring {
+  fill: none;
+  stroke: var(--hot);
+  stroke-width: 1;
+}
+.xm-key-dot {
+  fill: var(--hot);
+}
+.xm-key-near {
+  fill: none;
+  stroke: var(--hot);
+  stroke-width: 1.6;
+}
+.xm-key-calm {
+  fill: var(--map-camp);
+  stroke: var(--map-camp-border);
+  stroke-width: 1;
+}
+.xm-key-seal {
+  stroke: var(--map-seal-3);
+  stroke-width: 5;
+}
+.xm-key-seal-core {
+  stroke: var(--map-seal-core);
+  stroke-width: 1.7;
+}
+
+.xm-card {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 184px;
+  z-index: 5;
+  padding: 12px 16px 16px 18px;
+  border-radius: 20px;
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  box-shadow: 0 18px 40px -14px rgba(4, 22, 24, 0.6);
+  cursor: auto;
+}
+.xm-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.xm-card-top > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 400 0.75rem var(--atlas-mono);
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+}
+.xm-card-top > span > i {
+  width: 6px;
+  height: 16px;
+  border-radius: 3px;
+}
+.xm-card-top > button {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  margin: -6px -10px -6px 0;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+}
+.xm-card h3 {
+  margin: 0;
+  font: 400 1.9rem/1.12 var(--atlas-display);
+}
+.xm-card > p {
+  margin: 6px 0 0;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+.xm-card-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+.xm-card-chips > span {
+  padding: 5px 9px;
+  border-radius: 12px;
+  background: var(--secondary);
+  color: var(--foreground);
+  font: 400 0.75rem var(--atlas-mono);
+  letter-spacing: 0.04em;
+}
+.xm-card-chips > span.is-hot {
+  background: var(--hot-soft);
+  color: var(--hot-ink);
+}
+.xm-card > p.xm-card-move {
+  margin: 14px 0 0;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--foreground);
+}
+.xm-card-move > span {
+  display: block;
+  margin-bottom: 4px;
+  font: 400 0.75rem var(--atlas-mono);
+  letter-spacing: 0.04em;
+  color: var(--gold);
+}
+.xm-card > button.primary {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  min-height: 48px;
+  border: 1px solid var(--primary-border);
+}
+
+@keyframes xm-sonar {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(2.3);
+    opacity: 0;
+  }
+}
+@keyframes xm-summit-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes xm-summit-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.3);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .xm-sonar,
+  .xm-summit {
+    animation: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .expedition-map.is-atlas {
+    height: calc(100dvh - 76px);
+    margin: 0 -20px;
+    border-radius: 0;
+  }
+}

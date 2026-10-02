@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "../vendor/shadcn-tailwind-4.13.0.css";
 @import "./atlas.css";
+@import "./expedition-map.css";
 /* design-reference/ is a design handoff, not source: keep it out of class detection. */
 @source not "../design-reference";
 /* The app is always dark (Grafit Gece); shadcn's dark: variants follow <html class="dark">. */
