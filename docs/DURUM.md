@@ -44,7 +44,7 @@ Tasarım kaynağı depodaki `design-reference/` klasörüdür (Claude Design dev
 
 Kullanıcı 25 Eylül'de Atlas 02'yi onayladı. Petrol tonlu topografik harita, mercan seçili durak, açık sıcak zemin; Instrument Serif, DM Sans ve IBM Plex Mono. Dil bütün uygulamaya uygulandı. Haritada durak seçmek yalnız hamleyi gösterir. Sıra “Sırayı düzenle” penceresinde sağdaki tutamacı basılı tutup sürükleyerek değiştirilir; görünür yukarı/aşağı veya “Başa al” düğmeleri yok. Değişiklik açıkça kaydedilir ve kayıt defterinden geri alınabilir. Mevcut emir onayı korunur; onaylanmamış emir kendiliğinden onaylanmaz. Eski şartnamenin renk/yazı tipi kararları geçersiz. Yazı tipleri geçerli kalır; renkleri aşağıdaki 1 Ekim kararı değiştirir.
 
-1 Ekim renk kararı (tasarlandı, kodda henüz uygulanmadı; tasarım: Claude projesindeki “Berthier Harita v7”, depoda `design-reference/project/Berthier Harita v7.dc.html`): açık kum zemin gece ve uzun odakta gözü yorduğu için uygulama koyu “Grafit Gece” paletine geçer. Harita ve uygulama kabuğu (başlık, alt panel, liste, kartlar) aynı paletle koyu.
+1 Ekim renk kararı (tasarlandı; uygulama kabuğu 2 Ekim'de kodda uygulandı, harita henüz uygulanmadı; tasarım: Claude projesindeki “Berthier Harita v7”, depoda `design-reference/project/Berthier Harita v7.dc.html`): açık kum zemin gece ve uzun odakta gözü yorduğu için uygulama koyu “Grafit Gece” paletine geçer. Harita ve uygulama kabuğu (başlık, alt panel, liste, kartlar) aynı paletle koyu.
 
 - Uygulama: zemin `#18191b`, yüzey `#202123`, ikincil yüzey `#2a2b2d`, çizgi `#343538`, metin `#d6d3cb`, ikincil metin `#8f8d88`, vurgu `#d4b98a`. Ana düğme parlak değil: `#333437` zemin, `#e2dfd7` yazı.
 - Harita: zemin `#1c1d1f`, patika soluk altın `#c9ad7a`, mühür ve bayrak `#d4b98a`. Mercan `#e0805e` yalnız aciliyeti anlatır.
@@ -73,6 +73,12 @@ Kullanıcı 25 Eylül'de Atlas 02'yi onayladı. Petrol tonlu topografik harita, 
 
 ## Kaldığın yer
 
+- 2 Ekim, Adım A (dal `claude/design-implementation-docs-7jewx2`, yayınlanmadı):
+  - Tasarım paketi `design-reference/` adıyla depoya alındı; build, lint, tip denetimi ve Tailwind taramasından çıkarıldı. `CLAUDE.md` eklendi.
+  - Grafit Gece paleti bütün uygulamaya uygulandı. Tokenlar `app/atlas.css` `:root` içinde tek kaynak.
+  - P5'in kart ve etiket dili, tasarımı olmayan ekranlara uygulandı: Ufuk, Teftiş, Fikir deposu, Kayıt defteri, Tercihler ve pencereler.
+  - Karargâh'taki rota hâlâ eski basit harita; yalnız renkleri değişti. Sefer haritası, geçilen kamp ve haritada sürükleme Adım B'de; P5 ekranları (bildirimsiz) Adım C'de.
+  - Doğrulama: tip denetimi, 31 deterministik test ve derleme geçti. Lint'te yalnız önceden var olan 8 hata ve 11 uyarı kaldı. 390×844 görüntüleri tasarımla karşılaştırıldı; ölçülen 42 stil değeri tasarımla eşleşti; 320 px'te yatay taşma yok. Fiziksel iPhone'da denenmedi.
 - 1 Ekim: Kullanıcı bundan sonra Claude ile devam etmeye karar verdi ve GitHub güncellemesine izin verdi.
 - 1 Ekim: Harita (Grafit Gece, “Berthier Harita v7”) ve P5 (“Berthier P5”) Claude projesinde tasarlandı. Kod, GitHub ve yayın değişmedi. Sırada: kullanıcı onaylarsa haritayı ve P5'i koda geçirmek, ardından fiziksel iPhone'da bildirim testi.
 
