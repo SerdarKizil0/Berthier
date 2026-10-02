@@ -72,6 +72,13 @@
   --hot-glow: rgba(224, 128, 94, 0.45);
   --hot-glow-soft: rgba(224, 128, 94, 0.28);
 
+  /* Sefer defteri: day cells and the seal track */
+  --gold-strong: rgba(212, 185, 138, 0.72);
+  --gold-faint: rgba(212, 185, 138, 0.22);
+  --gold-glow: rgba(212, 185, 138, 0.55);
+  --cell-future: #3a3b3e;
+  --track-dot: #5d5c58;
+
   /* Front types */
   --type-course: #567c8d;
   --type-lane: #507769;

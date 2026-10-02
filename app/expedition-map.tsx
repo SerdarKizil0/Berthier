@@ -39,6 +39,9 @@ export type ExpeditionMapProps = {
 const HQ = '__hq';
 const SIZE = {home: {w: 390, h: 360}, atlas: {w: 390, h: 768}};
 const PAD = {home: {t: 40, r: 64, b: 46, l: 50}, atlas: {t: 150, r: 30, b: 232, l: 44}};
+// Narrower than the design, the home route would run under the zoom group (12 + 44 px from the edge, camps up
+// to 22 px wide), so it keeps clear of it there. The atlas already starts below the group.
+const padFor = (variant: 'home' | 'atlas', w: number) => variant === 'home' && w < SIZE.home.w ? {...PAD.home, r: 84} : PAD[variant];
 const pad2 = (n: number) => String(n).padStart(2, '0');
 const later = (fn: () => void) => {
   const idle = (window as Window & {requestIdleCallback?: (cb: () => void, o?: {timeout: number}) => number}).requestIdleCallback;
@@ -146,7 +149,7 @@ export default function ExpeditionMap({variant, state, order, focus, onFocus, on
     const pts = fitIds.map(id => pos[id]).filter(Boolean).concat([C.HQ]);
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (const [x, y] of pts) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
-    const pad = PAD[variant], {w, h} = size, k = Math.min((w - pad.l - pad.r) / Math.max(1, x1 - x0), (h - pad.t - pad.b) / Math.max(1, y1 - y0));
+    const {w, h} = size, pad = padFor(variant, w), k = Math.min((w - pad.l - pad.r) / Math.max(1, x1 - x0), (h - pad.t - pad.b) / Math.max(1, y1 - y0));
     return {k, x: pad.l + ((w - pad.l - pad.r) - (x1 - x0) * k) / 2 - x0 * k, y: pad.t + ((h - pad.t - pad.b) - (y1 - y0) * k) / 2 - y0 * k};
   })();
   const clampK = (k: number) => Math.min(fit.k * 5, Math.max(fit.k * 0.55, k));

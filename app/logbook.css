@@ -1,0 +1,242 @@
+/* Sefer defteri (design: “Berthier P5”, screen 3). */
+
+body .is-logbook main {
+  padding-top: 0;
+}
+.lb-head {
+  padding-bottom: 0;
+}
+
+.lb-cells {
+  display: grid;
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 18px;
+}
+.lb-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font: 400 0.75rem var(--atlas-mono);
+  color: var(--tertiary-foreground);
+}
+.lb-cell > span:first-child {
+  height: 22px;
+  width: 100%;
+  border-radius: 5px;
+  border: 1px solid transparent;
+}
+.lb-cell.is-past > span:first-child {
+  background: var(--gold-strong);
+  border-color: var(--gold-strong);
+}
+.lb-cell.is-zero > span:first-child {
+  border-color: var(--input);
+}
+.lb-cell.is-today > span:first-child {
+  background: var(--gold-faint);
+  border-color: var(--gold);
+}
+.lb-cell.is-today {
+  color: var(--gold);
+}
+.lb-cell.is-future > span:first-child {
+  border: 1px dashed var(--cell-future);
+}
+.lb-cell.is-future {
+  color: var(--muted-foreground);
+}
+
+.lb-totals {
+  margin: 14px 0 0;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  color: var(--tertiary-foreground);
+}
+.lb-totals span {
+  color: var(--gold);
+}
+
+.lb-entry {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.lb-entry-top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  color: var(--foreground);
+}
+.lb-entry-top > span:last-child {
+  margin-left: auto;
+  color: var(--muted-foreground);
+}
+.lb-entry-top > span.is-gold {
+  color: var(--gold);
+}
+
+/* The day's seal track: headquarters, then each camp of the order; taken camps glow and the line between
+   two taken camps is a seal. */
+.lb-track {
+  display: flex;
+  align-items: center;
+  padding: 2px 0;
+}
+.lb-hq {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: var(--card);
+  border: 1px solid var(--map-camp-border);
+  color: var(--brand);
+  font-size: 0.75rem;
+}
+.lb-line {
+  flex: 1;
+  min-width: 8px;
+  height: 0;
+  border-top: 2px dotted var(--track-dot);
+}
+.lb-line.is-sealed {
+  height: 2px;
+  border-top: 0;
+  background: var(--gold);
+  box-shadow: 0 0 6px var(--gold-glow);
+}
+.lb-node {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--background);
+  border: 1.5px solid var(--map-camp-border);
+}
+.lb-node.is-taken {
+  background: var(--gold);
+  border: 1px solid var(--gold);
+  box-shadow: 0 0 8px var(--gold-glow);
+}
+
+.lb-text {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--foreground);
+  text-wrap: pretty;
+}
+.lb-text.is-muted {
+  color: var(--muted-foreground);
+}
+.lb-closed {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--map-seal-border);
+  color: var(--gold);
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+}
+.lb-closed svg {
+  fill: currentColor;
+}
+
+.lb-toggle {
+  width: 100%;
+  margin-top: 22px;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  text-align: left;
+}
+.lb-toggle > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.lb-toggle > span > span:first-child {
+  font-weight: 500;
+}
+.lb-toggle > span > span:last-child {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--muted-foreground);
+}
+.lb-toggle svg {
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.lb-toggle[aria-expanded="true"] svg {
+  transform: rotate(90deg);
+}
+.lb-metrics {
+  margin-top: 6px;
+}
+.lb-metric {
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.lb-metric > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.lb-metric > div > span:first-child {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+.lb-metric > div > span:last-child {
+  font: 500 0.875rem var(--atlas-mono);
+  color: var(--gold);
+  white-space: nowrap;
+}
+.lb-metric > span {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--muted-foreground);
+  text-wrap: pretty;
+}
+.lb-metrics > p {
+  margin: 12px 4px 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--tertiary-foreground);
+  text-wrap: pretty;
+}
+.lb-empty {
+  margin: 18px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--muted-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lb-toggle svg {
+    transition: none;
+  }
+}
