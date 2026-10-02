@@ -25,6 +25,8 @@ Kullanıcı başlamadan doldurur. Boş bırakılan maddede Astra varsayılanı k
 | Yapay zekâ sağlayıcısı | Claude Sonnet 5 seçildi; canlı kabul testleri geçti | Anahtarlar yalnız sunucuda |
 | Gmail ve Google Takvim | Şimdilik bağlanmayacak; OAuth kurulumu yapılmayacak (26 Eylül kararı) | Ertelendi |
 | Sabah raporunda gelen evrak | Şimdilik olmayacak (26 Eylül kararı) | Ertelendi |
+| Akşam bildirimi | Saat Tercihler › Bildirimler'de elle ayarlanır (1 Ekim kararı) | 21:00 |
+| Sessiz saatte yakalanan çakışma | Ayrı bildirim olmaz, sabah raporuna girer (1 Ekim kararı) | Sabah raporuna girer |
 
 ## İlerleme
 
@@ -34,13 +36,51 @@ Kullanıcı başlamadan doldurur. Boş bırakılan maddede Astra varsayılanı k
 | P2 Tarihler | tamamlandı ve özel yayında | Ufuk, tarih çıkarma/düzenleme, çakışmalar, mail taslağı, hazırlıklar ve başvuru belgeleri. |
 | P3 Kulvarlar ve teftiş | tamamlandı ve özel yayında | Fikir deposu, sınırsız aktif kulvar, kalıcı beş adımlı teftiş. |
 | P4 Ses ve belge girişi | tamamlandı ve özel yayında | Ses, ekran görüntüsü ve PDF hazır. Gmail/Takvim kullanıcı kararıyla ertelendi. |
-| P5 Ritim ve motivasyon | başlamadı | |
+| P5 Ritim ve motivasyon | tasarlandı, kodda uygulanmadı | Tasarım: Claude projesindeki “Berthier P5” (depoda `design-reference/project/Berthier P5.dc.html`). Notlar aşağıda. |
 
 ## Tasarım dili
 
-Kullanıcı 25 Eylül'de Atlas 02'yi onayladı. Petrol tonlu topografik harita, mercan seçili durak, açık sıcak zemin; Instrument Serif, DM Sans ve IBM Plex Mono. Dil bütün uygulamaya uygulandı. Haritada durak seçmek yalnız hamleyi gösterir. Sıra “Sırayı düzenle” penceresinde sağdaki tutamacı basılı tutup sürükleyerek değiştirilir; görünür yukarı/aşağı veya “Başa al” düğmeleri yok. Değişiklik açıkça kaydedilir ve kayıt defterinden geri alınabilir. Mevcut emir onayı korunur; onaylanmamış emir kendiliğinden onaylanmaz. Eski şartnamenin renk/yazı tipi kararları geçersiz.
+Tasarım kaynağı depodaki `design-reference/` klasörüdür (Claude Design devir paketi). Yalnız referanstır; build, lint, tip denetimi ve Tailwind taramasına girmez. Ayrıntılı devir notları: `design-reference/project/design_handoff_berthier_harita_p5/README.md`.
+
+Kullanıcı 25 Eylül'de Atlas 02'yi onayladı. Petrol tonlu topografik harita, mercan seçili durak, açık sıcak zemin; Instrument Serif, DM Sans ve IBM Plex Mono. Dil bütün uygulamaya uygulandı. Haritada durak seçmek yalnız hamleyi gösterir. Sıra “Sırayı düzenle” penceresinde sağdaki tutamacı basılı tutup sürükleyerek değiştirilir; görünür yukarı/aşağı veya “Başa al” düğmeleri yok. Değişiklik açıkça kaydedilir ve kayıt defterinden geri alınabilir. Mevcut emir onayı korunur; onaylanmamış emir kendiliğinden onaylanmaz. Eski şartnamenin renk/yazı tipi kararları geçersiz. Yazı tipleri geçerli kalır; renkleri aşağıdaki 1 Ekim kararı değiştirir.
+
+1 Ekim renk kararı (tasarlandı; uygulama kabuğu 2 Ekim'de kodda uygulandı, harita henüz uygulanmadı; tasarım: Claude projesindeki “Berthier Harita v7”, depoda `design-reference/project/Berthier Harita v7.dc.html`): açık kum zemin gece ve uzun odakta gözü yorduğu için uygulama koyu “Grafit Gece” paletine geçer. Harita ve uygulama kabuğu (başlık, alt panel, liste, kartlar) aynı paletle koyu.
+
+- Uygulama: zemin `#18191b`, yüzey `#202123`, ikincil yüzey `#2a2b2d`, çizgi `#343538`, metin `#d6d3cb`, ikincil metin `#8f8d88`, vurgu `#d4b98a`. Ana düğme parlak değil: `#333437` zemin, `#e2dfd7` yazı.
+- Harita: zemin `#1c1d1f`, patika soluk altın `#c9ad7a`, mühür ve bayrak `#d4b98a`. Mercan `#e0805e` yalnız aciliyeti anlatır.
+
+27 Eylül harita kararı (tasarlandı, kodda henüz uygulanmadı):
+
+- Kampın yeri cephe tipidir: kulvarlar sarp dağlarda (sık kontur), dersler geniş ovada (seyrek kontur, nehir), başvurular bölgeleri bağlayan vadi ve geçitte, genel işler karargâhın çevresindeki düzlükte. Yükselti tarihi göstermez; bölge adları haritada yazar.
+- Aciliyet kampın kendi durumudur: tarihi 7 gün ve altındaki kamp mercan, 2 gün ve altındaki kamp mercan dolgu ve yavaş sonar. Uzak ve tarihsiz kamplar sade.
+- Günün sırası karargâhtan çıkan tek patikadır; eğime göre hesaplanır, dik yamaçlardan kaçar, vadi ve geçitleri izler. Seçili kamp kalın, sıradaki kamp ince halkayla gösterilir.
+- Geçilen kamp silinmez: altın bayrak ve her zaman görünen “GEÇİLDİ · saat” mührü. İki alınmış kamp arası parıltılı mühür hattına dönüşür; hamle bitince konturlar kamptan bir an dalgalanır; son hamlede “Sefer tamamlandı”.
+- Karargâh'ta sabit yükseklikte küçük rota haritası, Harita sekmesinde tam ekran atlas. İkisinde de iki parmakla yakınlaştırma/kaydırma ve sığdır düğmesi var. Atlasta kampa dokununca cephe kartı açılır.
+- Haritada kampa dokunmak hamleyi gösterir. Sıra, haritada kampı basılı tutup başka bir kampın üstüne bırakarak ya da “Sırayı düzenle” penceresinde tutamaçla değiştirilir; görünür yukarı/aşağı veya “Başa al” düğmeleri yok. Değişiklik açıkça kaydedilir ve kayıt defterinden geri alınabilir. Mevcut emir onayı korunur; onaylanmamış emir kendiliğinden onaylanmaz.
+
+## P5 tasarım notları
+
+1 Ekim, Claude tasarımı (“Berthier P5”). Kodda uygulanmadı; uygularken bu notları ve P5 şartnamesini izle.
+
+- Sabah raporu her gün aynı dört bölüm, aynı sırada: I Günün emri (her cephe için gerekçe ve kalan gün), II Uyarılar (çakışma, daralan hazırlık), III Bugün ve yarın olunacak yerler (yanına alınacaklarla), IV Kararını bekleyenler (Berthier'in soruları, gönderilmeyi bekleyen mail taslakları). Boş bölüm gizlenmez, “yok” yazar. Üstte bölümlere atlayan dört düğme, altta sabit “Emri onayla”.
+- Rapor 08:00'de hazırlanır, bildirim 08:30'da gelir. Sessiz saatlerde (23:00–07:30) bildirim gönderilmez; bu aralıkta yakalanan çakışma ayrı bildirim olmaz, sabah raporuna girer. Akşam bildirimi yalnız yarın olunacak bir yer varsa gelir; saatini kullanıcı Tercihler › Bildirimler'de seçer (varsayılan 21:00). Sessiz saatlere denk gelen saat seçilirse uyarı görünür.
+- iPhone: Web Push yalnız ana ekrana eklenmiş uygulamada çalışır (iOS 16.4+). Tercihler › Bildirimler'de üç adım: ana ekrana ekle, izin ver (izin isteği yalnız kullanıcı dokunuşuyla), deneme bildirimi. Ana ekran uygulamasında ChatGPT oturumunun korunması ve sunucuda zamanlanmış gönderim fiziksel iPhone'da doğrulanmalı.
+- Sefer defteri: günleri Berthier tamamlanan hamlelerden yazar. Seri, puan, seviye yok; emirsiz gün “Karargâhta”. Bütün kampları alınan gün “Sefer tamamlandı”, kapanan cephe “Cephe kapandı” mührü alır.
+- İki haftalık sefer ölçümleri (tamamlanma oranı, rapor açılışından onaya süre, elle düzenleme ve ayar sayısı) yalnız “Seferin ölçümleri” açılınca görünür. Süre raporda gösterilmez. 14. günde tek soru: “Kilitlenmeler seyreldi mi?”
+- Çevrimdışı: son rapor ve harita cihazda görünür; dikte cihaz kuyruğunda bekler; onay ve yanıt bağlantı gelince yapılır.
+- “Kilitlendim” düğmesi kullanıcı kararıyla yok.
+- 2 Ekim kararı: bildirimlerle ilgili her şey (Web Push, Tercihler › Bildirimler, zamanlanmış gönderim, `vite.config.ts` ve Worker değişiklikleri) Sites tarafı doğrulanana kadar yapılmaz; sonra ayrı bir dalda ele alınır.
 
 ## Kaldığın yer
+
+- 2 Ekim, Adım A (dal `claude/design-implementation-docs-7jewx2`, yayınlanmadı):
+  - Tasarım paketi `design-reference/` adıyla depoya alındı; build, lint, tip denetimi ve Tailwind taramasından çıkarıldı. `CLAUDE.md` eklendi.
+  - Grafit Gece paleti bütün uygulamaya uygulandı. Tokenlar `app/atlas.css` `:root` içinde tek kaynak.
+  - P5'in kart ve etiket dili, tasarımı olmayan ekranlara uygulandı: Ufuk, Teftiş, Fikir deposu, Kayıt defteri, Tercihler ve pencereler.
+  - Karargâh'taki rota hâlâ eski basit harita; yalnız renkleri değişti. Sefer haritası, geçilen kamp ve haritada sürükleme Adım B'de; P5 ekranları (bildirimsiz) Adım C'de.
+  - Doğrulama: tip denetimi, 31 deterministik test ve derleme geçti. Lint'te yalnız önceden var olan 8 hata ve 11 uyarı kaldı. 390×844 görüntüleri tasarımla karşılaştırıldı; ölçülen 42 stil değeri tasarımla eşleşti; 320 px'te yatay taşma yok. Fiziksel iPhone'da denenmedi.
+- 1 Ekim: Kullanıcı bundan sonra Claude ile devam etmeye karar verdi ve GitHub güncellemesine izin verdi.
+- 1 Ekim: Harita (Grafit Gece, “Berthier Harita v7”) ve P5 (“Berthier P5”) Claude projesinde tasarlandı. Kod, GitHub ve yayın değişmedi. Sırada: kullanıcı onaylarsa haritayı ve P5'i koda geçirmek, ardından fiziksel iPhone'da bildirim testi.
 
 - P4 özel GitHub kopyası da güncellendi; `SerdarKizil0/Berthier` için `isPrivate=true` doğrulandı. Son dışa aktarım: 151 dosya, bilinen 3 yerel anahtar taraması; anahtar eşleşmesi 0, `.env*` dosyası 0.
 
