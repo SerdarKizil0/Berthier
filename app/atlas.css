@@ -1,6 +1,66 @@
-/* Atlas 02: the approved daylight sheet against a deep petrol map. */
-:root:root {
-  color-scheme: light;
+/* Grafit Gece (1 Ekim): the whole app and the map share one dark palette.
+   Source: design-reference/project/Berthier Harita v7.dc.html and the handoff README.
+   These tokens are the single source of colour; rules below only reference them. */
+:root {
+  color-scheme: dark;
+
+  /* App surfaces and text */
+  --background: #18191b;
+  --foreground: #d6d3cb;
+  --card: #202123;
+  --card-foreground: #d6d3cb;
+  --popover: #202123;
+  --popover-foreground: #d6d3cb;
+  --secondary: #2a2b2d;
+  --secondary-foreground: #d6d3cb;
+  --muted: #2a2b2d;
+  --muted-foreground: #8f8d88;
+  --tertiary-foreground: #b3b0a8;
+  --accent: #2a2b2d;
+  --accent-foreground: #d6d3cb;
+  --border: #343538;
+  --input: #434448;
+  --radius: 0.8rem;
+
+  /* Main button: deliberately not bright */
+  --primary: #333437;
+  --primary-foreground: #e2dfd7;
+  --primary-border: #434448;
+
+  /* Accents: gold marks focus, selection and done states; coral only urgency */
+  --gold: #d4b98a;
+  --gold-soft: rgba(212, 185, 138, 0.14);
+  --ring: #d4b98a;
+  --hot: #e0805e;
+  --hot-ink: #ea9a7c;
+  --hot-soft: rgba(224, 128, 94, 0.18);
+  --hot-border: rgba(234, 154, 124, 0.55);
+  --destructive: #ea9a7c;
+  --brand: #ed845c;
+  --shadow: rgba(0, 0, 0, 0.3);
+
+  /* Map */
+  --map-ground: #1c1d1f;
+  --map-ink: #d6d3cb;
+  --map-muted: #8f8d88;
+  --map-contour: rgba(220, 220, 215, 0.08);
+  --map-contour-index: rgba(220, 220, 215, 0.2);
+  --map-route: #c9ad7a;
+  --map-route-dim: rgba(201, 173, 122, 0.55);
+  --map-camp: #222325;
+  --map-camp-border: #77756f;
+  --map-plate: rgba(28, 29, 31, 0.92);
+
+  /* Front types */
+  --type-course: #567c8d;
+  --type-lane: #507769;
+  --type-application: #c7764d;
+  --type-general: #94856b;
+
+  /* Type */
+  --atlas-mono: "IBM Plex Mono", monospace;
+  --atlas-display: "Instrument Serif", Georgia, serif;
+  --atlas-sans: "DM Sans", "Segoe UI", sans-serif;
 }
 body .next-panel .move-text {
   font-family: var(--atlas-display);
@@ -62,7 +122,7 @@ body .horizon-link {
   gap: 15px;
 }
 body .horizon-link > svg:first-child {
-  color: #a14c2d;
+  color: var(--gold);
 }
 body .horizon-link h2 {
   font-family: var(--atlas-display);
@@ -88,14 +148,18 @@ body .front-group {
   margin-bottom: 32px;
 }
 body .front-group > h2 {
-  font: 400 0.875rem var(--atlas-mono);
-  letter-spacing: 0.07em;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tertiary-foreground);
   border-bottom: 1px solid var(--border);
-  padding-bottom: 15px;
+  padding-bottom: 10px;
 }
 body .front-group h2 > span {
   margin-left: auto;
-  letter-spacing: 0;
+  letter-spacing: 0.04em;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
 }
 body .front-row {
   gap: 14px;
@@ -120,20 +184,20 @@ body .front-row-body small {
 body .type-dot {
   width: 8px;
   height: 28px;
-  background: #507769;
+  background: var(--type-lane);
   border-radius: 4px;
 }
 body .type-dot.course {
-  background: #567c8d;
+  background: var(--type-course);
 }
 body .type-dot.application {
-  background: #c7764d;
+  background: var(--type-application);
 }
 body .type-dot.general {
-  background: #94856b;
+  background: var(--type-general);
 }
 body .next-panel {
-  border-radius: 18px;
+  border-radius: 14px;
   background: var(--card);
   padding: 26px;
   border: 1px solid var(--border);
@@ -150,13 +214,15 @@ body .next-panel .move-text {
 body .bookmark {
   background: var(--secondary);
   border: 0;
-  border-radius: 18px;
+  border-radius: 14px;
   padding: 24px;
 }
 body .bookmark h2,
 body .bookmark h3 {
-  font: 400 0.875rem var(--atlas-mono);
-  letter-spacing: 0.02em;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
 }
 body .bookmark p {
   font-size: 1.5rem;
@@ -171,8 +237,9 @@ body .status-controls button {
   padding: 9px 16px;
 }
 body .status-controls .chosen {
-  background: var(--primary);
-  color: var(--primary-foreground);
+  background: var(--gold-soft);
+  color: var(--gold);
+  border-color: var(--gold);
 }
 body .horizon-day {
   position: relative;
@@ -217,41 +284,84 @@ body .event-main button {
 body .event-main p svg {
   flex-shrink: 0;
 }
+/* Warning cards follow the P5 report: mono label, coral only for hard conflicts. */
 body .conflict {
-  background: #f7e7d8;
-  border: 1px solid #dabda4;
-  border-left: 3px solid #b96840;
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 14px;
-  padding: 20px;
-  color: #673d2b;
+  padding: 14px 16px 6px;
+  color: var(--foreground);
 }
 body .conflict.soft {
-  background: var(--secondary);
+  background: var(--card);
   color: var(--foreground);
   border-color: var(--border);
 }
 body .conflict-heading {
   flex-wrap: wrap;
+  gap: 8px;
+  color: var(--hot-ink);
+}
+body .conflict.soft .conflict-heading {
+  color: var(--muted-foreground);
 }
 body .conflict h2 {
-  font-size: 1.1rem;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+body .conflict-heading > .quiet {
+  margin-left: auto;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+body .conflict:has(.conflict-heading > .quiet) {
+  opacity: 0.65;
+}
+body .conflict:has(.conflict-heading > .quiet) .conflict-heading {
+  color: var(--muted-foreground);
+}
+body .conflict p {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+body .conflict button {
+  background: none;
+  border: 0;
+  padding: 8px 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
 }
 body .notice {
   border-radius: 12px;
 }
+/* Text-only notices (offline, busy) keep the icon beside the text, as in P5. */
+body .notice:not(:has(button)) {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+}
+body .notice:not(:has(button)) svg {
+  margin-top: 1px;
+}
 body .error {
-  background: #fae9e3;
-  color: #792c26;
+  background: rgba(224, 128, 94, 0.1);
+  border-color: var(--hot-border);
+  color: var(--hot-ink);
 }
 body .idea-card {
   padding: 23px;
   border: 1px solid var(--border);
   background: var(--card);
-  border-radius: 17px;
+  border-radius: 14px;
   margin: 18px 0;
 }
 body .idea-card > .quiet {
   font: 400 0.75rem var(--atlas-mono);
+  letter-spacing: 0.06em;
 }
 body .idea-text {
   font-size: 1.7rem;
@@ -267,13 +377,13 @@ body .idea-actions button {
 body .idea-actions button:first-child {
   background: var(--primary);
   color: var(--primary-foreground);
-  border-color: var(--primary);
+  border-color: var(--primary-border);
 }
 body .review-start {
   padding: 28px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: 14px;
 }
 body .review-start h2 {
   font: 400 2.2rem/1.16 var(--atlas-display);
@@ -294,8 +404,9 @@ body .review-steps button {
   border: 0;
 }
 body .review-steps .chosen {
-  background: var(--primary);
-  color: var(--primary-foreground);
+  background: var(--gold-soft);
+  color: var(--gold);
+  box-shadow: inset 0 0 0 1px var(--gold);
 }
 body .review-steps span {
   display: none !important;
@@ -324,7 +435,7 @@ body .settings-list {
   padding: 6px 20px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 14px;
 }
 body .settings-list > div:last-child {
   border: 0;
@@ -348,6 +459,7 @@ body .change-entry small {
 body .change-entry summary > span:last-child {
   font-size: 0.75rem;
   background: var(--secondary);
+  color: var(--tertiary-foreground);
   border-radius: 12px;
   padding: 5px 9px;
   align-self: flex-start;
@@ -355,20 +467,33 @@ body .change-entry summary > span:last-child {
 body .change-entry .op-row {
   flex-wrap: wrap;
 }
+/* Berthier's question reads like the P5 "Kararını bekleyenler" card. */
 body .question-block {
-  border: 1px solid #d9b48e;
-  border-left: 3px solid #bd7148;
+  border: 1px solid var(--border);
   border-radius: 14px;
-  background: #fcf6e9;
-  padding: 20px;
+  background: var(--card);
+  padding: 14px 16px;
 }
 body .question-block h2 {
-  font-family: var(--atlas-display);
-  font-size: 1.8rem;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+body .question-block p {
+  margin: 6px 0 10px;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--foreground);
 }
 body .question-block button {
-  background: var(--primary);
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 22px;
+  background: var(--secondary);
+  border: 1px solid var(--primary-border);
   color: var(--primary-foreground);
+  font-size: 0.875rem;
 }
 @media (max-width: 600px) {
   body .home-links {
@@ -413,34 +538,6 @@ body .question-block button {
   body .settings-list {
     padding: 3px 16px;
   }
-}
-:root:root {
-  --background: #f5f2e9;
-  --foreground: #193d3d;
-  --card: #fcfaf4;
-  --card-foreground: #193d3d;
-  --popover: #fcfaf4;
-  --popover-foreground: #193d3d;
-  --primary: #193d3d;
-  --primary-foreground: #f7f6ed;
-  --secondary: #e6ebdf;
-  --secondary-foreground: #193d3d;
-  --muted: #e6ebdf;
-  --muted-foreground: #596963;
-  --accent: #e4eadc;
-  --accent-foreground: #193d3d;
-  --destructive: #ad3f31;
-  --border: #d2d9ca;
-  --input: #a9b8aa;
-  --ring: #bc5935;
-  --radius: 0.8rem;
-  --atlas-terrain: #123f43;
-  --atlas-terrain-ink: #edf1e5;
-  --atlas-terrain-muted: #bad0c3;
-  --atlas-coral: #ed845c;
-  --atlas-mono: "IBM Plex Mono", monospace;
-  --atlas-display: "Instrument Serif", Georgia, serif;
-  --atlas-sans: "DM Sans", "Segoe UI", sans-serif;
 }
 html body {
   font-family: var(--atlas-sans);
@@ -488,7 +585,7 @@ body .brand {
 body .brand-asterisk {
   font-family: var(--atlas-sans);
   font-size: 1.6rem;
-  color: var(--atlas-coral);
+  color: var(--brand);
 }
 body .seal {
   border: 0;
@@ -536,25 +633,22 @@ body input {
   border-radius: 10px;
 }
 body .orders {
-  background: var(--atlas-terrain);
+  background: var(--map-ground);
   border: 0;
   border-radius: 20px;
-  color: var(--atlas-terrain-ink);
+  color: var(--map-ink);
 }
 body .orders p {
-  color: var(--atlas-terrain-muted);
+  color: var(--map-muted);
 }
 body .orders .serif {
   font-size: 2.4rem;
 }
 body .orders textarea {
-  background: var(--card);
+  background: var(--secondary);
   color: var(--foreground);
 }
 body .orders textarea::placeholder {
-  color: var(--muted-foreground);
-}
-body .order-edit {
   color: var(--muted-foreground);
 }
 .atlas-order {
@@ -562,11 +656,11 @@ body .order-edit {
   overflow: hidden;
   border-radius: 24px;
   background: var(--card);
-  box-shadow: 0 8px 30px #183e3510;
+  box-shadow: 0 8px 30px var(--shadow);
 }
 .atlas-terrain {
-  background: var(--atlas-terrain);
-  color: var(--atlas-terrain-ink);
+  background: var(--map-ground);
+  color: var(--map-ink);
   padding: 25px 0 31px;
 }
 .terrain-heading {
@@ -584,7 +678,7 @@ body .order-edit {
   letter-spacing: 0.06em;
   max-width: 112px;
   text-align: right;
-  color: var(--atlas-terrain-muted);
+  color: var(--map-muted);
 }
 .terrain-map {
   position: relative;
@@ -597,17 +691,17 @@ body .order-edit {
     repeating-radial-gradient(
       ellipse at -12% 35%,
       transparent 0 27px,
-      #b6cfb517 28px 29px,
+      var(--map-contour) 28px 29px,
       transparent 30px 42px
     ),
     repeating-radial-gradient(
       ellipse at 110% 95%,
       transparent 0 33px,
-      #b6cfb51a 34px 35px,
+      var(--map-contour) 34px 35px,
       transparent 36px 47px
     ),
-    linear-gradient(#b6cfb50b 1px, transparent 1px),
-    linear-gradient(90deg, #b6cfb50b 1px, transparent 1px);
+    linear-gradient(rgba(220, 220, 215, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(220, 220, 215, 0.035) 1px, transparent 1px);
   background-size:
     auto,
     auto,
@@ -624,7 +718,7 @@ body .order-edit {
   pointer-events: none;
 }
 .terrain-path path {
-  stroke: #efbd80;
+  stroke: var(--map-route);
   stroke-width: 1.5;
   stroke-dasharray: 3 6;
   vector-effect: non-scaling-stroke;
@@ -639,7 +733,7 @@ body .order-edit {
   background: none;
   border: 0;
   border-radius: 0;
-  color: var(--atlas-terrain-ink);
+  color: var(--map-ink);
   padding: 0;
   width: 36%;
   font-weight: 400;
@@ -652,36 +746,36 @@ body .order-edit {
   place-items: center;
   width: 44px;
   height: 44px;
-  background: var(--atlas-terrain);
-  border: 1px solid #b4c4b4;
+  background: var(--map-camp);
+  border: 1px solid var(--map-camp-border);
   border-radius: 50%;
-  font: 400 0.875rem var(--atlas-mono);
+  font: 400 0.8125rem var(--atlas-mono);
 }
+/* Selection is a ring in ink; coral is reserved for urgency. */
 .terrain-node.is-focused .terrain-pin {
-  background: var(--atlas-coral);
-  color: #253e33;
-  border-color: var(--atlas-coral);
   box-shadow:
-    0 0 0 6px #ed845c27,
-    0 0 0 7px #ed845c50;
+    0 0 0 3.5px var(--map-ground),
+    0 0 0 6.5px var(--map-ink);
 }
 .terrain-name {
   max-width: 100%;
   margin-top: 7px;
-  padding: 2px 7px;
-  background: var(--atlas-terrain);
-  border-radius: 5px;
-  font-size: 0.875rem;
+  padding: 3px 8px 4px;
+  background: var(--map-plate);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .terrain-node small {
-  font: 400 0.75rem var(--atlas-mono);
+  font: 400 10.5px var(--atlas-mono);
   margin-top: 4px;
+  padding: 0 4px;
   letter-spacing: 0.05em;
-  color: #f4c58e;
-  background: var(--atlas-terrain);
+  color: var(--gold);
+  background: var(--map-plate);
 }
 .terrain-caption {
   padding: 10px 28px 0;
@@ -691,10 +785,10 @@ body .order-edit {
   align-items: center;
   gap: 4px;
   font: 400 0.75rem var(--atlas-mono);
-  color: var(--atlas-terrain-muted);
+  color: var(--map-muted);
 }
 .terrain-caption button {
-  color: var(--atlas-terrain-ink);
+  color: var(--map-ink);
   font-size: 0.875rem;
   border: 0;
   background: transparent;
@@ -703,7 +797,7 @@ body .order-edit {
 .terrain-empty {
   font: 400 1.6rem/1.4 var(--atlas-display);
   padding: 30px 28px 10px;
-  color: var(--atlas-terrain-muted);
+  color: var(--map-muted);
 }
 .atlas-order-sheet {
   margin-top: -20px;
@@ -752,7 +846,7 @@ body .order-edit {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #a24b2b;
+  color: var(--gold);
   font: 400 0.875rem var(--atlas-mono);
 }
 .atlas-move {
@@ -846,7 +940,7 @@ body .order-edit {
   margin-bottom: 3px;
 }
 .route-itinerary .is-current > span:first-child {
-  color: #a24b2b;
+  color: var(--gold);
 }
 .route-itinerary .is-current {
   font-weight: 600;
@@ -866,7 +960,7 @@ body .atlas-bottom {
   border: 1px solid var(--border);
   border-bottom: 0;
   border-radius: 22px 22px 0 0;
-  box-shadow: 0 -8px 30px #193d3d0b;
+  box-shadow: 0 -8px 30px var(--shadow);
 }
 .dictation-bar {
   display: flex;
@@ -893,8 +987,8 @@ body .atlas-bottom {
 .dictation-icon {
   width: 42px;
   height: 42px;
-  background: var(--primary);
-  color: #f5b871;
+  background: var(--secondary);
+  color: var(--gold);
   display: grid;
   place-items: center;
   border-radius: 50%;
@@ -990,13 +1084,14 @@ body .dock .nav-active svg {
 }
 .is-lifted {
   background: var(--secondary);
-  box-shadow: 0 5px 16px #193d3d2c;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
   z-index: 1;
 }
 .is-lifted .drag-handle {
   cursor: grabbing;
-  background: var(--primary);
-  color: var(--primary-foreground);
+  background: var(--gold-soft);
+  color: var(--gold);
+  box-shadow: inset 0 0 0 1px var(--gold);
 }
 body .berthier-dialog {
   border-radius: 22px;
@@ -1013,6 +1108,30 @@ body .berthier-dialog [data-slot="dialog-description"] {
 body .berthier-dialog .row-actions button {
   flex: 1;
   justify-content: center;
+}
+/* shadcn renders the overlay with a Tailwind utility; deepen it for the dark shell. */
+[data-slot="dialog-overlay"] {
+  background: rgba(0, 0, 0, 0.6);
+}
+/* Every dialog close control looks like the dictation dialog's icon button. */
+body .berthier-dialog [data-slot="dialog-close"] {
+  position: absolute;
+  top: 12px;
+  right: 10px;
+  width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--foreground);
+  opacity: 1;
+}
+body .choice [data-slot="checkbox"][data-state="checked"] {
+  background: var(--gold-soft);
+  border-color: var(--gold);
+  color: var(--gold);
 }
 .empty-order p {
   color: var(--muted-foreground);

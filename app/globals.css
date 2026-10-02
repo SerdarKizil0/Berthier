@@ -4,27 +4,9 @@
 @import "./atlas.css";
 /* design-reference/ is a design handoff, not source: keep it out of class detection. */
 @source not "../design-reference";
-:root {
-  --background: #f3f5f7;
-  --foreground: #1d2b38;
-  --card: #fff;
-  --card-foreground: #1d2b38;
-  --popover: #fff;
-  --popover-foreground: #1d2b38;
-  --primary: #205345;
-  --primary-foreground: #fff;
-  --secondary: #e9edf1;
-  --secondary-foreground: #1d2b38;
-  --muted: #e9edf1;
-  --muted-foreground: #586776;
-  --accent: #e6eee9;
-  --accent-foreground: #205345;
-  --destructive: #ac3e38;
-  --border: #ced6dc;
-  --input: #b7c4cd;
-  --ring: #327860;
-  --radius: 0.7rem;
-}
+/* The app is always dark (Grafit Gece); shadcn's dark: variants follow <html class="dark">. */
+@custom-variant dark (&:where(.dark, .dark *));
+/* Colour tokens live in atlas.css :root. */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -71,7 +53,7 @@ button:disabled {
   cursor: wait;
 }
 button:hover:not(:disabled) {
-  filter: brightness(0.96);
+  filter: brightness(1.12);
 }
 a {
   color: inherit;
@@ -81,7 +63,7 @@ button:focus-visible,
 a:focus-visible,
 textarea:focus-visible,
 input:focus-visible {
-  outline: 3px solid #c09238;
+  outline: 3px solid var(--ring);
   outline-offset: 3px;
 }
 h1,
@@ -134,7 +116,7 @@ h3 {
   font-size: 1.6rem;
 }
 .brand svg {
-  color: var(--primary);
+  color: var(--gold);
 }
 main {
   max-width: 720px;
@@ -157,17 +139,16 @@ main {
   height: 64px;
   border: 1px solid var(--border);
   border-radius: 50%;
-  color: var(--primary);
+  color: var(--foreground);
 }
 .orders {
-  background: #183e35;
-  color: #f7faf8;
+  background: var(--map-ground);
+  color: var(--map-ink);
   border-radius: 4px 24px 4px 4px;
   padding: 30px;
-  border-top: 4px solid #a4b99a;
 }
 .orders p {
-  color: #d4e2da;
+  color: var(--map-muted);
   margin: 16px 0 24px;
   max-width: 54ch;
 }
@@ -192,7 +173,7 @@ input {
   width: 100%;
   font: inherit;
   color: var(--foreground);
-  background: var(--card);
+  background: var(--secondary);
   border: 1px solid var(--input);
   border-radius: 6px;
   padding: 13px;
@@ -203,22 +184,22 @@ textarea {
   resize: vertical;
 }
 textarea::placeholder {
-  color: #677783;
+  color: var(--muted-foreground);
 }
 .orders textarea {
-  background: #fff;
-  color: #1d2b38;
+  background: var(--secondary);
+  color: var(--foreground);
 }
 .light {
-  background: #edf2e9;
-  color: #163b31;
+  background: var(--secondary);
+  color: var(--secondary-foreground);
   border: 0;
   margin-top: 16px;
 }
 .primary {
   background: var(--primary);
   color: var(--primary-foreground);
-  border-color: var(--primary);
+  border-color: var(--primary-border);
 }
 .map-link {
   display: flex;
@@ -255,7 +236,7 @@ textarea::placeholder {
   gap: 6px;
   background: var(--card);
   border: 1px solid var(--border);
-  box-shadow: 0 8px 40px #172e3219;
+  box-shadow: 0 8px 40px var(--shadow);
   padding: 8px;
   border-radius: 14px;
   z-index: 30;
@@ -270,10 +251,6 @@ textarea::placeholder {
 .dock .nav-active {
   background: var(--accent);
   color: var(--accent-foreground);
-}
-.dock .dictate {
-  background: var(--primary);
-  color: var(--primary-foreground);
 }
 @media (max-width: 600px) {
   .shell {
@@ -310,40 +287,8 @@ textarea::placeholder {
     height: 52px;
   }
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #13202b;
-    --foreground: #e8edf0;
-    --card: #1b2c39;
-    --card-foreground: #e8edf0;
-    --popover: #1b2c39;
-    --popover-foreground: #e8edf0;
-    --primary: #87c7ab;
-    --primary-foreground: #102b22;
-    --secondary: #243846;
-    --secondary-foreground: #e8edf0;
-    --muted: #243846;
-    --muted-foreground: #adbac5;
-    --accent: #2a463e;
-    --accent-foreground: #a6d8bf;
-    --border: #3a4d5a;
-    --input: #61717c;
-    --ring: #87c7ab;
-  }
-  .orders {
-    background: #193e35;
-  }
-  .orders textarea {
-    background: #152a23;
-    color: #edf6f0;
-  }
-  .orders textarea::placeholder {
-    color: #b0c6ba;
-  }
-}
 .header-actions,
-.row-actions,
-.approval {
+.row-actions {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -368,23 +313,25 @@ textarea::placeholder {
   color: var(--muted-foreground);
 }
 .notice {
-  padding: 14px 16px;
-  background: var(--accent);
-  border-left: 3px solid var(--primary);
+  padding: 10px 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
   margin: 0 0 20px;
   display: flex;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
   align-items: center;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--tertiary-foreground);
 }
 .notice svg {
   flex-shrink: 0;
 }
 .error {
-  border-color: #b94039;
-  background: #fff0ed;
-  color: #792c26;
+  border-color: var(--hot-border);
+  background: rgba(224, 128, 94, 0.1);
+  color: var(--hot-ink);
 }
 .notice button {
   font-size: 0.875rem;
@@ -406,48 +353,11 @@ textarea::placeholder {
   background: none;
   padding: 6px 10px;
   border: 0;
-  color: var(--primary);
+  color: var(--gold);
 }
 .orders .caption {
   font-size: 0.8rem;
   margin: 16px 0 0;
-}
-.order-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.order-list > li {
-  display: flex;
-  gap: 18px;
-  border-top: 1px solid #ffffff25;
-  padding: 24px 0;
-}
-.order-list > li:first-child {
-  border-top: 0;
-  padding-top: 0;
-}
-.order-number {
-  font-size: 1rem;
-  color: #b6cba9;
-  font-variant-numeric: tabular-nums;
-  padding-top: 4px;
-  min-width: 24px;
-}
-.order-body {
-  flex: 1;
-  min-width: 0;
-}
-.front-name {
-  border: 0;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 0;
-  background: none;
-  color: #dbebdf;
-  font-size: 0.95rem;
 }
 .move-text {
   font-family: Georgia, serif;
@@ -457,40 +367,12 @@ textarea::placeholder {
   overflow-wrap: anywhere;
   animation: ink 0.4s ease-out;
 }
-.orders .reason {
-  font-size: 0.875rem;
-  color: #bfcfc7;
-  margin: 12px 0;
-}
-.orders .left-note {
-  font-size: 0.875rem;
-  margin: 2px 0 14px;
-  padding-left: 12px;
-  border-left: 2px solid #95b799;
-}
 .row-actions button {
   display: flex;
   align-items: center;
   gap: 7px;
 }
 .row-actions .light {
-  margin: 0;
-}
-.order-edit {
-  background: none;
-  border: 0;
-  color: #dfebe2;
-  padding: 10px;
-}
-.order-footer {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  border-top: 1px solid #ffffff25;
-  padding-top: 18px;
-  margin-top: 4px;
-}
-.order-footer .light {
   margin: 0;
 }
 .map-link {
@@ -508,12 +390,12 @@ textarea::placeholder {
 .completion-line {
   display: flex;
   gap: 9px;
-  color: var(--primary);
+  color: var(--gold);
   margin-top: 18px;
   font-size: 0.9rem;
 }
 .question-block {
-  border-left: 3px solid #b38a3b;
+  border: 1px solid var(--border);
   margin-top: 24px;
   padding: 16px 20px;
   background: var(--card);
@@ -570,29 +452,28 @@ textarea::placeholder {
 .type-dot {
   height: 9px;
   width: 9px;
-  background: #428375;
+  background: var(--type-lane);
   border-radius: 2px;
   flex-shrink: 0;
 }
 .type-dot.course {
-  background: #4b77a7;
+  background: var(--type-course);
 }
 .type-dot.application {
-  background: #b48a38;
+  background: var(--type-application);
 }
 .type-dot.general {
-  background: #9675a1;
+  background: var(--type-general);
 }
 .bookmark {
   display: flex;
   gap: 16px;
-  border-left: 3px solid #a2ac78;
   background: var(--card);
   padding: 24px;
   margin-bottom: 24px;
 }
 .bookmark svg {
-  color: var(--primary);
+  color: var(--gold);
   flex-shrink: 0;
 }
 .bookmark h2 {
@@ -619,9 +500,9 @@ textarea::placeholder {
   font-size: 0.875rem;
 }
 .chosen {
-  background: var(--accent);
-  color: var(--primary);
-  border-color: var(--primary);
+  background: var(--gold-soft);
+  color: var(--gold);
+  border-color: var(--gold);
 }
 .next-panel {
   background: var(--card);
@@ -664,7 +545,7 @@ summary:focus-visible {
   font-size: 0.95rem;
 }
 .history-move svg {
-  color: var(--primary);
+  color: var(--gold);
   flex-shrink: 0;
   margin-top: 4px;
 }
@@ -744,7 +625,7 @@ summary:focus-visible {
 }
 .blank svg {
   margin: 0 auto 20px;
-  color: var(--primary);
+  color: var(--gold);
 }
 .blank p {
   margin: 14px 0 24px;
@@ -829,12 +710,6 @@ summary:focus-visible {
   }
 }
 @media (max-width: 600px) {
-  .order-list > li {
-    gap: 12px;
-  }
-  .order-number {
-    min-width: 20px;
-  }
   .move-text {
     font-size: 1.35rem;
   }
@@ -853,12 +728,6 @@ summary:focus-visible {
   }
   .status-controls button {
     flex: 1;
-  }
-}
-@media (prefers-color-scheme: dark) {
-  .error {
-    background: #452b29;
-    color: #ffd4cd;
   }
 }
 
@@ -881,9 +750,10 @@ summary:focus-visible {
   font-size: 1.4rem;
 }
 .dense-label {
-  font-family: "Segoe UI", sans-serif;
-  color: var(--primary);
-  font-size: 0.875rem;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
 }
 .event-card {
   display: flex;
@@ -923,17 +793,17 @@ summary:focus-visible {
   background: none;
 }
 .bring {
-  font-weight: 600;
-  color: var(--primary);
+  font-weight: 500;
+  color: var(--gold);
 }
 .conflict {
   padding: 20px;
-  border-left: 3px solid #b78731;
+  border: 1px solid var(--border);
   background: var(--card);
   margin: 20px 0;
 }
 .conflict.soft {
-  border-color: var(--primary);
+  border-color: var(--border);
 }
 .conflict-heading {
   display: flex;
@@ -987,7 +857,7 @@ summary:focus-visible {
   min-height: 300px;
 }
 .portal-link {
-  color: var(--primary);
+  color: var(--gold);
   text-decoration: underline;
 }
 @media (max-width: 600px) {
@@ -1045,7 +915,7 @@ summary:focus-visible {
   color: var(--muted-foreground);
 }
 .review-start svg {
-  color: var(--primary);
+  color: var(--gold);
   margin-bottom: 14px;
 }
 .review-steps {
