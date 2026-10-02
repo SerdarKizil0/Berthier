@@ -3,7 +3,7 @@ import {addIdeas} from '@/lib/research';
 import {EventInput} from '@/lib/event-input';
 import {env} from 'cloudflare:workers';
 import {getChatGPTUser} from '../../chatgpt-auth';
-import {type State,type Dictation,fresh,uid,commitChanges,nextMove,replaceSlot} from '@/lib/domain';
+import {type State,type Dictation,fresh,uid,commitChanges,nextMove,replaceSlot,materializeOrder} from '@/lib/domain';
 import {act,applyParsed,type Command} from '@/lib/reducer';
 import {parseDictation,type LlmConfig} from '@/lib/llm';
 import {z} from 'zod';
@@ -55,8 +55,8 @@ export async function POST(req:Request){
  if(input.kind==='complete'&&f){
  const item=parsed.items.find(x=>x.id===f.id);if(!item||parsed.question)throw Error('Sıradaki hamle netleşmedi. Notun kaydedildi; tekrar dene veya Atla ile tamamla.');
  // A completion only changes the chosen front; model cannot complete unrelated fronts.
- n=commitChanges(state,'Hamle tamamlandı; kaldığın yer kaydedildi',draft=>{const front=draft.fronts[f.id];const m=nextMove(front);if(m)m.doneAt=new Date().toISOString();if(item.where!==null)front.where=item.where;if(item.question!==null)front.question=item.question;
- if(item.moves.length&&!m?.eventId){front.moves=front.moves.filter(m=>!!m.doneAt);front.moves.push(...item.moves.map(text=>({id:uid(),text})));}front.notes.push(raw);front.touched=new Date().toISOString();replaceSlot(draft,front);});
+ n=commitChanges(state,'Hamle tamamlandı; kaldığın yer kaydedildi',draft=>{const front=draft.fronts[f.id];const m=nextMove(front);if(m){materializeOrder(draft,front.id);m.doneAt=new Date().toISOString();}if(item.where!==null)front.where=item.where;if(item.question!==null)front.question=item.question;
+ if(item.moves.length&&!m?.eventId){front.moves=front.moves.filter(m=>!!m.doneAt);front.moves.push(...item.moves.map(text=>({id:uid(),text})));}front.notes.push(raw);front.touched=new Date().toISOString();replaceSlot(draft,front,m);});
  }else n=applyParsed(state,parsed,raw,undefined,input.id);
  summary=parsed.question||parsed.summary;
  n.receipts.push(input.id);await save(user.userId,n,revision,{id:input.id,status:parsed.question?'question':'done',result:JSON.stringify({summary,question:parsed.question,kind:input.kind,replyTo:input.replyTo??null,source:input.source??'dictation'}),replyTo:input.replyTo});
