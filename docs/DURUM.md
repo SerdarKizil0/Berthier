@@ -36,7 +36,7 @@ Kullanıcı başlamadan doldurur. Boş bırakılan maddede Astra varsayılanı k
 | P2 Tarihler | tamamlandı ve özel yayında | Ufuk, tarih çıkarma/düzenleme, çakışmalar, mail taslağı, hazırlıklar ve başvuru belgeleri. |
 | P3 Kulvarlar ve teftiş | tamamlandı ve özel yayında | Fikir deposu, sınırsız aktif kulvar, kalıcı beş adımlı teftiş. |
 | P4 Ses ve belge girişi | tamamlandı ve özel yayında | Ses, ekran görüntüsü ve PDF hazır. Gmail/Takvim kullanıcı kararıyla ertelendi. |
-| P5 Ritim ve motivasyon | tasarlandı, kodda uygulanmadı | Tasarım: Claude projesindeki “Berthier P5” (depoda `design-reference/project/Berthier P5.dc.html`). Notlar aşağıda. |
+| P5 Ritim ve motivasyon | bildirimler dışında kodda (2 Ekim, yayınlanmadı) | Sabah raporu, sefer defteri, ölçümler ve çevrimdışı görünüm hazır. Bildirimler ayrı dalda bekliyor. Tasarım: `design-reference/project/Berthier P5.dc.html`. Notlar aşağıda. |
 
 ## Tasarım dili
 
@@ -60,7 +60,7 @@ Kullanıcı 25 Eylül'de Atlas 02'yi onayladı. Petrol tonlu topografik harita, 
 
 ## P5 tasarım notları
 
-1 Ekim, Claude tasarımı (“Berthier P5”). Kodda uygulanmadı; uygularken bu notları ve P5 şartnamesini izle.
+1 Ekim, Claude tasarımı (“Berthier P5”). 2 Ekim'de bildirimler dışında kodda uygulandı (Adım C); değiştirirken bu notları ve P5 şartnamesini izle.
 
 - Sabah raporu her gün aynı dört bölüm, aynı sırada: I Günün emri (her cephe için gerekçe ve kalan gün), II Uyarılar (çakışma, daralan hazırlık), III Bugün ve yarın olunacak yerler (yanına alınacaklarla), IV Kararını bekleyenler (Berthier'in soruları, gönderilmeyi bekleyen mail taslakları). Boş bölüm gizlenmez, “yok” yazar. Üstte bölümlere atlayan dört düğme, altta sabit “Emri onayla”.
 - Rapor 08:00'de hazırlanır, bildirim 08:30'da gelir. Sessiz saatlerde (23:00–07:30) bildirim gönderilmez; bu aralıkta yakalanan çakışma ayrı bildirim olmaz, sabah raporuna girer. Akşam bildirimi yalnız yarın olunacak bir yer varsa gelir; saatini kullanıcı Tercihler › Bildirimler'de seçer (varsayılan 21:00). Sessiz saatlere denk gelen saat seçilirse uyarı görünür.
@@ -73,6 +73,25 @@ Kullanıcı 25 Eylül'de Atlas 02'yi onayladı. Petrol tonlu topografik harita, 
 
 ## Kaldığın yer
 
+- 2 Ekim, Adım C (aynı dal, yayınlanmadı):
+  - Sabah raporu (`app/morning-report.tsx`, `lib/report.ts`): dört bölüm her gün aynı sırada; boş bölüm "yok" der. Rapor canlıdır, zamanlayıcı yok; başlıktaki saat raporun o gün ilk açıldığı saattir. "Emri onayla" gösterilen emri onaylar; onaydan sonra "Geri al" ve "Karargâh’a git" var. Rapor sayfasında alt panel yerine onay çubuğu durur.
+  - Uyarılar: katı saat çakışmaları (yakalandığı saatle) ve "Hazırlık daralıyor". İkincisi son 7 günde, hazırlık süresinin ikinci yarısında ve kalan iş oranı kalan süreden büyükse çıkar. Görülen uyarı o gün soluk kalır ve geri alınabilir; ertesi gün rapordan düşer.
+  - Bugün ve yarın: yeri olan kalemler; ders saatleri girmez. Kararını bekleyenler: Berthier'in soruları ve görülmemiş çakışmaların mail taslakları. Evet/Hayır soruları tek dokunuşla yanıtlanır; yanıtın değişikliği geri alınınca soru yeniden açılır.
+  - Sefer defteri (`app/logbook.tsx`, `lib/logbook.ts`): sefer ilk rapor açılışında ya da ilk onayda başlar; iki haftalık pencere bitince yenisi başlar. Gün kayıtlarını model yazar (`summarizeDays`); model yoksa düz bir satır yazılır ve ertesi gün yeniden denenir. Ölçümler yalnız açılınca görünür.
+  - Karargâh'ta 2×2 kart var: Sabah raporu, Sefer defteri, Fikir deposu, Haftalık teftiş. Teftiş'ten sefer defterine bağlantı var. "1 hamle bugün tamamlandı" satırı kaldırıldı.
+  - Adım B kararları: 390 px'ten dar ekranda Karargâh haritası yakınlaştırma düğmelerinden uzak durur; "Rotayı düzenle" penceresi haritada sürüklemeyi de anlatır.
+  - Durum eklemeleri (JSON, migrasyon yok): `Front.closedAt`, `Change.sourceId`, `conflictCaughtAt`, `seenWarnings`, `metrics.reportOpenedAt`, `expedition`, `logbook`. Yeni komutlar: `reportOpen`, `seenWarning`, `logbookSummaries`; `seenConflict` artık `seen:false` ile geri alınır.
+  - Doğrulama: tip denetimi, 51 deterministik test (yeni `--p5` dahil), yerel API denetimi ve derleme geçti. Lint main ile aynı: 8 hata, 11 uyarı. 390×844 görüntüleri P5 tasarımıyla karşılaştırıldı; 320 px'te taşma yok. Canlı model çağrısı yapılmadı; fiziksel iPhone'da denenmedi.
+  - Sırada: bildirimler (Sites tarafı doğrulandıktan sonra ayrı dalda) ve yayın kararı.
+- 2 Ekim, Adım B (aynı dal, yayınlanmadı):
+  - Sefer haritası Karargâh'ta (360 px, bugünün rotası) ve Harita sekmesinde (tam ekran atlas; mevcut liste altında, "LİSTE ↓" çipiyle) çalışıyor. Kod `app/expedition-map.tsx` ve `lib/expedition/` içinde. Arazi oturumda bir kez Web Worker'da üretilir; Worker yoksa 8 ms'lik dilimlerle.
+  - Kamp yeri kalıcı: bir türün n'inci cephesi önce tasarımın n'inci yuvasını dener, sonra kimlikten türetilen adayları. Yeni cephe eskileri kaydırmaz. Aciliyette haftalık ve ders kalemleri sayılmaz; kritik ≤2, yaklaşan ≤7 gün.
+  - Haritada sürükleyerek sıralama mevcut `reorder` komutuyla kaydolur ve emri onaylamaz. "Sırayı düzenle" mevcut pencereyi açar.
+  - Geçilen kamp için `Slot.doneAt` eklendi. Biten yuva donar; cephenin sıradaki hamlesi bugünün rotasına girmez, yarın önerilir. İlk tamamlamada öneri onaylanmadan saklanır. `select` ve `reorder` geçilen yuvayı yerinde tutar; geçilen kamp taşınamaz. Sayfadaki "Geri al" o tamamlamayı mevcut `undo` ile geri alır.
+  - Efektler (pop, kontur dalgası, mühür; son kampta ikinci dalga ve zirve parıltısı) harita içi bildirimle gelir; genel bildirim yinelenmez. Hareket azaltma açıksa animasyon yok.
+  - Tasarımdan bilinçli sapmalar: GEÇİLDİ plakası kendi bayrağının üstüne konmaz. Etiketler yazı tipleri yüklenince yeniden ölçülür; tasarım dosyası yedek yazı tipiyle ölçtüğü için bazı plakaları çerçeveden taşırıyor.
+  - Doğrulama: tip denetimi, 40 deterministik test (yeni `--map` dahil), yerel API denetimi ve derleme geçti. Lint main ile aynı: 8 hata, 11 uyarı. 4× CPU yavaşlatmada harita açılırken en uzun görev 138 ms. 390×844 görüntüleri tasarımla karşılaştırıldı; 320 px'te yatay taşma yok. Fiziksel iPhone'da denenmedi.
+  - Sırada, kullanıcı onaylarsa Adım C: P5 ekranları, bildirimsiz.
 - 2 Ekim, Adım A (dal `claude/design-implementation-docs-7jewx2`, yayınlanmadı):
   - Tasarım paketi `design-reference/` adıyla depoya alındı; build, lint, tip denetimi ve Tailwind taramasından çıkarıldı. `CLAUDE.md` eklendi.
   - Grafit Gece paleti bütün uygulamaya uygulandı. Tokenlar `app/atlas.css` `:root` içinde tek kaynak.

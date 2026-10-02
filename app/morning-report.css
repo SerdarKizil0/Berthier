@@ -1,0 +1,509 @@
+/* Sabah raporu (design: “Berthier P5”, screen 2). The page scrolls with the window; the section index
+   sticks to the top and the approval bar stays at the bottom in place of the dock. */
+
+body .is-report main {
+  padding-top: 0;
+  padding-bottom: 150px;
+}
+body .is-report .heading,
+body .is-logbook .heading {
+  display: none;
+}
+
+.mr-offline {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--tertiary-foreground);
+}
+.mr-offline svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.mr-head {
+  padding: 14px 0 16px;
+}
+.mr-back {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+body .mr-head h1 {
+  margin: 0;
+  font: 400 2.7rem/1.05 var(--atlas-display);
+  letter-spacing: -0.025em;
+  color: var(--foreground);
+}
+.mr-head p {
+  margin: 8px 0 0;
+  font: 400 0.75rem/1.5 var(--atlas-mono);
+  letter-spacing: 0.06em;
+  color: var(--muted-foreground);
+}
+
+.mr-index {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  margin: 0 -20px;
+  padding: 10px 20px 12px;
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.mr-index button {
+  min-height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  text-align: left;
+}
+.mr-index button > span:first-child {
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.06em;
+  color: var(--gold);
+}
+.mr-index button > span:last-child {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.mr-section {
+  padding-top: 28px;
+}
+.mr-section:first-child {
+  padding-top: 22px;
+}
+.mr-section h2 {
+  margin: 0 0 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.1em;
+  color: var(--tertiary-foreground);
+}
+.mr-section h2.is-tight {
+  margin-bottom: 4px;
+}
+.mr-section h2 > span:first-child {
+  color: var(--gold);
+}
+.mr-section h2 > span:last-child {
+  margin-left: auto;
+  letter-spacing: 0.04em;
+  color: var(--muted-foreground);
+}
+.mr-none {
+  margin: 0;
+  padding: 4px 0;
+  font-size: 1rem;
+  color: var(--muted-foreground);
+}
+.mr-muted {
+  color: var(--muted-foreground);
+}
+
+/* I · Günün emri */
+.mr-strip {
+  display: flex;
+  align-items: center;
+  padding: 4px 0 8px;
+}
+.mr-hq {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: var(--card);
+  border: 1px solid var(--map-camp-border);
+  color: var(--brand);
+  font-size: 0.95rem;
+}
+.mr-dots {
+  flex: 1;
+  min-width: 6px;
+  height: 0;
+  border-top: 2px dotted var(--map-route);
+}
+.mr-node {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  font: 400 0.75rem var(--atlas-mono);
+  background: var(--card);
+  border: 1px solid var(--map-camp-border);
+  color: var(--foreground);
+}
+.mr-node.is-crit {
+  background: var(--hot);
+  border-color: var(--hot);
+  color: var(--map-ground);
+  box-shadow: 0 0 0 4px var(--hot-soft);
+}
+.mr-node.is-near {
+  border: 1.5px solid var(--hot);
+  color: var(--hot-ink);
+}
+.mr-node.is-done {
+  background: var(--gold-soft);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.mr-path {
+  margin: 0 0 4px;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--muted-foreground);
+}
+.mr-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  gap: 2px 10px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+}
+.mr-num {
+  font: 400 0.75rem var(--atlas-mono);
+  color: var(--muted-foreground);
+  padding-top: 2px;
+}
+.mr-row-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.mr-row-head {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+.mr-move {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--foreground);
+  overflow-wrap: anywhere;
+}
+.mr-row.is-done .mr-move {
+  text-decoration: line-through;
+  color: var(--muted-foreground);
+}
+.mr-why {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--muted-foreground);
+  text-wrap: pretty;
+}
+.mr-chip {
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+  background: var(--secondary);
+  color: var(--tertiary-foreground);
+}
+.mr-chip.is-crit {
+  background: var(--hot);
+  color: var(--map-ground);
+}
+.mr-chip.is-near {
+  background: var(--hot-soft);
+  color: var(--hot-ink);
+}
+.mr-chip.is-done {
+  background: var(--gold-soft);
+  color: var(--gold);
+}
+.mr-links {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+.mr-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0;
+}
+.mr-empty p {
+  margin: 0;
+  font-size: 1rem;
+}
+.mr-empty p.mr-muted {
+  font-size: 0.875rem;
+}
+.mr-empty .text-button {
+  align-self: flex-start;
+}
+
+/* II · Uyarılar and IV · Kararını bekleyenler */
+.mr-card {
+  margin-bottom: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mr-warning,
+.mr-draft {
+  padding-bottom: 6px;
+}
+.mr-warning.is-seen {
+  opacity: 0.65;
+}
+.mr-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+}
+.mr-card-top > span:first-child {
+  color: var(--hot-ink);
+}
+.mr-warning.is-seen .mr-card-top > span:first-child {
+  color: var(--muted-foreground);
+}
+.mr-card-top > span:last-child {
+  letter-spacing: 0.04em;
+  color: var(--muted-foreground);
+  text-align: right;
+}
+.mr-card > p {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--foreground);
+  text-wrap: pretty;
+}
+.mr-card-actions {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.mr-card-actions button {
+  background: none;
+  border: 0;
+  padding: 8px 0;
+  min-height: 44px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+.mr-card-actions button + button {
+  color: var(--muted-foreground);
+}
+.mr-card-label {
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+}
+.mr-card > p.mr-card-title {
+  font-size: 1.0625rem;
+  font-weight: 500;
+}
+.mr-card > p.mr-card-note {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+.mr-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.mr-options button {
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 22px;
+  background: var(--secondary);
+  border: 1px solid var(--primary-border);
+  color: var(--primary-foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.mr-answered {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 2px;
+}
+.mr-answered > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9375rem;
+  color: var(--gold);
+}
+.mr-answered svg {
+  flex-shrink: 0;
+}
+
+/* III · Bugün ve yarın */
+.mr-place {
+  padding: 12px 0 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.mr-place .mr-none {
+  padding: 0;
+}
+.mr-when {
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+}
+body .mr-place h3 {
+  margin: 2px 0 0;
+  font: 400 1.6rem/1.15 var(--atlas-display);
+  color: var(--foreground);
+}
+.mr-context {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+.mr-bring {
+  margin: 6px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--foreground);
+}
+.mr-bring > span {
+  display: block;
+  margin-bottom: 2px;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.06em;
+  color: var(--gold);
+}
+
+.mr-end {
+  margin: 28px 0 0;
+  text-align: center;
+  font: 400 0.75rem var(--atlas-mono);
+  letter-spacing: 0.06em;
+  color: var(--muted-foreground);
+}
+
+/* The approval bar replaces the dock on this page. */
+.mr-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  padding: 12px max(16px, calc((100% - 760px) / 2)) max(28px, env(safe-area-inset-bottom));
+  background: var(--background);
+  border-top: 1px solid var(--border);
+}
+.mr-approve {
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: var(--primary);
+  border: 1px solid var(--primary-border);
+  color: var(--primary-foreground);
+  font-weight: 600;
+}
+.mr-approve > span:last-child {
+  font: 400 0.75rem var(--atlas-mono);
+  letter-spacing: 0.06em;
+  color: var(--tertiary-foreground);
+}
+.mr-approve.is-center {
+  justify-content: center;
+}
+.mr-approved {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 52px;
+}
+.mr-approved > span {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--gold);
+}
+.mr-approved .text-button {
+  padding: 8px 10px;
+}
+.mr-home {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--primary);
+  border: 1px solid var(--primary-border);
+  color: var(--primary-foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.mr-offline-note {
+  margin: 8px 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--muted-foreground);
+  text-align: center;
+}
+.morning-report button:disabled {
+  opacity: 0.5;
+}
+
+@media (min-width: 601px) {
+  .mr-index {
+    margin: 0;
+    padding: 10px 0 12px;
+  }
+}
