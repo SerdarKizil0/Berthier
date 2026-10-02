@@ -3,12 +3,14 @@ import type {CalendarEvent,EventKind,Profile} from './calendar';
 export type FrontType='course'|'lane'|'application'|'general';
 export type Move={id:string;text:string;userEdited?:boolean;directGoal?:string;prerequisiteReason?:string;doneAt?:string;eventId?:string;prepareAt?:string;dependent?:boolean};
 export type MovePreference={frontTitle:string;before:string;after:string;at:string};
-export type Front={id:string;title:string;type:FrontType;status:'active'|'held'|'closed';moves:Move[];where:string;question:string;notes:string[];touched:string};
+export type Front={id:string;title:string;type:FrontType;status:'active'|'held'|'closed';moves:Move[];where:string;question:string;notes:string[];touched:string;closedAt?:string};
 export type Slot={frontId:string;moveId:string;text:string;reason:string;doneAt?:string};
 export type Order={date:string;slots:Slot[];approvedAt?:string};
 export type Op={key:string;before:unknown;after:unknown;undone?:boolean};
-export type Change={id:string;label:string;at:string;ops:Op[]};
-export type State={movePreferences?:MovePreference[];fronts:Record<string,Front>;orders:Record<string,Order>;setup:boolean;changes:Change[];receipts:string[];events?:Record<string,CalendarEvent>;profile?:Profile;prepDefaults?:Partial<Record<EventKind,number>>;seenConflicts?:string[];ideas?:Record<string,Idea>;review?:Review;reviewHistory?:Review[];ideaImports?:string[]};
+export type Change={id:string;label:string;at:string;ops:Op[];sourceId?:string};
+// P5 records (morning report, expedition logbook) live outside the change log: they are Berthier's own notes, not user edits.
+export type DaySummary={summary:string;hash:string;at:string;fallback?:boolean};
+export type State={movePreferences?:MovePreference[];fronts:Record<string,Front>;orders:Record<string,Order>;setup:boolean;changes:Change[];receipts:string[];events?:Record<string,CalendarEvent>;profile?:Profile;prepDefaults?:Partial<Record<EventKind,number>>;seenConflicts?:string[];ideas?:Record<string,Idea>;review?:Review;reviewHistory?:Review[];ideaImports?:string[];conflictCaughtAt?:Record<string,string>;seenWarnings?:Record<string,string>;metrics?:{reportOpenedAt?:Record<string,string>};expedition?:{startedAt:string};logbook?:Record<string,DaySummary>};
 export type Dictation={id:string;raw:string;context:string|null;created_at:string;status:string;result:string|null};
 export const labels={course:'Dersler',lane:'Kulvarlar',application:'Başvurular',general:'Genel'};
 export const fresh=():State=>({fronts:{},orders:{},setup:false,changes:[],receipts:[]});

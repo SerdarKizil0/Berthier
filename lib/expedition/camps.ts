@@ -5,12 +5,13 @@
 import { C, pdist, type Pt } from './terrain';
 import type { Front, FrontType, State } from '../domain';
 import { addDays, calendarDay, daysBetween, occurrences, type CalendarEvent } from '../calendar';
+import { MO, WD } from '../turkish';
 
-export const REGIONS: Record<FrontType, { label: string; region: string }> = {
-  course: { label: 'DERSLER', region: 'DERS OVASI' },
-  lane: { label: 'KULVARLAR', region: 'KULVAR DAĞLARI' },
-  application: { label: 'BAŞVURULAR', region: 'BAŞVURU GEÇİDİ' },
-  general: { label: 'GENEL', region: 'GENEL DÜZLÜK' },
+export const REGIONS: Record<FrontType, { label: string; region: string; name: string }> = {
+  course: { label: 'DERSLER', region: 'DERS OVASI', name: 'Ders Ovası' },
+  lane: { label: 'KULVARLAR', region: 'KULVAR DAĞLARI', name: 'Kulvar Dağları' },
+  application: { label: 'BAŞVURULAR', region: 'BAŞVURU GEÇİDİ', name: 'Başvuru Geçidi' },
+  general: { label: 'GENEL', region: 'GENEL DÜZLÜK', name: 'Genel Düzlük' },
 };
 
 // Hand-picked spots from the design. The n-th front of a type tries the n-th spot first, so the first
@@ -132,8 +133,6 @@ export function daysTag(f: Pick<Front, 'status'>, days: number | null) {
   if (days === 1) return 'YARIN';
   return days + ' GÜN';
 }
-
-const WD = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'], MO = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
 
 /** “Sal 29 Eyl · 10:00” */
 export function whenText(e: Pick<CalendarEvent, 'date' | 'time'>) {
