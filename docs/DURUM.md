@@ -73,6 +73,15 @@ Kullanıcı 25 Eylül'de Atlas 02'yi onayladı. Petrol tonlu topografik harita, 
 
 ## Kaldığın yer
 
+- 2 Ekim, Adım B (aynı dal, yayınlanmadı):
+  - Sefer haritası Karargâh'ta (360 px, bugünün rotası) ve Harita sekmesinde (tam ekran atlas; mevcut liste altında, "LİSTE ↓" çipiyle) çalışıyor. Kod `app/expedition-map.tsx` ve `lib/expedition/` içinde. Arazi oturumda bir kez Web Worker'da üretilir; Worker yoksa 8 ms'lik dilimlerle.
+  - Kamp yeri kalıcı: bir türün n'inci cephesi önce tasarımın n'inci yuvasını dener, sonra kimlikten türetilen adayları. Yeni cephe eskileri kaydırmaz. Aciliyette haftalık ve ders kalemleri sayılmaz; kritik ≤2, yaklaşan ≤7 gün.
+  - Haritada sürükleyerek sıralama mevcut `reorder` komutuyla kaydolur ve emri onaylamaz. "Sırayı düzenle" mevcut pencereyi açar.
+  - Geçilen kamp için `Slot.doneAt` eklendi. Biten yuva donar; cephenin sıradaki hamlesi bugünün rotasına girmez, yarın önerilir. İlk tamamlamada öneri onaylanmadan saklanır. `select` ve `reorder` geçilen yuvayı yerinde tutar; geçilen kamp taşınamaz. Sayfadaki "Geri al" o tamamlamayı mevcut `undo` ile geri alır.
+  - Efektler (pop, kontur dalgası, mühür; son kampta ikinci dalga ve zirve parıltısı) harita içi bildirimle gelir; genel bildirim yinelenmez. Hareket azaltma açıksa animasyon yok.
+  - Tasarımdan bilinçli sapmalar: GEÇİLDİ plakası kendi bayrağının üstüne konmaz. Etiketler yazı tipleri yüklenince yeniden ölçülür; tasarım dosyası yedek yazı tipiyle ölçtüğü için bazı plakaları çerçeveden taşırıyor.
+  - Doğrulama: tip denetimi, 40 deterministik test (yeni `--map` dahil), yerel API denetimi ve derleme geçti. Lint main ile aynı: 8 hata, 11 uyarı. 4× CPU yavaşlatmada harita açılırken en uzun görev 138 ms. 390×844 görüntüleri tasarımla karşılaştırıldı; 320 px'te yatay taşma yok. Fiziksel iPhone'da denenmedi.
+  - Sırada, kullanıcı onaylarsa Adım C: P5 ekranları, bildirimsiz.
 - 2 Ekim, Adım A (dal `claude/design-implementation-docs-7jewx2`, yayınlanmadı):
   - Tasarım paketi `design-reference/` adıyla depoya alındı; build, lint, tip denetimi ve Tailwind taramasından çıkarıldı. `CLAUDE.md` eklendi.
   - Grafit Gece paleti bütün uygulamaya uygulandı. Tokenlar `app/atlas.css` `:root` içinde tek kaynak.
