@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>@keyframes sonar{0%{transform:scale(.55);opacity:.85}100%{transform:scale(2.3);opacity:0}}@keyframes zirveGiris{0%{opacity:0;transform:scale(.3)}100%{opacity:1;transform:scale(1)}}@keyframes zirveNabiz{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(1.3)}}*{box-sizing:border-box}body{margin:0;background:#e7e3d8}a{color:#193d3d;text-decoration:underline;text-underline-offset:3px}a:hover{color:#a24b2b}button{letter-spacing:inherit}</style>
+</helmet>
+<section data-screen-label="Tur 5" style="padding:56px 64px 88px;display:flex;flex-direction:column;gap:40px;min-height:100vh;font-family:'DM Sans','Segoe UI',sans-serif;color:#193d3d">
+<div style="display:flex;flex-direction:column;gap:10px;max-width:820px">
+<p style="margin:0;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#596963">TUR 5 · KARANLIK PALETLER · ONAYINI BEKLİYOR, REPOYA GÖNDERİLMEDİ</p>
+<h1 style="margin:0;font:400 2.8rem/1.08 'Instrument Serif',Georgia,serif">Sefer haritası: gece paletleri</h1>
+<p style="margin:0;font-size:1rem;line-height:1.6;color:#3f524d;text-wrap:pretty">Coğrafya, patika, aciliyet, mühür ve bayrak kuralları Tur 4 ile aynı; yalnız renkler değişiyor. Uzun odakta ve gece gözü yormasın diye dört palet de düşük kontrastlı. Uygulama kabuğu (başlık, alt panel, liste, kartlar) her palette koyu.</p>
+<div style="display:grid;grid-template-columns:max-content minmax(0,1fr);gap:4px 16px;font-size:.9375rem;line-height:1.55;color:#3f524d">
+<span style="font:500 .75rem/1.9 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#a24b2b">ACİLİYET</span><span style="text-wrap:pretty">Her palette acil kamp, paletin sıcak vurgusuyla (mercan ya da pas) parlar ve sonar atar. Rota ve mühür ondan ayrı bir renkte durur.</span>
+<span style="font:500 .75rem/1.9 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#a24b2b">DERİN KARARGÂH</span><span style="text-wrap:pretty">İstediğin gibi rota mercan. Bu yüzden acil kampı rotadan ayıran şey renk değil, dolgu ve sonar oluyor.</span>
+</div>
+<p style="margin:0;font-size:.9375rem;line-height:1.6;color:#596963;text-wrap:pretty">Dene: haritaları sürükle, yakınlaştır, “Hamleyi bitir”e bas. Tweaks’teki gün ve durum ayarları dört paleti birlikte değiştirir. Önceki turlar: <a href="Berthier Harita v5.dc.html">Tur 4 · Kum</a> · <a href="Berthier Harita v4.dc.html">Tur 3 · Petrol</a> · <a href="Berthier Mevcut.dc.html">mevcut ekranlar</a>.</p>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:80px;align-items:flex-start">
+<sc-for list="{{ variants }}" as="v" hint-placeholder-count="2">
+<div id="{{ v.id }}" style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;max-width:820px">
+<span style="font:500 .8125rem 'IBM Plex Mono',monospace;padding:4px 9px;border-radius:8px;background:#193d3d;color:#f7f6ed">{{ v.id }}</span>
+<span style="font:400 1.9rem/1 'Instrument Serif',Georgia,serif;color:#193d3d">{{ v.name }}</span>
+<span style="font-size:.9375rem;color:#596963">{{ v.sub }}</span>
+</div>
+<div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap">
+
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="margin:0;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#596963">KARARGÂH · KÜÇÜK ROTA</p>
+<div data-screen-label="Karargâh" style="position:relative;width:390px;height:844px;overflow:hidden;background:{{ v.U.bg }};color:{{ v.U.ink }};font-family:'DM Sans','Segoe UI',sans-serif;font-size:16px;line-height:1.55;box-shadow:0 30px 80px -24px #0f2a2a55">
+<div style="height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none">
+<div style="padding:0 20px">
+<header style="height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid {{ v.U.line }}">
+<a href="#" style="display:flex;align-items:center;gap:6px;font-family:'Instrument Serif',Georgia,serif;font-size:2rem;color:{{ v.U.ink }};text-decoration:none"><span>berthier</span><span style="font-family:'DM Sans','Segoe UI',sans-serif;font-size:1.6rem;color:#ed845c">✳</span></a>
+<div style="display:flex;align-items:center;gap:10px">
+<button aria-label="Kayıt defteri" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:{{ v.U.ink }};cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg></button>
+<button aria-label="Tercihler" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:{{ v.U.ink }};cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+</div>
+</header>
+<main style="max-width:760px;margin:0 auto;padding:22px 0 205px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+<div style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:14px">
+<p style="margin:0 0 6px;color:{{ v.U.muted }};font-size:.875rem">26 Eylül Cumartesi</p>
+<h1 style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:.875rem;font-weight:400;letter-spacing:.12em;line-height:1.2">Karargâh</h1>
+</div>
+</div>
+<section style="margin:0 -20px 24px;overflow:hidden;background:{{ v.U.surf }}">
+<div style="background:{{ v.P.ground }};color:{{ v.P.ink }};padding:24px 0 31px">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 23px">
+<h2 style="margin:0;font:400 2rem/1.12 'Instrument Serif',Georgia,serif">Bugünün arazisi.</h2>
+<span style="font:400 .75rem/1.5 'IBM Plex Mono',monospace;letter-spacing:.06em;max-width:95px;text-align:right;color:{{ v.P.muted }}">ÖNERİLEN ROTA</span>
+</div>
+<div ref="{{ v.home.ref }}" onPointerDown="{{ v.home.down }}" onPointerMove="{{ v.home.move }}" onPointerUp="{{ v.home.up }}" onPointerCancel="{{ v.home.cancel }}" onClick="{{ v.home.click }}" style="position:relative;margin-top:8px;height:360px;overflow:hidden;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none;background:{{ v.P.ground }}">
+<svg style="position:absolute;inset:0;width:100%;height:100%;display:block;overflow:hidden;pointer-events:none">
+<g transform="{{ v.home.tf }}">
+<rect x="-8000" y="-8000" width="16000" height="16000" style="fill:{{ v.P.ground }}"></rect>
+<sc-if value="{{ v.ter.hasImg }}" hint-placeholder-val="{{ false }}"><image href="{{ v.ter.img }}" x="{{ v.ter.ix }}" y="{{ v.ter.iy }}" width="{{ v.ter.iw }}" height="{{ v.ter.ih }}" preserveAspectRatio="none"></image></sc-if>
+<path d="{{ v.ter.stipple }}" style="fill:{{ v.P.stip }}"></path>
+<sc-for list="{{ v.ter.lines }}" as="l" hint-placeholder-count="0"><path d="{{ l.d }}" style="fill:none;stroke:{{ l.stroke }};stroke-width:{{ l.sw }};stroke-opacity:{{ l.op }};vector-effect:non-scaling-stroke"></path></sc-for>
+<path d="{{ v.ter.river }}" style="fill:none;stroke:{{ v.P.river }};stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke"></path>
+</g>
+<polygon points="{{ v.home.pk0.pts }}" style="display:{{ v.home.pk0.d }};fill:{{ v.P.label }};opacity:.8;stroke:{{ v.P.halo }};stroke-width:1.5px;paint-order:stroke"></polygon><polygon points="{{ v.home.pk1.pts }}" style="display:{{ v.home.pk1.d }};fill:{{ v.P.label }};opacity:.8;stroke:{{ v.P.halo }};stroke-width:1.5px;paint-order:stroke"></polygon><polygon points="{{ v.home.pk2.pts }}" style="display:{{ v.home.pk2.d }};fill:{{ v.P.label }};opacity:.8;stroke:{{ v.P.halo }};stroke-width:1.5px;paint-order:stroke"></polygon>
+<sc-for list="{{ v.home.rings }}" as="rg" hint-placeholder-count="0"><circle cx="{{ rg.x }}" cy="{{ rg.y }}" r="{{ rg.r }}" style="fill:none;stroke:{{ v.P.sealInk }};stroke-width:1.3;opacity:{{ rg.op }}"></circle></sc-for>
+<sc-for list="{{ v.home.legs }}" as="lg" hint-placeholder-count="0"><path d="{{ lg.d }}" style="fill:none;stroke:{{ v.P.casing }};stroke-width:6;stroke-linecap:round;stroke-linejoin:round"></path></sc-for>
+<sc-for list="{{ v.home.legs }}" as="lg" hint-placeholder-count="0"><path d="{{ lg.d }}" style="fill:none;stroke:{{ lg.stroke }};stroke-width:{{ lg.sw }};stroke-dasharray:{{ lg.dash }};stroke-linecap:round;stroke-linejoin:round;filter:{{ v.P.routeFx }}"></path></sc-for>
+<sc-for list="{{ v.home.seals }}" as="sl" hint-placeholder-count="0"><path d="{{ sl.d }}" style="fill:none;stroke:{{ v.P.sg1 }};stroke-width:13;stroke-linecap:round;stroke-linejoin:round"></path></sc-for><sc-for list="{{ v.home.seals }}" as="sl" hint-placeholder-count="0"><path d="{{ sl.d }}" style="fill:none;stroke:{{ v.P.sg2 }};stroke-width:7;stroke-linecap:round;stroke-linejoin:round"></path></sc-for><sc-for list="{{ v.home.seals }}" as="sl" hint-placeholder-count="0"><path d="{{ sl.d }}" style="fill:none;stroke:{{ v.P.sg3 }};stroke-width:3.6;stroke-linecap:round;stroke-linejoin:round"></path></sc-for><sc-for list="{{ v.home.seals }}" as="sl" hint-placeholder-count="0"><path d="{{ sl.d }}" style="fill:none;stroke:{{ v.P.sealCore }};stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"></path></sc-for>
+<text transform="{{ v.home.rl0.tf }}" style="display:{{ v.home.rl0.d }};font:italic 400 13px 'Instrument Serif',Georgia,serif;letter-spacing:.22em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">KULVAR DAĞLARI</text><text transform="{{ v.home.rl1.tf }}" style="display:{{ v.home.rl1.d }};font:italic 400 13px 'Instrument Serif',Georgia,serif;letter-spacing:.22em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">DERS OVASI</text><text transform="{{ v.home.rl2.tf }}" style="display:{{ v.home.rl2.d }};font:italic 400 12px 'Instrument Serif',Georgia,serif;letter-spacing:.16em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">BAŞVURU GEÇİDİ</text>
+<path id="{{ v.home.arcId }}" d="{{ v.home.arc }}" style="fill:none;stroke:none"></path>
+<text style="display:{{ v.home.arcD }};font:italic 400 12px 'Instrument Serif',Georgia,serif;letter-spacing:.16em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3px;stroke-linejoin:round"><textPath href="{{ v.home.arcHref }}" startOffset="50%" style="text-anchor:middle;dominant-baseline:central">GENEL DÜZLÜK</textPath></text>
+<text transform="{{ v.home.rl3.tf }}" style="display:{{ v.home.rl3.d }};font:italic 400 12px 'Instrument Serif',Georgia,serif;letter-spacing:.16em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">GENEL DÜZLÜK</text><g>{{ v.home.endGlow }}</g>
+</svg>
+<div style="position:absolute;inset:0;pointer-events:none;background:{{ v.P.vig }}"></div>
+<div style="position:absolute;inset:0;pointer-events:none;background-image:{{ grain }};mix-blend-mode:{{ v.P.blend }};opacity:{{ v.P.grainOp }}"></div>
+<div style="position:absolute;left:0;top:0;transform:{{ v.home.hq.tr }};width:0;height:0;pointer-events:none">
+<span style="position:absolute;left:-15px;top:-15px;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:{{ v.P.pin }};border:1px solid {{ v.P.pinBd }};color:#ed845c;font:400 1.1rem/1 'DM Sans',sans-serif">✳</span>
+<span style="position:absolute;left:-50px;top:19px;width:100px;text-align:center;font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:{{ v.P.ink }};text-shadow:{{ v.P.tsh }}">KARARGÂH</span>
+</div>
+<sc-for list="{{ v.home.stops }}" as="s" hint-placeholder-count="0">
+<button data-stop="{{ s.id }}" aria-label="{{ s.aria }}" onClick="{{ s.tap }}" style="position:absolute;left:0;top:0;transform:{{ s.tr }};width:44px;height:44px;padding:0;border:0;border-radius:50%;background:none;display:grid;place-items:center;cursor:pointer;touch-action:none;-webkit-touch-callout:none;user-select:none;opacity:{{ s.op }};font:inherit;color:inherit">
+<span style="position:absolute;inset:-14px;border-radius:50%;background:{{ v.P.clear }};pointer-events:none"></span>
+<span style="position:absolute;inset:-4px;border-radius:50%;border:1px dashed {{ v.P.palisade }};pointer-events:none"></span>{{ s.sonar }}
+<span style="position:relative;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:{{ s.bg }};border:{{ s.border }};color:{{ s.fg }};font:400 .8125rem 'IBM Plex Mono',monospace;box-shadow:{{ s.sh }};transform:scale({{ s.sc }})">
+<sc-if value="{{ s.done }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;fill:currentColor;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"></path></svg></sc-if>
+<sc-if value="{{ s.open }}" hint-placeholder-val="{{ true }}">{{ s.num }}</sc-if>
+</span>
+<sc-if value="{{ s.hasLabel }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:{{ s.lx }};top:{{ s.ly }};padding:3px 8px 4px;border-radius:6px;border:1px solid {{ s.pbd }};box-shadow:{{ s.pglow }};background:{{ v.P.plate }};color:{{ v.P.plateInk }};white-space:nowrap;text-align:left;line-height:1.3;pointer-events:none"><span style="display:{{ s.titleD }};font-size:13px;font-weight:500">{{ s.title }}</span><span style="display:block;font:400 10.5px/1.35 'IBM Plex Mono',monospace;letter-spacing:.05em;color:{{ s.tagc }}">{{ s.tag }}</span></span></sc-if>
+</button>
+</sc-for>
+<sc-if value="{{ v.home.ghost.show }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:0;top:0;transform:{{ v.home.ghost.tr }};width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:{{ v.U.btn }};color:{{ v.U.btnInk }};font:400 .875rem 'IBM Plex Mono',monospace;box-shadow:0 12px 26px -6px rgba(0,0,0,.5),0 0 0 6px {{ v.P.routeGlow }};pointer-events:none;z-index:4">{{ v.home.ghost.num }}</div></sc-if>
+<div onPointerDown="{{ stopProp }}" style="position:absolute;right:12px;top:10px;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;background:{{ v.P.ctrl }};border:1px solid {{ v.P.ctrlBd }};color:{{ v.P.ctrlInk }};z-index:3">
+<button aria-label="Yakınlaştır" onClick="{{ v.home.zin }}" style="font:inherit;width:44px;height:44px;display:grid;place-items:center;background:transparent;border:0;border-radius:0;color:inherit;cursor:pointer;padding:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+<span style="height:1px;background:{{ v.P.ctrlBd }}"></span>
+<button aria-label="Uzaklaştır" onClick="{{ v.home.zout }}" style="font:inherit;width:44px;height:44px;display:grid;place-items:center;background:transparent;border:0;border-radius:0;color:inherit;cursor:pointer;padding:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path></svg></button>
+<span style="height:1px;background:{{ v.P.ctrlBd }}"></span>
+<button aria-label="Tüm rotayı sığdır" onClick="{{ v.home.fit }}" style="font:inherit;width:44px;height:44px;display:grid;place-items:center;background:transparent;border:0;border-radius:0;color:inherit;cursor:pointer;padding:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path></svg></button>
+</div>
+<sc-if value="{{ v.home.dragOn }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:14px;top:12px;max-width:250px;padding:8px 12px;border-radius:10px;background:{{ v.U.surf }};color:{{ v.U.ink }};font-size:.8125rem;font-weight:500;box-shadow:0 8px 20px -8px rgba(4,22,24,.5);pointer-events:none;z-index:4">{{ v.home.dragText }}</div></sc-if>
+<sc-if value="{{ v.hintOn }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:14px;top:12px;max-width:260px;padding:8px 12px;border-radius:10px;background:{{ v.U.surf }};color:{{ v.U.ink }};font-size:.8125rem;line-height:1.45;box-shadow:0 8px 20px -8px rgba(4,22,24,.5);pointer-events:none;z-index:4">Bir kampı basılı tut, sonra başka bir kampın üstüne bırak. Masaüstünde doğrudan sürükle.</div></sc-if>
+<sc-if value="{{ v.toastOn }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:14px;bottom:12px;max-width:300px;padding:8px 12px;border-radius:10px;background:{{ v.U.btn }};color:{{ v.U.btnInk }};font-size:.8125rem;box-shadow:0 8px 20px -8px rgba(4,22,24,.5);pointer-events:none;z-index:4">{{ v.toast }}</div></sc-if>
+<sc-if value="{{ v.pendOn }}" hint-placeholder-val="{{ false }}"><div onPointerDown="{{ stopProp }}" style="position:absolute;left:12px;right:12px;bottom:12px;display:flex;align-items:center;gap:4px;padding:5px 5px 5px 14px;border-radius:14px;background:{{ v.U.surf }};color:{{ v.U.ink }};border:1px solid {{ v.U.line }};box-shadow:0 12px 30px -10px rgba(4,22,24,.55);z-index:5"><span style="flex:1;font-size:.875rem">Yeni sıra hazır.</span><button onClick="{{ v.cancelPend }}" style="font:inherit;background:none;border:0;min-height:44px;padding:8px 10px;font-size:.875rem;font-weight:500;color:{{ v.U.ink }};border-radius:10px;cursor:pointer">Vazgeç</button><button onClick="{{ v.savePend }}" style="font:inherit;white-space:nowrap;background:{{ v.U.btn }};color:{{ v.U.btnInk }};border:1px solid {{ v.U.btnBd }};min-height:44px;padding:8px 14px;font-size:.875rem;font-weight:500;border-radius:10px;cursor:pointer">Sırayı kaydet</button></div></sc-if>
+</div>
+<div style="padding:10px 23px 0;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px;min-height:44px;font:400 .75rem 'IBM Plex Mono',monospace;color:{{ v.P.muted }}">
+<span>{{ v.caption }}</span><span>{{ v.hotWord }} = ACİL</span>
+</div>
+</div>
+<div style="margin-top:-20px;position:relative;background:{{ v.U.surf }};border-radius:23px 23px 0 0;padding:10px 23px 20px">
+<div style="height:3px;width:32px;margin:0 auto 9px;background:{{ v.U.line }};border-radius:4px"></div>
+<div style="display:flex;gap:6px;justify-content:space-between;align-items:center;margin-bottom:14px">
+<span style="font:400 .75rem 'IBM Plex Mono',monospace;color:{{ v.U.muted }};letter-spacing:.03em;max-width:200px">{{ v.sheet.top }}</span>
+<button onClick="{{ v.showHint }}" style="font:inherit;background:none;border:0;display:inline-flex;align-items:center;gap:7px;font-size:.8rem;min-height:44px;padding:8px 0;font-weight:500;color:{{ v.U.ink }};border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m3 16 4 4 4-4"></path><path d="M7 20V4"></path><path d="m21 8-4-4-4 4"></path><path d="M17 4v16"></path></svg>Sırayı düzenle</button>
+</div>
+<button style="border:0;background:none;padding:0;min-height:32px;display:flex;align-items:center;gap:6px;color:{{ v.U.accent }};font:400 .875rem 'IBM Plex Mono',monospace;border-radius:10px;cursor:pointer">{{ v.sheet.title }}<svg viewBox="0 0 24 24" style="width:14px;height:14px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+<sc-if value="{{ v.sheet.hasWhere }}" hint-placeholder-val="{{ false }}"><p style="font-size:.875rem;color:{{ v.U.muted }};border-left:2px solid {{ v.U.line }};padding-left:10px;margin:6px 0">{{ v.sheet.where }}</p></sc-if>
+<h3 style="font:400 2.2rem/1.13 'Instrument Serif',Georgia,serif;letter-spacing:-.015em;margin:7px 0 15px;overflow-wrap:anywhere;color:{{ v.sheet.moveColor }};text-decoration:{{ v.sheet.deco }}">{{ v.sheet.move }}</h3>
+<p style="margin:0;font-size:.875rem;line-height:1.6;color:{{ v.U.muted }}">{{ v.sheet.reason }}</p>
+<div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:19px">
+<button onClick="{{ v.sheet.finish }}" disabled="{{ v.sheet.isDone }}" style="font:inherit;display:flex;align-items:center;gap:8px;background:{{ v.U.chip }};border:1px solid transparent;border-radius:10px;padding:10px 16px;min-height:44px;color:{{ v.U.ink }};font-weight:500;cursor:pointer;opacity:{{ v.sheet.fop }}"><svg viewBox="0 0 24 24" style="width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M20 6 9 17l-5-5"></path></svg>Hamleyi bitir</button>
+<sc-if value="{{ v.sheet.isDone }}" hint-placeholder-val="{{ false }}"><button onClick="{{ v.sheet.undo }}" style="font:inherit;background:none;border:0;display:flex;align-items:center;gap:8px;font-size:.875rem;min-height:44px;padding:8px 0;font-weight:500;color:{{ v.U.ink }};border-radius:10px;cursor:pointer">Geri al</button></sc-if>
+<sc-if value="{{ v.sheet.notDone }}" hint-placeholder-val="{{ true }}"><button style="font:inherit;background:none;border:0;display:flex;align-items:center;gap:8px;font-size:.875rem;min-height:44px;padding:8px 0;font-weight:500;color:{{ v.U.ink }};border-radius:10px;cursor:pointer">Düzenle</button></sc-if>
+</div>
+<button style="font:inherit;width:100%;display:flex;align-items:center;justify-content:space-between;margin-top:20px;min-height:50px;background:{{ v.U.btn }};color:{{ v.U.btnInk }};border:1px solid {{ v.U.btnBd }};border-radius:10px;padding:10px 16px;font-weight:500;cursor:pointer"><span>Bu rotayla ilerle</span><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg></button>
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:2px;flex-wrap:wrap;margin-top:10px">
+<span style="color:{{ v.U.muted }};font-size:.75rem;padding-top:13px">Günün emri onayını bekliyor.</span>
+<button style="font:inherit;background:none;border:0;display:inline-flex;align-items:center;gap:7px;font-size:.875rem;min-height:44px;padding:8px 0;font-weight:500;color:{{ v.U.ink }};border-radius:10px;cursor:pointer">Cephe ekle / çıkar</button>
+</div>
+<div style="margin-top:18px;border-top:1px solid {{ v.U.line }}">
+<sc-for list="{{ v.rows }}" as="r" hint-placeholder-count="6">
+<button onClick="{{ r.tap }}" style="font:inherit;display:flex;width:100%;align-items:center;gap:14px;padding:15px 0;border:0;border-bottom:1px solid {{ v.U.line }};border-radius:0;text-align:left;background:none;font-size:.875rem;font-weight:{{ r.weight }};min-height:44px;color:{{ r.color }};cursor:pointer">
+<span style="font:400 .75rem 'IBM Plex Mono',monospace;color:{{ r.numColor }};min-width:16px">{{ r.num }}</span>
+<span style="flex:1;min-width:0"><small style="display:block;color:{{ v.U.muted }};font-size:.75rem;margin-bottom:3px">{{ r.title }}</small><span style="text-decoration:{{ r.deco }}">{{ r.text }}</span></span>
+<svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg>
+</button>
+</sc-for>
+</div>
+</div>
+</section>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:30px 0 12px">
+<button style="font:inherit;font-weight:400;display:block;width:100%;text-align:left;background:{{ v.U.chip }};border:0;border-radius:16px;padding:17px 14px;position:relative;color:{{ v.U.ink }};min-height:44px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:21px;height:21px;display:block;margin-bottom:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect width="20" height="5" x="2" y="3" rx="1"></rect><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path><path d="M10 12h4"></path></svg><div><h2 style="margin:0;font-size:1rem;font-weight:500">Fikir deposu</h2><p style="margin:7px 0 0;color:{{ v.U.muted }};font-size:.875rem">7 fikir, okuma ve soru</p></div><svg viewBox="0 0 24 24" style="position:absolute;right:16px;top:20px;width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+<button style="font:inherit;font-weight:400;display:block;width:100%;text-align:left;background:{{ v.U.chip }};border:0;border-radius:16px;padding:17px 14px;position:relative;color:{{ v.U.ink }};min-height:44px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:21px;height:21px;display:block;margin-bottom:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg><div><h2 style="margin:0;font-size:1rem;font-weight:500">Haftalık teftiş</h2><p style="margin:7px 0 0;color:{{ v.U.muted }};font-size:.875rem">Pazar 20:00 · İstersen şimdi başlayabilirsin</p></div><svg viewBox="0 0 24 24" style="position:absolute;right:16px;top:20px;width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+</div>
+<button style="font:inherit;font-weight:400;display:flex;align-items:center;gap:15px;width:100%;text-align:left;background:{{ v.U.surf }};border:1px solid {{ v.U.line }};border-radius:16px;padding:22px;margin-top:15px;color:{{ v.U.ink }};min-height:44px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;flex-shrink:0;color:{{ v.U.accent }};fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M8 13h.01"></path><path d="M12 13h.01"></path><path d="M16 13h.01"></path><path d="M8 17h.01"></path><path d="M12 17h.01"></path><path d="M16 17h.01"></path></svg><div style="flex:1"><h2 style="margin:0;display:flex;align-items:baseline;gap:12px;font-family:'Instrument Serif',Georgia,serif;font-size:1.7rem;font-weight:500">Ufuk <span style="color:{{ v.U.muted }};font-size:.875rem">14 gün</span></h2><p style="margin:0;color:{{ v.U.muted }};font-size:.9rem">6 tarihli kalem · Son iade günü</p></div><svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></button>
+<button style="font:inherit;font-weight:400;display:flex;align-items:center;gap:20px;padding:28px 0;width:100%;border:0;border-bottom:1px solid {{ v.U.line }};border-radius:0;background:none;text-align:left;color:{{ v.U.ink }};min-height:44px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg><div style="flex:1"><h2 style="margin:0;font-size:1.25rem;font-weight:500">Harita</h2><p style="margin:0;color:{{ v.U.muted }};font-size:.9rem">13 açık cephe, 2 aktif kulvar</p></div><svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+<aside style="display:flex;gap:16px;margin-top:28px;color:{{ v.U.muted }};padding:10px 0;opacity:.9"><svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;flex-shrink:0;margin-top:3px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M12 5v16"></path><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"></path></svg><div><h3 style="margin:0;font-size:1rem;font-weight:500">Hiçbir şey aklında kalmak zorunda değil.</h3><p style="margin:6px 0 0;font-size:.875rem">Ham diktelerin kayıt defterinde saklanır. Berthier’in değişikliklerini oradan geri alabilirsin.</p></div></aside>
+</main>
+</div>
+</div>
+<div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:30;width:calc(100% - 20px);padding:10px 12px 34px;background:{{ v.U.bg }};border:1px solid {{ v.U.line }};border-bottom:0;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px {{ v.U.dockSh }}">
+<button style="font:inherit;display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:{{ v.U.chip }};border:0;padding:10px 12px;border-radius:14px;font-size:1rem;font-weight:500;color:{{ v.U.ink }};min-height:44px;cursor:pointer"><span style="width:42px;height:42px;background:{{ v.U.mic }};color:{{ v.U.micInk }};display:grid;place-items:center;border-radius:50%;flex-shrink:0"><svg viewBox="0 0 24 24" style="width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M2 10v3"></path><path d="M6 6v11"></path><path d="M10 3v18"></path><path d="M14 8v7"></path><path d="M18 5v13"></path><path d="M22 10v3"></path></svg></span><span style="flex:1">Aklındakini bırak.<small style="display:block;font-size:.75rem;color:{{ v.U.muted }};font-weight:400;margin-top:2px">Berthier yerine yerleştirir.</small></span><svg viewBox="0 0 24 24" style="width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+<nav style="display:flex;justify-content:space-around;width:100%;padding:9px 0 0">
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:{{ v.U.ink }};font-weight:700;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"></path></svg>Karargâh</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:{{ v.U.muted }};font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg>Harita</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:{{ v.U.muted }};font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M8 13h.01"></path><path d="M12 13h.01"></path><path d="M16 13h.01"></path><path d="M8 17h.01"></path><path d="M12 17h.01"></path><path d="M16 17h.01"></path></svg>Ufuk</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:{{ v.U.muted }};font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg>Teftiş</button>
+</nav>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="margin:0;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#596963">HARİTA · TAM EKRAN ATLAS</p>
+<div data-screen-label="Harita" style="position:relative;width:390px;height:844px;overflow:hidden;background:{{ v.U.bg }};color:{{ v.U.ink }};font-family:'DM Sans','Segoe UI',sans-serif;font-size:16px;line-height:1.55;box-shadow:0 30px 80px -24px #0f2a2a55">
+<header style="position:absolute;left:0;right:0;top:0;height:76px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;background:{{ v.U.bg }};border-bottom:1px solid {{ v.U.line }};z-index:6">
+<a href="#" style="display:flex;align-items:center;gap:6px;font-family:'Instrument Serif',Georgia,serif;font-size:2rem;color:{{ v.U.ink }};text-decoration:none"><span>berthier</span><span style="font-family:'DM Sans','Segoe UI',sans-serif;font-size:1.6rem;color:#ed845c">✳</span></a>
+<div style="display:flex;align-items:center;gap:10px">
+<button aria-label="Kayıt defteri" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:{{ v.U.ink }};cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg></button>
+<button aria-label="Tercihler" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:{{ v.U.ink }};cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+</div>
+</header>
+<div ref="{{ v.atlas.ref }}" onPointerDown="{{ v.atlas.down }}" onPointerMove="{{ v.atlas.move }}" onPointerUp="{{ v.atlas.up }}" onPointerCancel="{{ v.atlas.cancel }}" onClick="{{ v.atlas.click }}" style="position:absolute;left:0;right:0;top:76px;bottom:0;overflow:hidden;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;background:{{ v.P.ground }}">
+<svg style="position:absolute;inset:0;width:100%;height:100%;display:block;overflow:hidden;pointer-events:none">
+<g transform="{{ v.atlas.tf }}">
+<rect x="-8000" y="-8000" width="16000" height="16000" style="fill:{{ v.P.ground }}"></rect>
+<sc-if value="{{ v.ter.hasImg }}" hint-placeholder-val="{{ false }}"><image href="{{ v.ter.img }}" x="{{ v.ter.ix }}" y="{{ v.ter.iy }}" width="{{ v.ter.iw }}" height="{{ v.ter.ih }}" preserveAspectRatio="none"></image></sc-if>
+<path d="{{ v.ter.stipple }}" style="fill:{{ v.P.stip }}"></path>
+<sc-for list="{{ v.ter.lines }}" as="l" hint-placeholder-count="0"><path d="{{ l.d }}" style="fill:none;stroke:{{ l.stroke }};stroke-width:{{ l.sw }};stroke-opacity:{{ l.op }};vector-effect:non-scaling-stroke"></path></sc-for>
+<path d="{{ v.ter.river }}" style="fill:none;stroke:{{ v.P.river }};stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke"></path>
+</g>
+<polygon points="{{ v.atlas.pk0.pts }}" style="display:{{ v.atlas.pk0.d }};fill:{{ v.P.label }};opacity:.8;stroke:{{ v.P.halo }};stroke-width:1.5px;paint-order:stroke"></polygon><polygon points="{{ v.atlas.pk1.pts }}" style="display:{{ v.atlas.pk1.d }};fill:{{ v.P.label }};opacity:.8;stroke:{{ v.P.halo }};stroke-width:1.5px;paint-order:stroke"></polygon><polygon points="{{ v.atlas.pk2.pts }}" style="display:{{ v.atlas.pk2.d }};fill:{{ v.P.label }};opacity:.8;stroke:{{ v.P.halo }};stroke-width:1.5px;paint-order:stroke"></polygon>
+<sc-for list="{{ v.atlas.rings }}" as="rg" hint-placeholder-count="0"><circle cx="{{ rg.x }}" cy="{{ rg.y }}" r="{{ rg.r }}" style="fill:none;stroke:{{ v.P.sealInk }};stroke-width:1.3;opacity:{{ rg.op }}"></circle></sc-for>
+<sc-for list="{{ v.atlas.legs }}" as="lg" hint-placeholder-count="0"><path d="{{ lg.d }}" style="fill:none;stroke:{{ v.P.casing }};stroke-width:6;stroke-linecap:round;stroke-linejoin:round"></path></sc-for>
+<sc-for list="{{ v.atlas.legs }}" as="lg" hint-placeholder-count="0"><path d="{{ lg.d }}" style="fill:none;stroke:{{ lg.stroke }};stroke-width:{{ lg.sw }};stroke-dasharray:{{ lg.dash }};stroke-linecap:round;stroke-linejoin:round;filter:{{ v.P.routeFx }}"></path></sc-for>
+<sc-for list="{{ v.atlas.seals }}" as="sl" hint-placeholder-count="0"><path d="{{ sl.d }}" style="fill:none;stroke:{{ v.P.sg1 }};stroke-width:13;stroke-linecap:round;stroke-linejoin:round"></path></sc-for><sc-for list="{{ v.atlas.seals }}" as="sl" hint-placeholder-count="0"><path d="{{ sl.d }}" style="fill:none;stroke:{{ v.P.sg2 }};stroke-width:7;stroke-linecap:round;stroke-linejoin:round"></path></sc-for><sc-for list="{{ v.atlas.seals }}" as="sl" hint-placeholder-count="0"><path d="{{ sl.d }}" style="fill:none;stroke:{{ v.P.sg3 }};stroke-width:3.6;stroke-linecap:round;stroke-linejoin:round"></path></sc-for><sc-for list="{{ v.atlas.seals }}" as="sl" hint-placeholder-count="0"><path d="{{ sl.d }}" style="fill:none;stroke:{{ v.P.sealCore }};stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"></path></sc-for>
+<text transform="{{ v.atlas.rl0.tf }}" style="display:{{ v.atlas.rl0.d }};font:italic 400 13px 'Instrument Serif',Georgia,serif;letter-spacing:.22em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">KULVAR DAĞLARI</text><text transform="{{ v.atlas.rl1.tf }}" style="display:{{ v.atlas.rl1.d }};font:italic 400 13px 'Instrument Serif',Georgia,serif;letter-spacing:.22em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">DERS OVASI</text><text transform="{{ v.atlas.rl2.tf }}" style="display:{{ v.atlas.rl2.d }};font:italic 400 12px 'Instrument Serif',Georgia,serif;letter-spacing:.16em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">BAŞVURU GEÇİDİ</text>
+<path id="{{ v.atlas.arcId }}" d="{{ v.atlas.arc }}" style="fill:none;stroke:none"></path>
+<text style="display:{{ v.atlas.arcD }};font:italic 400 12px 'Instrument Serif',Georgia,serif;letter-spacing:.16em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3px;stroke-linejoin:round"><textPath href="{{ v.atlas.arcHref }}" startOffset="50%" style="text-anchor:middle;dominant-baseline:central">GENEL DÜZLÜK</textPath></text>
+<text transform="{{ v.atlas.rl3.tf }}" style="display:{{ v.atlas.rl3.d }};font:italic 400 12px 'Instrument Serif',Georgia,serif;letter-spacing:.16em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">GENEL DÜZLÜK</text><g>{{ v.atlas.endGlow }}</g>
+</svg>
+<div style="position:absolute;inset:0;pointer-events:none;background:{{ v.P.vig }}"></div>
+<div style="position:absolute;inset:0;pointer-events:none;background-image:{{ grain }};mix-blend-mode:{{ v.P.blend }};opacity:{{ v.P.grainOp }}"></div>
+<div style="position:absolute;left:0;top:0;transform:{{ v.atlas.hq.tr }};width:0;height:0;pointer-events:none">
+<span style="position:absolute;left:-15px;top:-15px;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:{{ v.P.pin }};border:1px solid {{ v.P.pinBd }};color:#ed845c;font:400 1.1rem/1 'DM Sans',sans-serif">✳</span>
+<span style="position:absolute;left:-50px;top:19px;width:100px;text-align:center;font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:{{ v.P.ink }};text-shadow:{{ v.P.tsh }}">KARARGÂH</span>
+</div>
+<sc-for list="{{ v.atlas.others }}" as="o" hint-placeholder-count="0">
+<button data-front="{{ o.id }}" aria-label="{{ o.title }}" onClick="{{ o.tap }}" style="position:absolute;left:0;top:0;transform:{{ o.tr }};width:44px;height:44px;padding:0;border:0;border-radius:50%;background:none;display:grid;place-items:center;cursor:pointer;font:inherit;color:inherit;opacity:{{ o.op }};-webkit-touch-callout:none">
+{{ o.sonar }}<span style="width:14px;height:14px;border-radius:50%;background:{{ o.bg }};border:{{ o.border }};box-shadow:{{ o.sh }};display:grid;place-items:center"><span style="width:4px;height:4px;border-radius:50%;background:{{ o.dot }}"></span></span>
+<sc-if value="{{ o.hasLabel }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:{{ o.lx }};top:{{ o.ly }};padding:3px 7px;border-radius:6px;border:1px solid {{ o.pbd }};box-shadow:{{ o.pglow }};background:{{ v.P.plate }};color:{{ v.P.plateInk }};white-space:nowrap;text-align:left;line-height:1.3;pointer-events:none;opacity:.96"><span style="display:block;font-size:12px;font-weight:500">{{ o.title }}</span><sc-if value="{{ o.hasTag }}" hint-placeholder-val="{{ false }}"><span style="display:block;font:400 10px/1.35 'IBM Plex Mono',monospace;letter-spacing:.05em;color:{{ o.tagc }}">{{ o.tag }}</span></sc-if></span></sc-if>
+</button>
+</sc-for>
+<sc-for list="{{ v.atlas.stops }}" as="s" hint-placeholder-count="0">
+<button data-stop="{{ s.id }}" aria-label="{{ s.aria }}" onClick="{{ s.tap }}" style="position:absolute;left:0;top:0;transform:{{ s.tr }};width:44px;height:44px;padding:0;border:0;border-radius:50%;background:none;display:grid;place-items:center;cursor:pointer;touch-action:none;-webkit-touch-callout:none;user-select:none;opacity:{{ s.op }};font:inherit;color:inherit">
+<span style="position:absolute;inset:-14px;border-radius:50%;background:{{ v.P.clear }};pointer-events:none"></span>
+<span style="position:absolute;inset:-4px;border-radius:50%;border:1px dashed {{ v.P.palisade }};pointer-events:none"></span>{{ s.sonar }}
+<span style="position:relative;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:{{ s.bg }};border:{{ s.border }};color:{{ s.fg }};font:400 .8125rem 'IBM Plex Mono',monospace;box-shadow:{{ s.sh }};transform:scale({{ s.sc }})">
+<sc-if value="{{ s.done }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;fill:currentColor;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"></path></svg></sc-if>
+<sc-if value="{{ s.open }}" hint-placeholder-val="{{ true }}">{{ s.num }}</sc-if>
+</span>
+<sc-if value="{{ s.hasLabel }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:{{ s.lx }};top:{{ s.ly }};padding:3px 8px 4px;border-radius:6px;border:1px solid {{ s.pbd }};box-shadow:{{ s.pglow }};background:{{ v.P.plate }};color:{{ v.P.plateInk }};white-space:nowrap;text-align:left;line-height:1.3;pointer-events:none"><span style="display:{{ s.titleD }};font-size:13px;font-weight:500">{{ s.title }}</span><span style="display:block;font:400 10.5px/1.35 'IBM Plex Mono',monospace;letter-spacing:.05em;color:{{ s.tagc }}">{{ s.tag }}</span></span></sc-if>
+</button>
+</sc-for>
+<sc-if value="{{ v.atlas.ghost.show }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:0;top:0;transform:{{ v.atlas.ghost.tr }};width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:{{ v.U.btn }};color:{{ v.U.btnInk }};font:400 .875rem 'IBM Plex Mono',monospace;box-shadow:0 12px 26px -6px rgba(0,0,0,.5),0 0 0 6px {{ v.P.routeGlow }};pointer-events:none;z-index:4">{{ v.atlas.ghost.num }}</div></sc-if>
+<div style="position:absolute;left:0;right:0;top:0;padding:10px 20px 44px;background:{{ v.P.scrim }};pointer-events:none;z-index:2">
+<button onPointerDown="{{ stopProp }}" style="font:inherit;border:0;padding:0;display:flex;gap:8px;align-items:center;font-size:.875rem;background:none;color:{{ v.P.muted }};font-weight:500;min-height:44px;border-radius:10px;cursor:pointer;pointer-events:auto"><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>Karargâh</button>
+<h1 style="margin:0;font:400 2.7rem/1.05 'Instrument Serif',Georgia,serif;letter-spacing:-.025em;color:{{ v.P.ink }}">Harita</h1>
+<p style="margin:8px 0 0;font:400 .75rem/1.5 'IBM Plex Mono',monospace;letter-spacing:.06em;color:{{ v.P.muted }};max-width:250px">{{ v.atlasSub }}</p>
+</div>
+<div onPointerDown="{{ stopProp }}" style="position:absolute;right:12px;top:16px;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;background:{{ v.P.ctrl }};border:1px solid {{ v.P.ctrlBd }};color:{{ v.P.ctrlInk }};z-index:3">
+<button aria-label="Yakınlaştır" onClick="{{ v.atlas.zin }}" style="font:inherit;width:44px;height:44px;display:grid;place-items:center;background:transparent;border:0;border-radius:0;color:inherit;cursor:pointer;padding:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+<span style="height:1px;background:{{ v.P.ctrlBd }}"></span>
+<button aria-label="Uzaklaştır" onClick="{{ v.atlas.zout }}" style="font:inherit;width:44px;height:44px;display:grid;place-items:center;background:transparent;border:0;border-radius:0;color:inherit;cursor:pointer;padding:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path></svg></button>
+<span style="height:1px;background:{{ v.P.ctrlBd }}"></span>
+<button aria-label="Tüm cepheleri sığdır" onClick="{{ v.atlas.fit }}" style="font:inherit;width:44px;height:44px;display:grid;place-items:center;background:transparent;border:0;border-radius:0;color:inherit;cursor:pointer;padding:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path></svg></button>
+</div>
+<sc-if value="{{ v.atlas.dragOn }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:20px;top:150px;max-width:260px;padding:8px 12px;border-radius:10px;background:{{ v.U.surf }};color:{{ v.U.ink }};font-size:.8125rem;font-weight:500;box-shadow:0 8px 20px -8px rgba(4,22,24,.5);pointer-events:none;z-index:4">{{ v.atlas.dragText }}</div></sc-if>
+<sc-if value="{{ v.legendChip }}" hint-placeholder-val="{{ true }}"><button onClick="{{ v.toggleLegend }}" onPointerDown="{{ stopProp }}" style="position:absolute;right:12px;bottom:186px;min-height:44px;padding:0 14px;white-space:nowrap;border-radius:12px;background:{{ v.P.ctrl }};border:1px solid {{ v.P.ctrlBd }};color:{{ v.P.ctrlInk }};font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.05em;cursor:pointer;z-index:3">NASIL OKUNUR?</button></sc-if>
+<sc-if value="{{ v.legendOn }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ v.toggleLegend }}" onPointerDown="{{ stopProp }}" style="position:absolute;right:12px;bottom:186px;padding:10px 12px;border-radius:12px;background:{{ v.P.ctrl }};border:1px solid {{ v.P.ctrlBd }};color:{{ v.P.muted }};display:flex;flex-direction:column;gap:6px;width:262px;font:400 .6875rem/1.3 'IBM Plex Mono',monospace;letter-spacing:.05em;cursor:pointer;z-index:3">
+<span style="font:400 .8125rem/1.45 'DM Sans',sans-serif;letter-spacing:0;color:{{ v.P.ink }};text-wrap:pretty;padding-bottom:3px">Kampın yeri cephe tipini, rengi aciliyeti söyler.</span>
+<span style="display:flex;align-items:center;gap:9px"><svg viewBox="0 0 16 12" style="width:16px;height:12px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round"><path d="M1 11 5.5 3 8.5 7.5 11 4.5 15 11"></path><path d="M4 11 5.5 8 7 10"></path></svg>DAĞLIK · KULVARLAR</span>
+<span style="display:flex;align-items:center;gap:9px"><svg viewBox="0 0 16 12" style="width:16px;height:12px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round"><path d="M1 4.5c3-1.6 6 1.6 9 0s4-.8 5 0"></path><path d="M1 9c4-1.4 9 1.4 14 0"></path></svg>OVA · DERSLER</span>
+<span style="display:flex;align-items:center;gap:9px"><svg viewBox="0 0 16 12" style="width:16px;height:12px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round"><path d="M1 2c3 0 5 8 7 8s4-8 7-8"></path><path d="M4.5 2c2 0 2.6 4.5 3.5 4.5S9.5 2 11.5 2"></path></svg>GEÇİT · BAŞVURULAR</span>
+<span style="display:flex;align-items:center;gap:9px"><svg viewBox="0 0 16 12" style="width:16px;height:12px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round"><path d="M1 8.5h14"></path><path d="M5 5.5h6"></path></svg>DÜZLÜK · GENEL</span>
+<span style="height:1px;background:{{ v.P.ctrlBd }};margin:2px 0"></span>
+<span style="display:flex;align-items:center;gap:9px;color:{{ v.P.coralInk }}"><svg viewBox="0 0 16 12" style="width:16px;height:12px;display:block;flex-shrink:0;overflow:visible"><circle cx="8" cy="6" r="6" style="fill:none;stroke:{{ v.P.coral }};stroke-width:1"></circle><circle cx="8" cy="6" r="3.3" style="fill:{{ v.P.coral }}"></circle></svg>SONAR · {{ v.critTxt }}</span>
+<span style="display:flex;align-items:center;gap:9px;color:{{ v.P.coralInk }}"><svg viewBox="0 0 16 12" style="width:16px;height:12px;display:block;flex-shrink:0;overflow:visible"><circle cx="8" cy="6" r="4" style="fill:none;stroke:{{ v.P.coral }};stroke-width:1.6"></circle></svg>{{ v.hotWord }} · {{ v.nearTxt }}</span>
+<span style="display:flex;align-items:center;gap:9px"><svg viewBox="0 0 16 12" style="width:16px;height:12px;display:block;flex-shrink:0;overflow:visible"><circle cx="8" cy="6" r="4" style="fill:{{ v.P.pin }};stroke:{{ v.P.pinBd }};stroke-width:1"></circle></svg>SAKİN · UZAK VEYA TARİHSİZ</span>
+<span style="height:1px;background:{{ v.P.ctrlBd }};margin:2px 0"></span>
+<span style="display:flex;align-items:center;gap:9px"><svg viewBox="0 0 16 12" style="width:16px;height:12px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-dasharray:.1 4"><path d="M1 6h14"></path></svg>PATİKA · GÜNÜN SIRASI</span>
+<span style="display:flex;align-items:center;gap:9px;color:{{ v.P.sealInk }}"><svg viewBox="0 0 16 12" style="width:16px;height:12px;display:block;flex-shrink:0;fill:none;stroke-linecap:round"><path d="M2 6h12" style="stroke:{{ v.P.sg3 }};stroke-width:5"></path><path d="M2 6h12" style="stroke:{{ v.P.sealCore }};stroke-width:1.7"></path></svg>MÜHÜR · ELE GEÇEN HAT</span>
+<span style="display:flex;align-items:center;gap:9px;color:{{ v.P.sealInk }}"><svg viewBox="0 0 24 24" style="width:16px;height:14px;display:block;flex-shrink:0;fill:currentColor;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"></path></svg>BAYRAK · GEÇİLEN KAMP</span>
+</div>
+</sc-if>
+<sc-if value="{{ v.card.show }}" hint-placeholder-val="{{ false }}">
+<div onPointerDown="{{ stopProp }}" style="position:absolute;left:10px;right:10px;bottom:184px;background:{{ v.U.surf }};color:{{ v.U.ink }};border:1px solid {{ v.U.line }};border-radius:20px;padding:12px 16px 16px 18px;box-shadow:0 18px 40px -14px rgba(4,22,24,.6);z-index:5;cursor:auto">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+<span style="display:flex;align-items:center;gap:8px;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.05em;color:{{ v.U.muted }}"><span style="width:6px;height:16px;border-radius:3px;background:{{ v.card.color }}"></span>{{ v.card.type }}</span>
+<button aria-label="Kapat" onClick="{{ v.card.close }}" style="font:inherit;width:44px;height:44px;margin:-6px -10px -6px 0;display:grid;place-items:center;background:transparent;border:0;border-radius:10px;color:{{ v.U.ink }};cursor:pointer;padding:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+</div>
+<h3 style="margin:0;font:400 1.9rem/1.12 'Instrument Serif',Georgia,serif">{{ v.card.title }}</h3>
+<p style="margin:6px 0 0;font-size:.875rem;color:{{ v.U.muted }}">{{ v.card.meta }}</p>
+<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">
+<span style="font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.04em;padding:5px 9px;border-radius:12px;background:{{ v.card.dayBg }};color:{{ v.card.dayInk }}">{{ v.card.days }}</span>
+<span style="font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.04em;padding:5px 9px;border-radius:12px;background:{{ v.U.chip }};color:{{ v.U.ink }}">{{ v.card.route }}</span>
+</div>
+<p style="margin:14px 0 0;font-size:1rem;line-height:1.45"><span style="display:block;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.04em;color:{{ v.U.accent }};margin-bottom:4px">SIRADAKİ HAMLE</span>{{ v.card.move }}</p>
+<button style="font:inherit;width:100%;display:flex;align-items:center;justify-content:space-between;margin-top:14px;min-height:48px;background:{{ v.U.btn }};color:{{ v.U.btnInk }};border:1px solid {{ v.U.btnBd }};border-radius:10px;padding:10px 16px;font-weight:500;cursor:pointer"><span>Cepheyi aç</span><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></button>
+</div>
+</sc-if>
+<sc-if value="{{ v.toastOn }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:20px;top:150px;max-width:300px;padding:8px 12px;border-radius:10px;background:{{ v.U.btn }};color:{{ v.U.btnInk }};font-size:.8125rem;box-shadow:0 8px 20px -8px rgba(4,22,24,.5);pointer-events:none;z-index:4">{{ v.toast }}</div></sc-if>
+<sc-if value="{{ v.pendOn }}" hint-placeholder-val="{{ false }}"><div onPointerDown="{{ stopProp }}" style="position:absolute;left:12px;right:12px;bottom:186px;display:flex;align-items:center;gap:4px;padding:5px 5px 5px 14px;border-radius:14px;background:{{ v.U.surf }};color:{{ v.U.ink }};border:1px solid {{ v.U.line }};box-shadow:0 12px 30px -10px rgba(4,22,24,.55);z-index:6"><span style="flex:1;font-size:.875rem">Yeni sıra hazır.</span><button onClick="{{ v.cancelPend }}" style="font:inherit;background:none;border:0;min-height:44px;padding:8px 10px;font-size:.875rem;font-weight:500;color:{{ v.U.ink }};border-radius:10px;cursor:pointer">Vazgeç</button><button onClick="{{ v.savePend }}" style="font:inherit;white-space:nowrap;background:{{ v.U.btn }};color:{{ v.U.btnInk }};border:1px solid {{ v.U.btnBd }};min-height:44px;padding:8px 14px;font-size:.875rem;font-weight:500;border-radius:10px;cursor:pointer">Sırayı kaydet</button></div></sc-if>
+</div>
+<div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:30;width:calc(100% - 20px);padding:10px 12px 34px;background:{{ v.U.bg }};border:1px solid {{ v.U.line }};border-bottom:0;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px {{ v.U.dockSh }}">
+<button style="font:inherit;display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:{{ v.U.chip }};border:0;padding:10px 12px;border-radius:14px;font-size:1rem;font-weight:500;color:{{ v.U.ink }};min-height:44px;cursor:pointer"><span style="width:42px;height:42px;background:{{ v.U.mic }};color:{{ v.U.micInk }};display:grid;place-items:center;border-radius:50%;flex-shrink:0"><svg viewBox="0 0 24 24" style="width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M2 10v3"></path><path d="M6 6v11"></path><path d="M10 3v18"></path><path d="M14 8v7"></path><path d="M18 5v13"></path><path d="M22 10v3"></path></svg></span><span style="flex:1">Aklındakini bırak.<small style="display:block;font-size:.75rem;color:{{ v.U.muted }};font-weight:400;margin-top:2px">Berthier yerine yerleştirir.</small></span><svg viewBox="0 0 24 24" style="width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+<nav style="display:flex;justify-content:space-around;width:100%;padding:9px 0 0">
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:{{ v.U.muted }};font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"></path></svg>Karargâh</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:{{ v.U.ink }};font-weight:700;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg>Harita</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:{{ v.U.muted }};font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M8 13h.01"></path><path d="M12 13h.01"></path><path d="M16 13h.01"></path><path d="M8 17h.01"></path><path d="M12 17h.01"></path><path d="M16 17h.01"></path></svg>Ufuk</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:{{ v.U.muted }};font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg>Teftiş</button>
+</nav>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;gun&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;3 cephe&quot;,&quot;6 cephe&quot;,&quot;12 cephe&quot;],&quot;default&quot;:&quot;6 cephe&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Örnek gün&quot;},&quot;durum&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Başlangıç&quot;,&quot;Yarı yol&quot;,&quot;Gün sonu&quot;],&quot;default&quot;:&quot;Başlangıç&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Örnek gün&quot;},&quot;kritik&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:2,&quot;min&quot;:0,&quot;max&quot;:5,&quot;step&quot;:1,&quot;unit&quot;:&quot;gün&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Aciliyet&quot;},&quot;yaklasan&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:7,&quot;min&quot;:3,&quot;max&quot;:14,&quot;step&quot;:1,&quot;unit&quot;:&quot;gün&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Aciliyet&quot;},&quot;kabartma&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Arazi&quot;},&quot;etiketler&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Arazi&quot;}}">
+class Component extends DCLogic {
+  state = { views: {}, focus: {}, sel: {}, orders: {}, pending: {}, done: {}, drag: null, hint: {}, toast: {}, legend: {}, fxT: -1 };
+
+  componentDidMount() {
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { this._tw = {}; this.forceUpdate(); });
+  }
+  componentWillUnmount() {
+    const M = this._maps || {};
+    for (const k in M) if (M[k].el) M[k].el.removeEventListener('wheel', M[k].wheel);
+    cancelAnimationFrame(this._raf); cancelAnimationFrame(this._anim); cancelAnimationFrame(this._fxRaf);
+  }
+  rm() { if (this._reduced == null) { try { this._reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (_) { this._reduced = false; } } return this._reduced; }
+
+  get C() {
+    return this._C || (this._C = {
+      X0: -380, Y0: -420, X1: 1180, Y1: 1520, ST: 6, PS: 12, LV: .036, HQ: [400, 640],
+      RIDGE: [[-420, 300], [-150, 250], [100, 175], [300, 225], [470, 135], [640, 190], [860, 110], [1200, 60]],
+      VAL: [[520, 660], [590, 530], [660, 400], [715, 270], [770, 130], [840, -60], [900, -260]], PASS: 560,
+      RIVER: [[760, 155], [741, 205], [715, 270], [690, 335], [660, 400], [627, 462], [590, 530], [556, 594], [520, 660], [512, 715], [528, 770], [534, 825], [515, 878], [492, 930], [470, 990], [458, 1048], [436, 1108], [404, 1168], [380, 1240], [352, 1320], [336, 1420], [318, 1540]],
+      HILLS: [[160, 880, .06, 120], [420, 1010, .045, 150], [650, 940, .07, 110], [250, 1190, .055, 130], [600, 1230, .05, 140], [40, 1060, .06, 110], [-120, 820, .08, 140]],
+      SE: [950, 640, .52, 210],
+      SLOTS: {
+        general: [[270, 590], [310, 470], [300, 740], [440, 790]],
+        course: [[180, 900], [380, 960], [610, 895], [260, 1080], [600, 1095]],
+        lane: [[230, 330], [420, 250], [120, 240], [560, 120], [320, 95]],
+        application: [[547, 544], [691, 408], [730, 143], [856, -20]]
+      },
+      REG: [
+        ['KULVAR DAĞLARI', [[330, 150, -4], [560, 330, -6], [300, 20, -3], [470, 400, -5], [110, 420, -6], [620, 240, -8]]],
+        ['DERS OVASI', [[300, 830, 0], [420, 1040, 0], [470, 880, 0], [430, 1190, 0], [650, 1010, 0], [150, 990, 0]]],
+        ['BAŞVURU GEÇİDİ', [[683, 510, -62], [765, 318, -67], [585, 455, -62], [812, 560, -62], [640, 250, -67]]]
+      ],
+      ARC: [[130, 0], [130, 1], [145, 0], [145, 1], [160, 0], [160, 1], [180, 0], [180, 1], [200, 0], [200, 1], [220, 0], [220, 1], [245, 0], [245, 1], [270, 0], [270, 1]],
+      HOME: { w: 390, h: 360 }, ATLAS: { w: 390, h: 768 }
+    });
+  }
+  get PALS() {
+    if (this._pals) return this._pals;
+    const base = { blend: 'soft-light', hl: 0, calmSh: '', routeFx: 'none' };
+    const mk = o => ({ ...base, ...o });
+    return this._pals = {
+      kul: mk({ id: 'kul', ground: '#1f1c19', minor: 'rgba(196,176,150,.1)', index: 'rgba(214,196,170,.26)', stip: 'rgba(196,176,150,.16)', river: 'rgba(122,136,132,.5)',
+        ink: '#d8cdbd', muted: '#9d9282', route: '#cbbfae', routeDim: 'rgba(203,191,174,.55)', routeGlow: 'rgba(203,191,174,.18)', casing: 'rgba(12,10,9,.6)',
+        pin: '#26221e', pinBd: '#8a7f70', plate: 'rgba(31,28,25,.92)', plateInk: '#d8cdbd', tagMuted: '#9d9282', label: '#b8ab98', halo: 'rgba(31,28,25,.75)',
+        ctrl: 'rgba(31,28,25,.9)', ctrlBd: 'rgba(160,146,128,.3)', ctrlInk: '#d8cdbd', vig: 'radial-gradient(ellipse at 50% 45%, rgba(8,6,5,0) 50%, rgba(8,6,5,.55) 100%)', grainOp: .5,
+        other: '#cbbfae', clear: 'radial-gradient(circle, rgba(216,205,189,.07) 0%, rgba(216,205,189,0) 70%)', palisade: 'rgba(216,205,189,.2)', scrim: 'linear-gradient(#1b1916 0%, rgba(27,25,22,.88) 45%, rgba(27,25,22,0) 100%)', tsh: '0 0 3px #1f1c19, 0 0 6px #1f1c19',
+        sealCore: '#f0d6a8', sg1: 'rgba(217,163,91,.12)', sg2: 'rgba(217,163,91,.28)', sg3: 'rgba(217,163,91,.75)', sealInk: '#d9a35b', sealBd: 'rgba(217,163,91,.6)',
+        flagBg: '#1f1c19', flagBd: '#d9a35b', flagFg: '#d9a35b', flagSh: '0 0 0 4px rgba(217,163,91,.14), 0 0 16px 3px rgba(217,163,91,.38)', summitCap: '#d9a35b',
+        coral: '#d0683a', coralInk: '#e08a5e', coralSoft: 'rgba(208,104,58,.18)', coralGlow: 'rgba(208,104,58,.5)', coralGlowSoft: 'rgba(208,104,58,.3)', coralBd: 'rgba(224,138,94,.55)', critInk: '#1f1c19',
+        hotWord: 'PAS', hlc: [120, 106, 90], hs: .45, ds: .55,
+        HY: [[0, [22, 20, 18]], [.07, [27, 24, 21]], [.095, [31, 28, 25]], [.16, [34, 30, 27]], [.3, [41, 36, 31]], [.5, [50, 43, 37]], [.75, [60, 52, 44]], [1, [72, 62, 52]], [1.3, [88, 76, 64]]],
+        U: { bg: '#1b1916', surf: '#24211d', chip: '#2e2a25', line: '#3a342e', ink: '#ddd2c2', muted: '#9d9282', onInk: '#1b1916', accent: '#e08a5e', mic: '#2e2a25', btn: '#3a332c', btnInk: '#ecdcc6', btnBd: '#4a4138', micInk: '#d9a35b', dockSh: 'rgba(0,0,0,.3)', hotBg: 'rgba(208,104,58,.2)', hotInk: '#e79a72' } }),
+      orman: mk({ id: 'orman', ground: '#242a28', minor: 'rgba(214,222,206,.09)', index: 'rgba(224,228,206,.22)', stip: 'rgba(190,204,180,.14)', river: 'rgba(150,176,186,.45)',
+        ink: '#dcd6b8', muted: '#98a197', route: '#d9cf9c', routeDim: 'rgba(217,207,156,.55)', routeGlow: 'rgba(217,207,156,.16)', casing: 'rgba(12,16,15,.55)',
+        pin: '#1e2522', pinBd: '#7d877f', plate: 'rgba(30,37,34,.92)', plateInk: '#dcd6b8', tagMuted: '#98a197', label: '#c9c3a3', halo: 'rgba(30,37,34,.75)',
+        ctrl: 'rgba(30,37,34,.9)', ctrlBd: 'rgba(150,164,150,.3)', ctrlInk: '#dcd6b8', vig: 'radial-gradient(ellipse at 50% 40%, rgba(10,14,13,0) 50%, rgba(10,14,13,.45) 100%)', grainOp: .4,
+        other: '#c9c3a3', clear: 'radial-gradient(circle, rgba(220,214,184,.07) 0%, rgba(220,214,184,0) 70%)', palisade: 'rgba(220,214,184,.2)', scrim: 'linear-gradient(#1d2321 0%, rgba(29,35,33,.88) 45%, rgba(29,35,33,0) 100%)', tsh: '0 0 3px #242a28, 0 0 6px #242a28',
+        sealCore: '#f4efd6', sg1: 'rgba(232,221,166,.1)', sg2: 'rgba(232,221,166,.24)', sg3: 'rgba(232,221,166,.7)', sealInk: '#e3d9a8', sealBd: 'rgba(227,217,168,.55)',
+        flagBg: '#1e2522', flagBd: '#e3d9a8', flagFg: '#e3d9a8', flagSh: '0 0 0 4px rgba(232,221,166,.12), 0 0 14px 2px rgba(232,221,166,.3)', summitCap: '#e3d9a8',
+        coral: '#e07a5a', coralInk: '#eb9677', coralSoft: 'rgba(224,122,90,.18)', coralGlow: 'rgba(224,122,90,.45)', coralGlowSoft: 'rgba(224,122,90,.28)', coralBd: 'rgba(235,150,119,.55)', critInk: '#1e2522',
+        hlc: [150, 160, 150], hs: .35, ds: .55,
+        HY: [[0, [44, 50, 48]], [.07, [40, 46, 44]], [.095, [36, 42, 40]], [.16, [33, 41, 37]], [.3, [27, 40, 33]], [.5, [24, 38, 31]], [.75, [31, 43, 37]], [1, [48, 57, 53]], [1.3, [70, 78, 74]]],
+        U: { bg: '#1d2321', surf: '#252c29', chip: '#2e3632', line: '#39423d', ink: '#dcd6b8', muted: '#98a197', onInk: '#1d2321', accent: '#d9c98a', mic: '#2e3632', btn: '#34403a', btnInk: '#e6e0c4', btnBd: '#44514a', micInk: '#e3d9a8', dockSh: 'rgba(0,0,0,.3)', hotBg: 'rgba(224,122,90,.18)', hotInk: '#eb9677' } }),
+      derin: mk({ id: 'derin', ground: '#0c2528', minor: 'rgba(186,208,195,.1)', index: 'rgba(186,220,208,.28)', stip: 'rgba(150,190,180,.14)', river: 'rgba(110,170,175,.42)',
+        ink: '#d9e4dc', muted: '#8fa8a0', route: '#ed845c', routeDim: 'rgba(237,132,92,.6)', routeGlow: 'rgba(237,132,92,.22)', casing: 'rgba(3,14,15,.6)', routeFx: 'drop-shadow(0 0 3px rgba(237,132,92,.75))',
+        pin: '#0f2e31', pinBd: '#6f8f88', plate: 'rgba(12,37,40,.92)', plateInk: '#d9e4dc', tagMuted: '#8fa8a0', label: '#a9c2b8', halo: 'rgba(12,37,40,.75)',
+        ctrl: 'rgba(12,37,40,.9)', ctrlBd: 'rgba(143,168,160,.3)', ctrlInk: '#d9e4dc', vig: 'radial-gradient(ellipse at 50% 45%, rgba(2,12,13,0) 50%, rgba(2,12,13,.6) 100%)', grainOp: .4,
+        other: '#b9cfc6', clear: 'radial-gradient(circle, rgba(217,228,220,.06) 0%, rgba(217,228,220,0) 70%)', palisade: 'rgba(217,228,220,.18)', scrim: 'linear-gradient(#0f2326 0%, rgba(15,35,38,.88) 45%, rgba(15,35,38,0) 100%)', tsh: '0 0 3px #0c2528, 0 0 6px #0c2528',
+        sealCore: '#fff1dc', sg1: 'rgba(245,184,113,.12)', sg2: 'rgba(245,184,113,.3)', sg3: 'rgba(245,184,113,.8)', sealInk: '#f5b871', sealBd: 'rgba(245,184,113,.55)',
+        flagBg: '#0c2528', flagBd: '#f5b871', flagFg: '#f5b871', flagSh: '0 0 0 4px rgba(245,184,113,.14), 0 0 18px 3px rgba(245,184,113,.42)', summitCap: '#f5b871',
+        coral: '#ed845c', coralInk: '#f2956f', coralSoft: 'rgba(237,132,92,.2)', coralGlow: 'rgba(237,132,92,.6)', coralGlowSoft: 'rgba(237,132,92,.34)', coralBd: 'rgba(242,149,111,.6)', critInk: '#1b2a26', calmSh: '0 0 10px 1px rgba(237,132,92,.14)',
+        hlc: [70, 120, 116], hs: .35, ds: .55,
+        HY: [[0, [7, 26, 28]], [.07, [10, 33, 36]], [.095, [12, 37, 40]], [.16, [14, 42, 45]], [.3, [18, 50, 52]], [.5, [23, 58, 59]], [.75, [29, 66, 66]], [1, [37, 75, 74]], [1.3, [50, 88, 85]]],
+        U: { bg: '#0f2326', surf: '#142d30', chip: '#1b3739', line: '#244446', ink: '#d9e4dc', muted: '#8fa8a0', onInk: '#0f2326', accent: '#f2956f', mic: '#1b3739', btn: '#1f4346', btnInk: '#e3ece6', btnBd: '#2b5557', micInk: '#f5b871', dockSh: 'rgba(0,0,0,.35)', hotBg: 'rgba(237,132,92,.18)', hotInk: '#f2956f' } }),
+      grafit: mk({ id: 'grafit', ground: '#1c1d1f', minor: 'rgba(220,220,215,.08)', index: 'rgba(220,220,215,.2)', stip: 'rgba(200,200,195,.12)', river: 'rgba(140,150,165,.42)',
+        ink: '#d6d3cb', muted: '#8f8d88', route: '#c9ad7a', routeDim: 'rgba(201,173,122,.55)', routeGlow: 'rgba(201,173,122,.16)', casing: 'rgba(8,8,9,.55)',
+        pin: '#222325', pinBd: '#77756f', plate: 'rgba(28,29,31,.92)', plateInk: '#d6d3cb', tagMuted: '#8f8d88', label: '#b3b0a8', halo: 'rgba(28,29,31,.75)',
+        ctrl: 'rgba(28,29,31,.9)', ctrlBd: 'rgba(150,148,142,.3)', ctrlInk: '#d6d3cb', vig: 'radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 50%, rgba(0,0,0,.5) 100%)', grainOp: .35,
+        other: '#c4c1b9', clear: 'radial-gradient(circle, rgba(214,211,203,.06) 0%, rgba(214,211,203,0) 70%)', palisade: 'rgba(214,211,203,.18)', scrim: 'linear-gradient(#18191b 0%, rgba(24,25,27,.88) 45%, rgba(24,25,27,0) 100%)', tsh: '0 0 3px #1c1d1f, 0 0 6px #1c1d1f',
+        sealCore: '#efe2c4', sg1: 'rgba(201,173,122,.1)', sg2: 'rgba(201,173,122,.24)', sg3: 'rgba(201,173,122,.7)', sealInk: '#d4b98a', sealBd: 'rgba(212,185,138,.55)',
+        flagBg: '#1c1d1f', flagBd: '#d4b98a', flagFg: '#d4b98a', flagSh: '0 0 0 4px rgba(212,185,138,.12), 0 0 14px 2px rgba(212,185,138,.3)', summitCap: '#d4b98a',
+        coral: '#e0805e', coralInk: '#ea9a7c', coralSoft: 'rgba(224,128,94,.18)', coralGlow: 'rgba(224,128,94,.45)', coralGlowSoft: 'rgba(224,128,94,.28)', coralBd: 'rgba(234,154,124,.55)', critInk: '#1c1d1f',
+        hlc: [95, 96, 98], hs: .35, ds: .5,
+        HY: [[0, [20, 21, 23]], [.07, [25, 26, 28]], [.095, [28, 29, 31]], [.16, [31, 32, 34]], [.3, [36, 37, 39]], [.5, [42, 43, 46]], [.75, [49, 50, 53]], [1, [57, 58, 61]], [1.3, [70, 71, 74]]],
+        U: { bg: '#18191b', surf: '#202123', chip: '#2a2b2d', line: '#343538', ink: '#d6d3cb', muted: '#8f8d88', onInk: '#18191b', accent: '#d4b98a', mic: '#2a2b2d', btn: '#333437', btnInk: '#e2dfd7', btnBd: '#434448', micInk: '#d4b98a', dockSh: 'rgba(0,0,0,.3)', hotBg: 'rgba(224,128,94,.18)', hotInk: '#ea9a7c' } })
+    };
+  }
+  get FR() {
+    return this._fr || (this._fr = [
+      { id: 'bio', title: 'Biyokimya', type: 'course', status: 'active', days: 3, event: 'Enzim kinetiği sunumu', when: 'Sal 29 Eyl · 10:00', move: 'Sunumun ilk beş slaytını hazırla.' },
+      { id: 'ist', title: 'İstatistik', type: 'course', status: 'active', days: 9, event: 'İstatistik vizesi', when: 'Pzt 5 Eki · 13:30', move: 'Hipotez testleri bölümünden 10 soru çöz.' },
+      { id: 'gen', title: 'Moleküler Genetik', type: 'course', status: 'active', days: 20, event: 'Ödev 2 teslimi', when: 'Cum 16 Eki', move: 'Ödev 2’nin ilk sorusunu çöz.' },
+      { id: 'org', title: 'Organik Kimya Lab', type: 'course', status: 'active', days: 6, event: 'Deney 3 raporu', when: 'Cum 2 Eki · 17:00', move: 'Deney 3 raporunun sonuç bölümünü yaz.' },
+      { id: 'era', title: 'Erasmus+ başvurusu', type: 'application', status: 'active', days: 4, event: 'Erasmus+ son başvuru', when: 'Çar 30 Eyl · 23:59', move: 'Ayşe Hoca’ya referans ricası mailini gönder.', doneAt: '10:12' },
+      { id: 'tub', title: 'TÜBİTAK 2209-A', type: 'application', status: 'active', days: 18, event: '2209-A son başvuru', when: 'Çar 14 Eki', move: 'Proje özetinin ilk taslağını yaz.' },
+      { id: 'bur', title: 'Bursluluk başvurusu', type: 'application', status: 'active', days: 44, event: 'Burs son başvuru', when: 'Pzt 9 Kas', move: 'Başvuru portalını aç ve istenen belgeleri listele.' },
+      { id: 'mik', title: 'Mikrobiyom derlemesi', type: 'lane', status: 'active', days: null, where: 'Literatür tablosunda 12. makalede kaldın.', move: '13. makaleyi oku ve tabloya ekle.' },
+      { id: 'reu', title: 'Reuteri fermantasyonu', type: 'lane', status: 'active', days: null, where: 'İlk parti 24 saatte pH 4,3’e indi.', move: 'İkinci partinin pH ölçümünü kaydet.' },
+      { id: 'tez', title: 'Tez önerisi', type: 'lane', status: 'held', days: null, where: '', move: 'Danışmana soracağın üç soruyu yaz.' },
+      { id: 'kar', title: 'Kargo iadesi', type: 'general', status: 'active', days: 1, event: 'Son iade günü', when: 'Paz 27 Eyl', move: 'İade paketini PTT şubesine götür.' },
+      { id: 'dek', title: 'Dekanlık imzası', type: 'general', status: 'active', days: 2, event: 'Dekanlık randevusu', when: 'Pzt 28 Eyl · 14:00', move: 'Staj formunu dekanlıkta imzalat.' },
+      { id: 'sta', title: 'Staj defteri', type: 'general', status: 'active', days: 16, event: 'Defter teslimi', when: 'Pzt 12 Eki', move: 'Staj defterinin 3. haftasını doldur.' }
+    ]);
+  }
+  get BY() { if (!this._by) { this._by = {}; for (const f of this.FR) this._by[f.id] = f; } return this._by; }
+  get PRESETS() { return this._pr || (this._pr = { '3 cephe': ['kar', 'bio', 'mik'], '6 cephe': ['era', 'kar', 'bio', 'ist', 'mik', 'tub'], '12 cephe': ['era', 'kar', 'dek', 'bio', 'org', 'ist', 'mik', 'reu', 'sta', 'tub', 'gen', 'bur'] }); }
+  get TYPES() { return { course: ['DERSLER', '#567c8d', 'DERS OVASI'], lane: ['KULVARLAR', '#507769', 'KULVAR DAĞLARI'], application: ['BAŞVURULAR', '#c7764d', 'BAŞVURU GEÇİDİ'], general: ['GENEL', '#94856b', 'GENEL DÜZLÜK'] }; }
+  get GRAIN() { return "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")"; }
+  get TIMES() { return ['10:12', '11:05', '12:30', '14:10', '15:40', '16:55', '17:45', '18:30', '19:20', '20:10', '20:50', '21:30']; }
+
+  pad(n) { return String(n).padStart(2, '0'); }
+  ss(a, b, x) { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); }
+  smin(a, b, k) { const q = Math.max(k - Math.abs(a - b), 0) / k; return Math.min(a, b) - q * q * k * .25; }
+  pdist(x, y, P) {
+    let bd = Infinity, bs = 0, acc = 0;
+    for (let i = 0; i < P.length - 1; i++) {
+      const ax = P[i][0], ay = P[i][1], dx = P[i + 1][0] - ax, dy = P[i + 1][1] - ay, L2 = dx * dx + dy * dy, L = Math.sqrt(L2);
+      let t = ((x - ax) * dx + (y - ay) * dy) / L2; t = t < 0 ? 0 : t > 1 ? 1 : t;
+      const ex = ax + dx * t - x, ey = ay + dy * t - y, d = ex * ex + ey * ey;
+      if (d < bd) { bd = d; bs = acc + t * L; }
+      acc += L;
+    }
+    return { d: Math.sqrt(bd), s: bs };
+  }
+  nInit() {
+    if (this._perm) return;
+    const a = []; for (let i = 0; i < 256; i++) a.push(i);
+    let s = 1337; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    for (let i = 255; i > 0; i--) { const j = Math.floor(r() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; }
+    const p = new Uint8Array(512); for (let i = 0; i < 512; i++) p[i] = a[i & 255];
+    this._perm = p;
+  }
+  n2(x, y) {
+    const p = this._perm, X = Math.floor(x), Y = Math.floor(y), fx = x - X, fy = y - Y, xi = X & 255, yi = Y & 255;
+    const u = fx * fx * fx * (fx * (fx * 6 - 15) + 10), v = fy * fy * fy * (fy * (fy * 6 - 15) + 10);
+    const g = (q, dx, dy) => { switch (q & 7) { case 0: return dx + dy; case 1: return dy - dx; case 2: return dx - dy; case 3: return -dx - dy; case 4: return dx; case 5: return -dx; case 6: return dy; default: return -dy; } };
+    const A = p[xi] + yi, B = p[xi + 1] + yi;
+    const g00 = g(p[A], fx, fy), g10 = g(p[B], fx - 1, fy), g01 = g(p[A + 1], fx, fy - 1), g11 = g(p[B + 1], fx - 1, fy - 1);
+    const x1 = g00 + (g10 - g00) * u, x2 = g01 + (g11 - g01) * u;
+    return x1 + (x2 - x1) * v;
+  }
+  fbm(x, y, o, sd) { let s = 0, a = .5, f = 1; for (let i = 0; i < o; i++) { s += a * this.n2(x * f + sd * (i + 1), y * f - sd * (i + 1) * .7); f *= 2.03; a *= .5; } return s; }
+  ridged(x, y) { let r = 0, a = .5, f = 1, w = 1; for (let i = 0; i < 4; i++) { let q = 1 - Math.abs(this.n2(x * f + i * 17.3, y * f - i * 9.1)); q *= q; q *= w; w = Math.min(1, Math.max(0, q * 2)); r += q * a; f *= 2.05; a *= .5; } return r / .94; }
+  height(x, y) {
+    const C = this.C;
+    const wx = x + 70 * this.n2(x / 420 + 3.1, y / 420 + 7.7), wy = y + 70 * this.n2(x / 420 + 11.3, y / 420 + 1.9);
+    let h = .115 + .05 * this.fbm(wx / 300, wy / 300, 3, 5.2);
+    for (const q of C.HILLS) { const dx = wx - q[0], dy = wy - q[1]; h += q[2] * Math.exp(-(dx * dx + dy * dy) / (2 * q[3] * q[3])); }
+    { const q = C.SE, dx = wx - q[0], dy = wy - q[1], e = Math.exp(-(dx * dx + dy * dy) / (2 * q[3] * q[3])); if (e > .01) h += q[2] * e * (.7 + .5 * this.fbm(wx / 150, wy / 150, 3, 9.1)); }
+    const mm = this.ss(340, 40, this.pdist(wx, wy, C.RIDGE).d);
+    if (mm > 0) h += Math.pow(mm, 1.25) * (.16 + .84 * this.ridged(wx / 210, wy / 210));
+    const pr = this.pdist(x, y, C.RIVER), south = this.ss(680, 900, y);
+    if (south > 0) h += .055 * Math.min(1, pr.d / 340) * south;
+    const pv = this.pdist(x, y, C.VAL), fl = .05 + .3 * Math.exp(-Math.pow((pv.s - C.PASS) / 115, 2));
+    h = this.smin(h, fl + .95 * Math.pow(pv.d / 170, 1.5), .09);
+    const fq = this.ss(265, 125, Math.hypot(x - C.HQ[0], y - C.HQ[1]));
+    if (fq > 0) h = h * (1 - fq) + (.095 + .006 * this.n2(x / 90, y / 90)) * fq;
+    h -= .014 * Math.exp(-(pr.d * pr.d) / 512);
+    const e = Math.min(x - C.X0, C.X1 - x, y - C.Y0, C.Y1 - y);
+    return .09 + (h - .09) * this.ss(0, 240, e);
+  }
+  rdp(P, eps, closed) {
+    if (P.length < 3) return P;
+    if (closed) {
+      let far = 0, fd = -1; for (let i = 1; i < P.length; i++) { const d = (P[i][0] - P[0][0]) ** 2 + (P[i][1] - P[0][1]) ** 2; if (d > fd) { fd = d; far = i; } }
+      const a = this.rdp(P.slice(0, far + 1), eps, false), b = this.rdp(P.slice(far).concat([P[0]]), eps, false);
+      return a.slice(0, -1).concat(b.slice(0, -1));
+    }
+    const keep = new Uint8Array(P.length); keep[0] = keep[P.length - 1] = 1;
+    const st = [[0, P.length - 1]];
+    while (st.length) {
+      const [s, e] = st.pop(), ax = P[s][0], ay = P[s][1], dx = P[e][0] - ax, dy = P[e][1] - ay, L = Math.hypot(dx, dy) || 1e-9;
+      let md = -1, mi = -1;
+      for (let i = s + 1; i < e; i++) { const d = Math.abs((P[i][0] - ax) * dy - (P[i][1] - ay) * dx) / L; if (d > md) { md = d; mi = i; } }
+      if (md > eps) { keep[mi] = 1; st.push([s, mi], [mi, e]); }
+    }
+    return P.filter((_, i) => keep[i]);
+  }
+  crC(p) {
+    const n = p.length, f = v => Math.round(v * 10) / 10; let d = 'M' + f(p[0][0]) + ' ' + f(p[0][1]);
+    for (let i = 0; i < n; i++) { const p0 = p[(i - 1 + n) % n], p1 = p[i], p2 = p[(i + 1) % n], p3 = p[(i + 2) % n]; d += 'C' + f(p1[0] + (p2[0] - p0[0]) / 6) + ' ' + f(p1[1] + (p2[1] - p0[1]) / 6) + ' ' + f(p2[0] - (p3[0] - p1[0]) / 6) + ' ' + f(p2[1] - (p3[1] - p1[1]) / 6) + ' ' + f(p2[0]) + ' ' + f(p2[1]); }
+    return d + 'Z';
+  }
+  crO(p) {
+    const n = p.length, f = v => Math.round(v * 10) / 10; let d = 'M' + f(p[0][0]) + ' ' + f(p[0][1]);
+    for (let i = 0; i < n - 1; i++) { const p0 = p[Math.max(0, i - 1)], p1 = p[i], p2 = p[i + 1], p3 = p[Math.min(n - 1, i + 2)]; d += 'C' + f(p1[0] + (p2[0] - p0[0]) / 6) + ' ' + f(p1[1] + (p2[1] - p0[1]) / 6) + ' ' + f(p2[0] - (p3[0] - p1[0]) / 6) + ' ' + f(p2[1] - (p3[1] - p1[1]) / 6) + ' ' + f(p2[0]) + ' ' + f(p2[1]); }
+    return d;
+  }
+  dens(pts, closed, mx) {
+    const out = [], n = pts.length, m = closed ? n : n - 1;
+    for (let i = 0; i < m; i++) { const a = pts[i], b = pts[(i + 1) % n], s = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / mx)); for (let j = 0; j < s; j++) out.push([a[0] + (b[0] - a[0]) * j / s, a[1] + (b[1] - a[1]) * j / s]); }
+    if (!closed) out.push(pts[n - 1]);
+    return out;
+  }
+  geo() {
+    if (this._geo) return this._geo;
+    this.nInit();
+    const C = this.C, st = C.ST, nx = Math.round((C.X1 - C.X0) / st) + 1, ny = Math.round((C.Y1 - C.Y0) / st) + 1, H = new Float32Array(nx * ny);
+    let hmax = 0;
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) { const v = this.height(C.X0 + i * st, C.Y0 + j * st); H[j * nx + i] = v; if (v > hmax) hmax = v; }
+    const LV = C.LV, NL = Math.floor(hmax / LV), maps = [];
+    for (let l = 0; l <= NL; l++) maps.push(new Map());
+    const add = (M, k1, p1, k2, p2) => { let a = M.get(k1); if (!a) { a = { p: p1, n: [] }; M.set(k1, a); } a.n.push(k2); let b = M.get(k2); if (!b) { b = { p: p2, n: [] }; M.set(k2, b); } b.n.push(k1); };
+    for (let j = 0; j < ny - 1; j++) for (let i = 0; i < nx - 1; i++) {
+      const o = j * nx + i, a = H[o], b = H[o + 1], c = H[o + nx + 1], d = H[o + nx];
+      const l0 = Math.max(1, Math.ceil(Math.min(a, b, c, d) / LV)), l1 = Math.min(NL, Math.floor(Math.max(a, b, c, d) / LV));
+      if (l0 > l1) continue;
+      const x0 = C.X0 + i * st, y0 = C.Y0 + j * st, kT = o * 2, kL = o * 2 + 1, kR = (o + 1) * 2 + 1, kB = (o + nx) * 2;
+      for (let l = l0; l <= l1; l++) {
+        const L = l * LV, code = (a > L ? 8 : 0) | (b > L ? 4 : 0) | (c > L ? 2 : 0) | (d > L ? 1 : 0);
+        if (code === 0 || code === 15) continue;
+        const M = maps[l];
+        const T = () => [x0 + st * (L - a) / (b - a), y0], R = () => [x0 + st, y0 + st * (L - b) / (c - b)], B = () => [x0 + st * (L - d) / (c - d), y0 + st], Lf = () => [x0, y0 + st * (L - a) / (d - a)];
+        switch (code) {
+          case 1: case 14: add(M, kL, Lf(), kB, B()); break;
+          case 2: case 13: add(M, kB, B(), kR, R()); break;
+          case 3: case 12: add(M, kL, Lf(), kR, R()); break;
+          case 4: case 11: add(M, kT, T(), kR, R()); break;
+          case 6: case 9: add(M, kT, T(), kB, B()); break;
+          case 7: case 8: add(M, kT, T(), kL, Lf()); break;
+          case 5: if ((a + b + c + d) / 4 > L) { add(M, kT, T(), kL, Lf()); add(M, kR, R(), kB, B()); } else { add(M, kT, T(), kR, R()); add(M, kL, Lf(), kB, B()); } break;
+          case 10: if ((a + b + c + d) / 4 > L) { add(M, kT, T(), kR, R()); add(M, kL, Lf(), kB, B()); } else { add(M, kT, T(), kL, Lf()); add(M, kR, R(), kB, B()); } break;
+        }
+      }
+    }
+    const levels = [];
+    for (let l = 1; l <= NL; l++) {
+      const M = maps[l], seen = new Set(), polys = [];
+      const walk = s0 => {
+        const ks = [s0]; seen.add(s0); let prev = -1, cur = s0;
+        for (;;) { const nb = M.get(cur).n; let nk = -1; for (const q of nb) if (q !== prev && !seen.has(q)) { nk = q; break; } if (nk < 0) break; seen.add(nk); ks.push(nk); prev = cur; cur = nk; }
+        const closed = ks.length > 2 && M.get(cur).n.includes(s0);
+        let pts = ks.map(q => M.get(q).p), x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+        for (const p of pts) { if (p[0] < x0) x0 = p[0]; if (p[0] > x1) x1 = p[0]; if (p[1] < y0) y0 = p[1]; if (p[1] > y1) y1 = p[1]; }
+        if (x1 - x0 + y1 - y0 < 34) return;
+        pts = this.rdp(pts, 1.2, closed);
+        if (pts.length < (closed ? 4 : 2)) return;
+        polys.push({ pts, closed, bb: [x0, y0, x1, y1], d: closed ? this.crC(pts) : this.crO(pts) });
+      };
+      for (const [q, v] of M) if (v.n.length === 1 && !seen.has(q)) walk(q);
+      for (const q of M.keys()) if (!seen.has(q)) walk(q);
+      levels.push({ L: l * LV, index: l % 5 === 0, polys, d: polys.map(p => p.d).join('') });
+    }
+    const hAt = (x, y) => { const gx = (x - C.X0) / st, gy = (y - C.Y0) / st, i = Math.max(0, Math.min(nx - 2, Math.floor(gx))), j = Math.max(0, Math.min(ny - 2, Math.floor(gy))), fx = gx - i, fy = gy - j, o = j * nx + i; return (H[o] * (1 - fx) + H[o + 1] * fx) * (1 - fy) + (H[o + nx] * (1 - fx) + H[o + nx + 1] * fx) * fy; };
+    let sd = 7, stp = '', cnt = 0; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < 9000 && cnt < 1300; i++) {
+      const x = -330 + rnd() * 1480, y = 690 + rnd() * 800;
+      if (y < 770 + 60 * this.n2(x / 220, 4.4)) continue;
+      if (Math.hypot(x - C.HQ[0], y - C.HQ[1]) < 250 || hAt(x, y) > .22 || this.pdist(x, y, C.RIVER).d < 24) continue;
+      if (this.n2(x / 120 + 8.8, y / 120 - 2.2) + rnd() * .9 < .3) continue;
+      const r = 1.5 + rnd() * 1.3; cnt++;
+      stp += 'M' + (x - r).toFixed(1) + ' ' + y.toFixed(1) + 'a' + r.toFixed(2) + ' ' + r.toFixed(2) + ' 0 1 0 ' + (2 * r).toFixed(2) + ' 0a' + r.toFixed(2) + ' ' + r.toFixed(2) + ' 0 1 0 ' + (-2 * r).toFixed(2) + ' 0';
+    }
+    const cand = [];
+    for (let j = 4; j < ny - 4; j += 2) for (let i = 4; i < nx - 4; i += 2) {
+      const v = H[j * nx + i], x = C.X0 + i * st, y = C.Y0 + j * st; if (v < .55 || x < -50 || x > 950 || y < -120 || y > 470) continue;
+      let mx = true; for (let dj = -4; dj <= 4 && mx; dj++) for (let di = -4; di <= 4; di++) if (H[(j + dj) * nx + i + di] > v) { mx = false; break; }
+      if (mx) cand.push([x, y, v]);
+    }
+    cand.sort((a, b) => b[2] - a[2]);
+    const peaks = []; for (const c of cand) { if (peaks.every(p => Math.hypot(p[0] - c[0], p[1] - c[1]) > 170)) peaks.push(c); if (peaks.length === 3) break; }
+    const s2 = Math.round(C.PS / st), pnx = Math.floor((nx - 1) / s2) + 1, pny = Math.floor((ny - 1) / s2) + 1, PH = new Float32Array(pnx * pny), PR = new Float32Array(pnx * pny);
+    for (let j = 0; j < pny; j++) for (let i = 0; i < pnx; i++) { PH[j * pnx + i] = H[(j * s2) * nx + i * s2]; PR[j * pnx + i] = 1 + .35 * (this.n2((C.X0 + i * C.PS) / 70 + 40.2, (C.Y0 + j * C.PS) / 70 - 13.7) * .5 + .5); }
+    return this._geo = { H, nx, ny, hAt, levels, stipple: stp, river: this.crO(C.RIVER), peaks, PH, PR, pnx, pny };
+  }
+  raster(PP) {
+    const IM = this._imgs || (this._imgs = {}); if (IM[PP.id]) return IM[PP.id];
+    const g = this.geo(), C = this.C, st = C.ST, nx = g.nx, ny = g.ny, H = g.H, HY = PP.HY;
+    const SH = new Float32Array(nx * ny), Z = 230, ln = Math.hypot(.52, .58, .63), Lx = -.52 / ln, Ly = -.58 / ln, Lz = .63 / ln;
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+      const o = j * nx + i, gx = (H[i < nx - 1 ? o + 1 : o] - H[i > 0 ? o - 1 : o]) / (2 * st), gy = (H[j < ny - 1 ? o + nx : o] - H[j > 0 ? o - nx : o]) / (2 * st);
+      const nX = -Z * gx, nY = -Z * gy, nl = Math.hypot(nX, nY, 1);
+      SH[o] = (nX * Lx + nY * Ly + Lz) / nl - Lz;
+    }
+    const sc = 2, W = Math.round((C.X1 - C.X0) / sc), Hh = Math.round((C.Y1 - C.Y0) / sc);
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = Hh;
+    const ctx = cv.getContext('2d'), im = ctx.createImageData(W, Hh), D = im.data;
+    let sd = 99; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+    for (let py = 0; py < Hh; py++) {
+      const gy = ((py + .5) * sc) / st, j = Math.min(ny - 2, Math.floor(gy)), fy = gy - j;
+      for (let px = 0; px < W; px++) {
+        const gx = ((px + .5) * sc) / st, i = Math.min(nx - 2, Math.floor(gx)), fx = gx - i, o = j * nx + i;
+        const h = (H[o] * (1 - fx) + H[o + 1] * fx) * (1 - fy) + (H[o + nx] * (1 - fx) + H[o + nx + 1] * fx) * fy;
+        const s = (SH[o] * (1 - fx) + SH[o + 1] * fx) * (1 - fy) + (SH[o + nx] * (1 - fx) + SH[o + nx + 1] * fx) * fy;
+        let k = 1; while (k < HY.length - 1 && HY[k][0] < h) k++;
+        const A = HY[k - 1], B = HY[k], t = Math.min(1, Math.max(0, (h - A[0]) / (B[0] - A[0]))), q = (py * W + px) * 4, dn = (rnd() - .5) * 2.2;
+        for (let c = 0; c < 3; c++) { let v = A[1][c] + (B[1][c] - A[1][c]) * t; v = s > 0 ? v + (PP.hlc[c] - v) * s * PP.hs : v * (1 + s * PP.ds); D[q + c] = v + dn; }
+        D[q + 3] = 255;
+      }
+    }
+    ctx.putImageData(im, 0, 0);
+    return IM[PP.id] = cv.toDataURL('image/jpeg', .9);
+  }
+  terrain(P, relief) {
+    const T = this._ter || (this._ter = {}), key = P.id + (relief ? 1 : 0); if (T[key]) return T[key];
+    const g = this.geo(), C = this.C;
+    const lines = g.levels.map(l => ({ d: l.d, stroke: l.index ? P.index : P.minor, sw: l.index ? 1.15 : .7, op: 1 }));
+    return T[key] = { lines, stipple: g.stipple, river: g.river, img: relief ? this.raster(P) : '', ix: C.X0, iy: C.Y0, iw: C.X1 - C.X0, ih: C.Y1 - C.Y0, imgD: relief ? 'inline' : 'none', hasImg: !!relief };
+  }
+  layout() {
+    if (this._pos) return this._pos;
+    const out = { __hq: this.C.HQ }, cnt = {};
+    for (const f of this.FR) { const sl = this.C.SLOTS[f.type], i = cnt[f.type] = (cnt[f.type] || 0) + 1; out[f.id] = sl[(i - 1) % sl.length]; }
+    return this._pos = out;
+  }
+  astar(a, b) {
+    const g = this.geo(), C = this.C, ps = C.PS, nx = g.pnx, ny = g.pny, PH = g.PH, PR = g.PR, N = nx * ny;
+    const cl = (v, m) => v < 0 ? 0 : v > m ? m : v, id = p => cl(Math.round((p[1] - C.Y0) / ps), ny - 1) * nx + cl(Math.round((p[0] - C.X0) / ps), nx - 1);
+    const s = id(a), t = id(b), tx = t % nx, ty = (t / nx) | 0;
+    const G = new Float64Array(N).fill(Infinity), from = new Int32Array(N).fill(-1), fin = new Uint8Array(N), hq = [], hf = [];
+    const push = (n, f) => { hq.push(n); hf.push(f); let i = hq.length - 1; while (i > 0) { const p = (i - 1) >> 1; if (hf[p] <= hf[i]) break; let x = hq[p]; hq[p] = hq[i]; hq[i] = x; x = hf[p]; hf[p] = hf[i]; hf[i] = x; i = p; } };
+    const pop = () => { const top = hq[0], ln = hq.pop(), lf = hf.pop(); if (hq.length) { hq[0] = ln; hf[0] = lf; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < hq.length && hf[l] < hf[m]) m = l; if (r < hq.length && hf[r] < hf[m]) m = r; if (m === i) break; let x = hq[m]; hq[m] = hq[i]; hq[i] = x; x = hf[m]; hf[m] = hf[i]; hf[i] = x; i = m; } } return top; };
+    const S0 = .0042, E = .7, DIR = [[1, 0, 1], [-1, 0, 1], [0, 1, 1], [0, -1, 1], [1, 1, 1.4142], [1, -1, 1.4142], [-1, 1, 1.4142], [-1, -1, 1.4142]];
+    G[s] = 0; push(s, 0);
+    while (hq.length) {
+      const u = pop(); if (fin[u]) continue; fin[u] = 1; if (u === t) break;
+      const ux = u % nx, uy = (u / nx) | 0, hu = PH[u];
+      for (const [dx, dy, dl] of DIR) {
+        const vx = ux + dx, vy = uy + dy; if (vx < 0 || vy < 0 || vx >= nx || vy >= ny) continue;
+        const v = vy * nx + vx; if (fin[v]) continue;
+        const len = dl * ps, sl = Math.abs(PH[v] - hu) / len, c = len * (1 + (sl / S0) * (sl / S0) + E * (hu + PH[v]) * .5) * (PR[u] + PR[v]) * .5, ng = G[u] + c;
+        if (ng < G[v]) { G[v] = ng; from[v] = u; push(v, ng + Math.hypot(vx - tx, vy - ty) * ps); }
+      }
+    }
+    const path = []; for (let n = t; n >= 0; n = from[n]) { path.push([C.X0 + (n % nx) * ps, C.Y0 + ((n / nx) | 0) * ps]); if (n === s) break; }
+    path.reverse();
+    let pts = [a].concat(path.slice(1, -1), [b]);
+    for (let it = 0; it < 4; it++) { const q = pts.slice(); for (let i = 1; i < pts.length - 1; i++) q[i] = [(pts[i - 1][0] + 2 * pts[i][0] + pts[i + 1][0]) / 4, (pts[i - 1][1] + 2 * pts[i][1] + pts[i + 1][1]) / 4]; pts = q; }
+    return pts;
+  }
+  legPts(a, b) {
+    const c = this._lp || (this._lp = {}), key = a + '>' + b; if (c[key]) return c[key];
+    const rk = b + '>' + a; if (c[rk]) return c[key] = c[rk].slice().reverse();
+    const pos = this.layout(); return c[key] = this.astar(pos[a], pos[b]);
+  }
+  tw(t, font) {
+    const c = this._tw || (this._tw = {}), k = font + '|' + t; if (c[k]) return c[k];
+    const cv = this._cv || (this._cv = document.createElement('canvas').getContext('2d'));
+    cv.font = font; return c[k] = cv.measureText(t).width;
+  }
+  kritik() { const v = this.props.kritik; return v == null || v === '' || isNaN(+v) ? 2 : +v; }
+  yakin() { const v = this.props.yaklasan; return Math.max(this.kritik(), v == null || v === '' || isNaN(+v) ? 7 : +v); }
+  urg(f, done) { if (done) return 'done'; if (f.status === 'held' || f.days == null) return 'calm'; return f.days <= this.kritik() ? 'crit' : f.days <= this.yakin() ? 'near' : 'calm'; }
+  daysTag(f) { if (f.status === 'held') return 'BEKLETİLİYOR'; if (f.days == null) return 'TARİHSİZ'; if (f.days === 0) return 'BUGÜN'; if (f.days === 1) return 'YARIN'; return f.days + ' GÜN'; }
+  reason(f) { if (f.type === 'lane') return 'Bu hafta aktif seçtiğin kulvar.'; if (f.days != null && f.days <= 14) return 'Tarihli kalemin hazırlık zamanı geldi.'; if (f.type === 'application') return 'Başvurunun sıradaki açık hamlesi.'; return 'Sıradaki açık hamle.'; }
+
+  preset() { const p = this.props.gun; return this.PRESETS[p] ? p : '6 cephe'; }
+  okey(vid) { return vid + '|' + this.preset(); }
+  vkey(mid) { return mid + '|' + this.preset(); }
+  orderOf(vid) { return this.state.orders[this.okey(vid)] || this.PRESETS[this.preset()]; }
+  baseOrder(vid) { return this.state.pending[this.okey(vid)] || this.orderOf(vid); }
+  moved(list, id, over) { const a = [...list], from = a.indexOf(id), to = a.indexOf(over); if (from < 0 || to < 0) return a; a.splice(from, 1); a.splice(to, 0, id); return a; }
+  shownOrder(vid) { const b = this.baseOrder(vid), d = this.state.drag; if (d && d.mid.indexOf(vid + '-') === 0 && d.over) return this.moved(b, d.id, d.over); return b; }
+  moment() { const m = this.props.durum; return ['Başlangıç', 'Yarı yol', 'Gün sonu'].includes(m) ? m : 'Başlangıç'; }
+  dkey(vid) { return this.okey(vid) + '|' + this.moment(); }
+  doneOf(vid) {
+    const k = this.dkey(vid); if (this.state.done[k]) return this.state.done[k];
+    const order = this.orderOf(vid), m = this.moment(), o = {};
+    if (m === 'Başlangıç') { for (const id of order) if (this.BY[id].doneAt) o[id] = this.BY[id].doneAt; }
+    else order.slice(0, m === 'Gün sonu' ? order.length : Math.ceil(order.length / 2)).forEach((id, i) => { o[id] = this.TIMES[i]; });
+    return o;
+  }
+  held(id, done) { return id === '__hq' || !!done[id]; }
+  sealedSet(order, done) { const n = ['__hq'].concat(order), s = new Set(); for (let i = 1; i < n.length; i++) if (this.held(n[i - 1], done) && this.held(n[i], done)) s.add(n[i - 1] + '>' + n[i]); return s; }
+  focusOf(vid, order, done) { const f = this.state.focus[vid]; if (f && order.includes(f)) return f; return order.find(x => !done[x]) || order[0]; }
+  startFx(vid, id, seals, final) {
+    if (this.rm()) return;
+    const c = this.layout()[id], src = [{ c, delay: 0, dur: 1150, maxR: 230, A: 9, sig: 18, lam: 34 }];
+    if (final) src.push({ c, delay: 480, dur: 2000, maxR: 560, A: 8, sig: 26, lam: 52 });
+    const S = {}; for (const key of seals) S[key] = { delay: 0, dur: 720 };
+    this._fx = { vid, t0: performance.now(), total: final ? 2520 : 1200, src, seals: S, pop: id };
+    cancelAnimationFrame(this._fxRaf);
+    this.setState({ fxT: 0 });
+    const step = now => { const fx = this._fx; if (!fx) return; const t = now - fx.t0; if (t >= fx.total) { this._fx = null; this.setState({ fxT: -1 }); return; } this.setState({ fxT: Math.max(0, t) }); this._fxRaf = requestAnimationFrame(step); };
+    this._fxRaf = requestAnimationFrame(step);
+  }
+  rippled(base, fx, t) {
+    const act = [];
+    for (const s of fx.src) { const u = (t - s.delay) / s.dur; if (u <= 0 || u >= 1) continue; act.push({ c: s.c, R: s.maxR * (1 - (1 - u) * (1 - u)), A: s.A * Math.pow(1 - u, 1.6), sig: s.sig, lam: s.lam, u }); }
+    if (!act.length) return { ter: base, act };
+    const g = this.geo(), TAU = Math.PI * 2, lines = base.lines.slice();
+    g.levels.forEach((l, li) => {
+      let changed = false; const ds = [];
+      for (const pl of l.polys) {
+        let hit = false;
+        for (const s of act) {
+          const [x0, y0, x1, y1] = pl.bb, o = s.R + 3 * s.sig, ii = s.R - 3 * s.sig;
+          const ex = Math.max(x0 - s.c[0], 0, s.c[0] - x1), ey = Math.max(y0 - s.c[1], 0, s.c[1] - y1);
+          if (ex * ex + ey * ey > o * o) continue;
+          const fx2 = Math.max(Math.abs(x0 - s.c[0]), Math.abs(x1 - s.c[0])), fy2 = Math.max(Math.abs(y0 - s.c[1]), Math.abs(y1 - s.c[1]));
+          if (ii > 0 && fx2 * fx2 + fy2 * fy2 < ii * ii) continue;
+          hit = true; break;
+        }
+        if (!hit) { ds.push(pl.d); continue; }
+        const pts = this.dens(pl.pts, pl.closed, 7).map(([x, y]) => {
+          let ox = 0, oy = 0;
+          for (const s of act) { const dx = x - s.c[0], dy = y - s.c[1], r = Math.hypot(dx, dy), u = r - s.R; if (r < .01 || Math.abs(u) > 3 * s.sig) continue; const w = s.A * Math.exp(-u * u / (2 * s.sig * s.sig)) * Math.sin(u * TAU / s.lam) * Math.min(1, r / 10); ox += dx / r * w; oy += dy / r * w; }
+          return [x + ox, y + oy];
+        });
+        ds.push(pl.closed ? this.crC(pts) : this.crO(pts)); changed = true;
+      }
+      if (changed) lines[li] = { ...lines[li], d: ds.join('') };
+    });
+    return { ter: { ...base, lines }, act };
+  }
+
+  size(mid) { return mid.slice(-4) === 'home' ? this.C.HOME : this.C.ATLAS; }
+  fitView(mid) {
+    const c = this._fit || (this._fit = {}), key = this.vkey(mid); if (c[key]) return c[key];
+    const vid = mid.split('-')[0], home = mid.slice(-4) === 'home', pos = this.layout();
+    const ids = home ? this.orderOf(vid) : this.FR.filter(f => f.status !== 'closed').map(f => f.id);
+    const pts = ids.map(id => pos[id]).concat([pos.__hq]);
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const [x, y] of pts) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+    const { w, h } = this.size(mid), pad = home ? { t: 40, r: 64, b: 46, l: 50 } : { t: 150, r: 30, b: 232, l: 44 };
+    const k = Math.min((w - pad.l - pad.r) / Math.max(1, x1 - x0), (h - pad.t - pad.b) / Math.max(1, y1 - y0));
+    return c[key] = { k, x: pad.l + ((w - pad.l - pad.r) - (x1 - x0) * k) / 2 - x0 * k, y: pad.t + ((h - pad.t - pad.b) - (y1 - y0) * k) / 2 - y0 * k };
+  }
+  clampK(mid, k) { const f = this.fitView(mid).k; return Math.min(f * 5, Math.max(f * .55, k)); }
+  getView(mid) { const key = this.vkey(mid); return (this._pv && this._pv[key]) || this.state.views[key] || this.fitView(mid); }
+  setView(mid, v) {
+    this._pv = this._pv || {}; this._pv[this.vkey(mid)] = v;
+    if (!this._raf) this._raf = requestAnimationFrame(() => { const pv = this._pv; this._pv = {}; this._raf = 0; this.setState(s => ({ views: { ...s.views, ...pv } })); });
+  }
+  animate(mid, to) {
+    const from = { ...this.getView(mid) }, t0 = performance.now();
+    cancelAnimationFrame(this._anim);
+    const step = now => { const t = Math.min(1, (now - t0) / 300), e = 1 - Math.pow(1 - t, 3); this.setView(mid, { k: from.k + (to.k - from.k) * e, x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e }); if (t < 1) this._anim = requestAnimationFrame(step); };
+    this._anim = requestAnimationFrame(step);
+  }
+  zoomBy(mid, f) { const v = this.getView(mid), { w, h } = this.size(mid), k = this.clampK(mid, v.k * f), cx = w / 2, cy = h / 2, wx = (cx - v.x) / v.k, wy = (cy - v.y) / v.k; this.animate(mid, { k, x: cx - wx * k, y: cy - wy * k }); }
+  refit(mid) { this.animate(mid, this.fitView(mid)); }
+  loc(e, el) { const r = el.getBoundingClientRect(), s = (r.width / el.offsetWidth) || 1; return [(e.clientX - r.left) / s, (e.clientY - r.top) / s]; }
+  bindWheel(mid, el) {
+    const M = this._maps || (this._maps = {}), cur = M[mid];
+    if (cur && cur.el === el) return;
+    if (cur && cur.el) cur.el.removeEventListener('wheel', cur.wheel);
+    if (!el) { delete M[mid]; return; }
+    const wheel = e => {
+      if (mid.slice(-4) === 'home' && !e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      const v = this.getView(mid), p = this.loc(e, el), k = this.clampK(mid, v.k * Math.exp(-e.deltaY * (e.ctrlKey ? .01 : .0016))), wx = (p[0] - v.x) / v.k, wy = (p[1] - v.y) / v.k;
+      this.setView(mid, { k, x: p[0] - wx * k, y: p[1] - wy * k });
+    };
+    el.addEventListener('wheel', wheel, { passive: false });
+    M[mid] = { el, wheel };
+  }
+  handlers(mid) {
+    const H = this._h || (this._h = {}); if (H[mid]) return H[mid];
+    return H[mid] = {
+      ref: el => this.bindWheel(mid, el), down: e => this.pDown(mid, e), move: e => this.pMove(mid, e), up: e => this.pUp(mid, e, false), cancel: e => this.pUp(mid, e, true), click: e => this.pClick(mid, e),
+      zin: () => this.zoomBy(mid, 1.45), zout: () => this.zoomBy(mid, 1 / 1.45), fit: () => this.refit(mid)
+    };
+  }
+  canDrag(mid, id) { const vid = mid.split('-')[0]; return !this.doneOf(vid)[id] && this.baseOrder(vid).includes(id); }
+  pDown(mid, e) {
+    const el = e.currentTarget, G = this._g || (this._g = {}), g = G[mid] || (G[mid] = { ptr: new Map() });
+    g.el = el; const p = this.loc(e, el); g.ptr.set(e.pointerId, p);
+    if (g.ptr.size === 2) {
+      clearTimeout(g.hold); const [a, b] = [...g.ptr.values()];
+      g.mode = 'pinch'; g.suppress = true; g.p0 = { dist: Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, mid: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], v: { ...this.getView(mid) } };
+      for (const id of g.ptr.keys()) { try { el.setPointerCapture(id); } catch (_) { } }
+      if (this.state.drag) this.setState({ drag: null });
+      return;
+    }
+    if (g.ptr.size > 2) return;
+    const st = e.target.closest ? e.target.closest('[data-stop]') : null;
+    g.mode = 'pending'; g.suppress = false; g.start = p; g.v0 = { ...this.getView(mid) }; g.stop = st ? st.getAttribute('data-stop') : null; g.type = e.pointerType; g.pid = e.pointerId;
+    if (g.stop && e.pointerType !== 'mouse' && this.canDrag(mid, g.stop)) g.hold = setTimeout(() => { if (g.mode === 'pending') this.lift(mid, g.stop, g.start); }, 350);
+  }
+  pMove(mid, e) {
+    const g = this._g && this._g[mid]; if (!g || !g.ptr.has(e.pointerId)) return;
+    const p = this.loc(e, g.el); g.ptr.set(e.pointerId, p);
+    if (g.mode === 'pinch') {
+      const [a, b] = [...g.ptr.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], v = g.p0.v, k = this.clampK(mid, v.k * d / g.p0.dist), wx = (g.p0.mid[0] - v.x) / v.k, wy = (g.p0.mid[1] - v.y) / v.k;
+      this.setView(mid, { k, x: m[0] - wx * k, y: m[1] - wy * k }); return;
+    }
+    if (g.mode === 'drag') { e.preventDefault(); this.dragTo(mid, p); return; }
+    if (g.mode !== 'pending' && g.mode !== 'pan') return;
+    const dx = p[0] - g.start[0], dy = p[1] - g.start[1];
+    if (g.mode === 'pending') {
+      if (Math.hypot(dx, dy) < 6) return;
+      clearTimeout(g.hold); g.suppress = true;
+      if (g.stop && g.type === 'mouse' && this.canDrag(mid, g.stop)) { this.lift(mid, g.stop, p); return; }
+      if (g.type === 'mouse' || mid.slice(-5) === 'atlas') { g.mode = 'pan'; try { g.el.setPointerCapture(e.pointerId); } catch (_) { } } else { g.mode = 'scroll'; return; }
+    }
+    this.setView(mid, { k: g.v0.k, x: g.v0.x + dx, y: g.v0.y + dy });
+  }
+  pUp(mid, e, cancel) {
+    const g = this._g && this._g[mid]; if (!g || !g.ptr.has(e.pointerId)) return;
+    clearTimeout(g.hold); g.ptr.delete(e.pointerId);
+    if (g.mode === 'pinch') { if (g.ptr.size === 1) { const [p] = [...g.ptr.values()]; g.mode = 'pan'; g.start = p; g.v0 = { ...this.getView(mid) }; } else if (!g.ptr.size) g.mode = null; return; }
+    if (g.mode === 'drag') this.drop(mid, cancel);
+    if (!g.ptr.size) g.mode = null;
+  }
+  pClick(mid, e) {
+    const g = this._g && this._g[mid];
+    if (g && g.suppress) { g.suppress = false; return; }
+    const t = e.target; if (t.closest && (t.closest('[data-stop]') || t.closest('[data-front]') || t.closest('button'))) return;
+    if (mid.slice(-5) === 'atlas') { const vid = mid.split('-')[0]; this.setState(s => ({ sel: { ...s.sel, [vid]: null } })); }
+  }
+  lift(mid, id, p) {
+    const g = this._g[mid]; g.mode = 'drag'; g.suppress = true;
+    try { g.el.setPointerCapture(g.pid); } catch (_) { }
+    this.setState({ drag: { mid, id, x: p[0], y: p[1], over: null } });
+    try { if (navigator.vibrate) navigator.vibrate(12); } catch (_) { }
+  }
+  dragTo(mid, p) {
+    const d = this.state.drag; if (!d || d.mid !== mid) return;
+    let over = null, best = 38;
+    for (const s of (this._scr && this._scr[mid]) || []) { if (s.id === d.id || s.done) continue; const dd = Math.hypot(s.x - p[0], s.y - p[1]); if (dd < best) { best = dd; over = s.id; } }
+    this.setState({ drag: { ...d, x: p[0], y: p[1], over } });
+  }
+  drop(mid, cancel) {
+    const d = this.state.drag; if (!d) return;
+    const vid = mid.split('-')[0], base = this.baseOrder(vid);
+    if (!cancel && d.over) { const next = this.moved(base, d.id, d.over); if (next.join() !== base.join()) { const k = this.okey(vid); this.setState(s => ({ pending: { ...s.pending, [k]: next } })); } }
+    this.setState({ drag: null });
+  }
+  tapFn(mid, id) {
+    const T = this._tap || (this._tap = {}), k = mid + ':' + id; if (T[k]) return T[k];
+    return T[k] = () => {
+      const g = this._g && this._g[mid]; if (g && g.suppress) { g.suppress = false; return; }
+      const vid = mid.split('-')[0];
+      if (mid.slice(-5) === 'atlas') this.setState(s => ({ sel: { ...s.sel, [vid]: id } }));
+      else this.setState(s => ({ focus: { ...s.focus, [vid]: id } }));
+    };
+  }
+  flash(vid, text) {
+    this._tt = this._tt || {}; clearTimeout(this._tt[vid]);
+    this.setState(s => ({ toast: { ...s.toast, [vid]: text } }));
+    this._tt[vid] = setTimeout(() => this.setState(s => ({ toast: { ...s.toast, [vid]: null } })), 2800);
+  }
+  vfn(vid) {
+    const F = this._vf || (this._vf = {}); if (F[vid]) return F[vid];
+    return F[vid] = {
+      save: () => { const k = this.okey(vid), p = this.state.pending[k]; if (!p) return; this.setState(s => ({ orders: { ...s.orders, [k]: p }, pending: { ...s.pending, [k]: null } })); this.flash(vid, 'Sıra kaydedildi. Kayıt defterinden geri alabilirsin.'); },
+      cancel: () => { const k = this.okey(vid); this.setState(s => ({ pending: { ...s.pending, [k]: null } })); },
+      hint: () => { this._ht = this._ht || {}; clearTimeout(this._ht[vid]); this.setState(s => ({ hint: { ...s.hint, [vid]: true } })); this._ht[vid] = setTimeout(() => this.setState(s => ({ hint: { ...s.hint, [vid]: false } })), 4200); },
+      close: () => this.setState(s => ({ sel: { ...s.sel, [vid]: null } })),
+      legend: () => this.setState(s => ({ legend: { ...(s.legend || {}), [vid]: !(s.legend && s.legend[vid]) } })),
+      finish: () => {
+        const k = this.dkey(vid), order = this.shownOrder(vid), before = this.doneOf(vid), cur = { ...before }, id = this.focusOf(vid, order, cur); if (cur[id]) return;
+        cur[id] = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Istanbul' });
+        const next = order.find(x => !cur[x]), sb = this.sealedSet(order, before), seals = [...this.sealedSet(order, cur)].filter(x => !sb.has(x));
+        this.setState(s => ({ done: { ...s.done, [k]: cur }, focus: { ...s.focus, [vid]: next || id } }));
+        this.flash(vid, next ? 'Hamle tamamlandı. Kampa bayrak dikildi.' : 'Günün bütün hamleleri bitti. Sefer tamamlandı.');
+        this.startFx(vid, id, seals, !next);
+      },
+      undo: () => { const k = this.dkey(vid), order = this.shownOrder(vid), cur = { ...this.doneOf(vid) }, id = this.focusOf(vid, order, cur); delete cur[id]; if (this._fx && this._fx.vid === vid) { this._fx = null; cancelAnimationFrame(this._fxRaf); } this.setState(s => ({ done: { ...s.done, [k]: cur }, fxT: -1 })); }
+    };
+  }
+  placeLabels(marks, w, h, extra, between) {
+    const boxes = marks.map(m => [m.x - m.r, m.y - m.r, m.x + m.r, m.y + m.r]).concat(extra), placed = [];
+    const hits = b => { for (const q of boxes) if (b[0] < q[2] && b[2] > q[0] && b[1] < q[3] && b[3] > q[1]) return true; for (const q of placed) if (b[0] < q[2] && b[2] > q[0] && b[1] < q[3] && b[3] > q[1]) return true; return false; };
+    const api = { boxes, placed, hits };
+    const rd = (b, q) => Math.hypot(Math.max(b[0] - q.x, 0, q.x - b[2]), Math.max(b[1] - q.y, 0, q.y - b[3]));
+    const owns = (m, b) => { const d = rd(b, m) + 10; for (const q of marks) if (q !== m && rd(b, q) < d) return false; return true; };
+    const tryAt = (m, mw, mh, gg, own) => { const g = gg || m.r + 3, cands = [[-mw / 2, g], [g, -mh / 2], [-g - mw, -mh / 2], [-mw / 2, -g - mh], [g - 2, g - 2], [-g - mw + 2, g - 2], [g - 2, -g - mh + 2], [-g - mw + 2, -g - mh + 2]]; for (const [dx, dy] of cands) { const b = [m.x + dx, m.y + dy, m.x + dx + mw, m.y + dy + mh]; if (b[0] < 2 || b[2] > w - 2 || b[1] < 2 || b[3] > h - 2) continue; if (!hits(b) && (!own || owns(m, b))) { placed.push(b); return [dx, dy]; } } return null; };
+    let did = false;
+    for (const m of marks.filter(m => m.w).sort((a, b) => b.prio - a.prio)) {
+      if (!did && m.prio < 45) { did = true; if (between) between(api); }
+      m.lab = null; m.compact = false;
+      if (m.x < -20 || m.x > w + 20 || m.y < -20 || m.y > h + 20) continue;
+      m.lab = tryAt(m, m.w, m.h, 0, true);
+      if (!m.lab && m.alt) { for (const gg of [m.r + 3, m.r + 15]) { m.lab = tryAt(m, m.alt[0], m.alt[1], gg, true); if (m.lab) { m.compact = true; break; } } }
+      if (!m.lab && m.force) {
+        const fw = m.alt ? m.alt[0] : m.w, fh = m.alt ? m.alt[1] : m.h, mi = marks.indexOf(m), own = boxes[mi], hq = mi === 0 ? null : boxes[0], all = boxes.concat(placed);
+        let best = null, bk = null;
+        for (const gg of [m.r + 3, m.r + 12]) for (const [dx, dy] of [[-fw / 2, gg], [gg, -fh / 2], [-gg - fw, -fh / 2], [-fw / 2, -gg - fh], [gg - 2, gg - 2], [-gg - fw + 2, gg - 2], [gg - 2, -gg - fh + 2], [-gg - fw + 2, -gg - fh + 2]]) {
+          const x0 = Math.min(Math.max(m.x + dx, 2), w - 2 - fw), y0 = Math.min(Math.max(m.y + dy, 2), h - 2 - fh), bx = [x0, y0, x0 + fw, y0 + fh];
+          if (hq && bx[0] < hq[2] && bx[2] > hq[0] && bx[1] < hq[3] && bx[3] > hq[1]) continue;
+          let ov = 0; for (const q of all) { if (q === own) continue; const ox = Math.min(bx[2], q[2]) - Math.max(bx[0], q[0]), oy = Math.min(bx[3], q[3]) - Math.max(bx[1], q[1]); if (ox > 0 && oy > 0) ov += ox * oy; }
+          const dOwn = rd(bx, m); let dOth = Infinity; for (const q of marks) if (q !== m) dOth = Math.min(dOth, rd(bx, q));
+          const key = [dOth - dOwn >= 10 ? 1 : 0, Math.min(dOth - dOwn, 10), -ov, -dOwn];
+          let better = !bk; for (let i = 0; !better && i < 4; i++) { if (key[i] > bk[i]) better = true; else if (key[i] < bk[i]) break; }
+          if (better) { bk = key; best = [x0 - m.x, y0 - m.y, bx]; }
+        }
+        if (!best) { const g = m.r + 3; best = [-fw / 2, g, [m.x - fw / 2, m.y + g, m.x + fw / 2, m.y + g + fh]]; }
+        m.lab = [best[0], best[1]]; m.compact = !!m.alt; placed.push(best[2]);
+      }
+    }
+    if (!did && between) between(api);
+    return api;
+  }
+  regionCands() {
+    if (this._rc) return this._rc;
+    const C = this.C, g = this.geo(), d2 = (a, b) => (a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1]);
+    const mt = []; for (let x = -100; x <= 900; x += 45) for (let y = 0; y <= 470; y += 30) { if (g.hAt(x, y) < .28 || this.pdist(x, y, C.VAL).d < 90) continue; mt.push([x, y, -4]); }
+    mt.sort((a, b) => d2(a, [380, 300]) - d2(b, [380, 300]));
+    const pl = []; for (let x = 0; x <= 800; x += 45) for (let y = 800; y <= 1320; y += 30) pl.push([x, y, 0]);
+    pl.sort((a, b) => d2(a, [400, 1000]) - d2(b, [400, 1000]));
+    const va = [], V = C.VAL;
+    for (let s = 40; s <= 720; s += 25) {
+      let acc = 0, p = null, tg = null;
+      for (let i = 0; i < V.length - 1; i++) { const dx = V[i + 1][0] - V[i][0], dy = V[i + 1][1] - V[i][1], L = Math.hypot(dx, dy); if (acc + L >= s) { const t = (s - acc) / L; p = [V[i][0] + dx * t, V[i][1] + dy * t]; tg = [dx / L, dy / L]; break; } acc += L; }
+      if (!p) continue;
+      let ang = Math.atan2(tg[1], tg[0]) * 180 / Math.PI; if (ang > 90) ang -= 180; if (ang < -90) ang += 180;
+      for (const o of [60, -60, 90, -90, 35, -35, 120, -120, 140, -140, 160, -160, 180, -180]) va.push([p[0] - tg[1] * o, p[1] + tg[0] * o, Math.round(ang), Math.abs(s - 250) + Math.abs(o) * .6]);
+      if (s <= 200) for (const o of [70, -70, 110, -110]) va.push([p[0] - tg[1] * o, p[1] + tg[0] * o, 0, 60 + Math.abs(s - 120) + Math.abs(o) * .6]);
+    }
+    va.sort((a, b) => a[3] - b[3]);
+    return this._rc = [['KULVAR DAĞLARI', mt.slice(0, 140)], ['DERS OVASI', pl.slice(0, 140)], ['BAŞVURU GEÇİDİ', va.slice(0, 300)]];
+  }
+  regionLabels(PL, S, sz, top, bot, legHit, prev) {
+    const F = [[13, .22], [13, .22], [12, .16]];
+    return this.regionCands().map(([text, cands], ri) => {
+      if (prev && prev[ri].d === 'inline') return prev[ri];
+      const w = this.tw(text, 'italic 400 ' + F[ri][0] + "px 'Instrument Serif'") + text.length * F[ri][0] * F[ri][1];
+      for (const [x, y, ang] of cands) {
+        const c = S([x, y]); if (c[0] < 0 || c[0] > sz.w || c[1] < top || c[1] > bot) continue;
+        const a = ang * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a), boxes = []; let ok = true;
+        for (let s = -w / 2; s <= w / 2 + .1; s += 8) { const px = c[0] + ca * s, py = c[1] + sa * s, b = [px - 5, py - 6, px + 5, py + 6]; if (b[0] < 4 || b[2] > sz.w - 4 || b[1] < top || b[3] > bot || PL.hits(b) || legHit(b)) { ok = false; break; } boxes.push(b); }
+        if (ok) { PL.placed.push(...boxes); return { tf: 'translate(' + c[0].toFixed(1) + ' ' + c[1].toFixed(1) + ') rotate(' + ang + ')', d: 'inline' }; }
+      }
+      return { tf: 'translate(-999 -999)', d: 'none' };
+    });
+  }
+  genelFlat(PL, S, sz, top, bot) {
+    const t = 'GENEL DÜZLÜK', w = this.tw(t, "italic 400 12px 'Instrument Serif'") + t.length * 12 * .16, c = S(this.C.HQ);
+    for (const [ox, oy] of [[0, 52], [0, -32], [0, 68], [0, -48], [-84, -26], [84, -26], [-84, 54], [84, 54]]) {
+      const x = c[0] + ox, y = c[1] + oy, b = [x - w / 2, y - 7, x + w / 2, y + 7];
+      if (b[0] < 4 || b[2] > sz.w - 4 || b[1] < top || b[3] > bot || PL.hits(b)) continue;
+      PL.placed.push(b); return { tf: 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ')', d: 'inline' };
+    }
+    return { tf: 'translate(-999 -999)', d: 'none' };
+  }
+  genelArc(PL, S, k, sz, top, bot, legHit) {
+    const t = 'GENEL DÜZLÜK', w = this.tw(t, "italic 400 12px 'Instrument Serif'") + t.length * 12 * .16, c = S(this.C.HQ);
+    for (const [rw, up] of this.C.ARC) {
+      const r = rw * k; if (w / r > 2.4) continue;
+      const mid = up ? -Math.PI / 2 : Math.PI / 2, boxes = []; let ok = true;
+      for (let s = -w / 2; s <= w / 2 + .1; s += 8) {
+        const th = up ? mid + s / r : mid - s / r, px = c[0] + Math.cos(th) * r, py = c[1] + Math.sin(th) * r, b = [px - 5, py - 6, px + 5, py + 6];
+        if (b[0] < 4 || b[2] > sz.w - 4 || b[1] < top || b[3] > bot || PL.hits(b) || legHit(b)) { ok = false; break; }
+        boxes.push(b);
+      }
+      if (!ok) continue;
+      PL.placed.push(...boxes);
+      const a0 = up ? mid - 1.25 : mid + 1.25, a1 = up ? mid + 1.25 : mid - 1.25;
+      return { arc: 'M' + (c[0] + Math.cos(a0) * r).toFixed(1) + ' ' + (c[1] + Math.sin(a0) * r).toFixed(1) + 'A' + r.toFixed(1) + ' ' + r.toFixed(1) + ' 0 0 ' + (up ? 1 : 0) + ' ' + (c[0] + Math.cos(a1) * r).toFixed(1) + ' ' + (c[1] + Math.sin(a1) * r).toFixed(1), arcD: 'inline' };
+    }
+    return { arc: 'M0 0', arcD: 'none' };
+  }
+  sonar(size, P) {
+    const ce = React.createElement, base = { position: 'absolute', left: '50%', top: '50%', width: size + 'px', height: size + 'px', marginLeft: (-size / 2) + 'px', marginTop: (-size / 2) + 'px', borderRadius: '50%', pointerEvents: 'none', boxSizing: 'border-box' };
+    if (this.rm()) return ce('span', { style: { ...base, transform: 'scale(1.45)', border: '1px solid ' + P.coralBd } });
+    const ring = d => ce('span', { key: 'r' + d, style: { ...base, border: '1.5px solid ' + P.coral, opacity: 0, animation: 'sonar 3.6s cubic-bezier(.22,.61,.36,1) ' + d + 's infinite' } });
+    return ce('span', { style: { position: 'absolute', inset: 0, pointerEvents: 'none' } }, ring(0), ring(1.8));
+  }
+  mapVals(vid, kind, P, ctx) {
+    const mid = vid + '-' + kind, atlas = kind === 'atlas', v = this.getView(mid), sz = this.size(mid), pos = this.layout(), k = v.k, H = this.handlers(mid), geo = this.geo();
+    const S = p => [p[0] * k + v.x, p[1] * k + v.y];
+    const route = ctx.order, done = ctx.done, firstUndone = route.find(id => !done[id]);
+    const drag = this.state.drag && this.state.drag.mid === mid ? this.state.drag : null;
+    const fx = ctx.fx, toD = pts => { let d = ''; for (let j = 0; j < pts.length; j++) { const s = S(pts[j]); d += (j ? 'L' : 'M') + s[0].toFixed(1) + ' ' + s[1].toFixed(1); } return d; };
+    const nodes = ['__hq'].concat(route), legs = [], seals = [];
+    for (let i = 1; i < nodes.length; i++) {
+      const a = nodes[i - 1], b = nodes[i], wp = this.legPts(a, b), key = a + '>' + b;
+      if (this.held(a, done) && this.held(b, done)) {
+        const an = fx && fx.seals[key];
+        if (!an) { seals.push({ d: toD(wp) }); continue; }
+        const f = Math.min(1, Math.max(0, (fx.t - an.delay) / an.dur)), e = f < .5 ? 2 * f * f : 1 - Math.pow(2 - 2 * f, 2) / 2;
+        if (e < 1) legs.push({ d: toD(wp), stroke: P.route, sw: 2.4, dash: '7 5' });
+        if (e > 0) { const x = e * (wp.length - 1), n = Math.floor(x), part = wp.slice(0, n + 1); if (n < wp.length - 1) { const p0 = wp[n], p1 = wp[n + 1], q = x - n; part.push([p0[0] + (p1[0] - p0[0]) * q, p0[1] + (p1[1] - p0[1]) * q]); } seals.push({ d: toD(part) }); }
+        continue;
+      }
+      const nx = b === firstUndone;
+      legs.push({ d: toD(wp), stroke: nx ? P.route : P.routeDim, sw: nx ? 2.4 : 2.2, dash: nx ? '7 5' : '0.1 6.5' });
+    }
+    const captured = route.length > 0 && route.every(id => done[id]);
+    const hq = S(pos.__hq), marks = [{ x: hq[0], y: hq[1] + 10, r: 30 }], scr = [];
+    const stops = route.map((id, i) => {
+      const f = this.BY[id], p = S(pos[id]), isDone = !!done[id], isFocus = id === ctx.focus, isNext = id === firstUndone, u = this.urg(f, isDone), tag = isDone ? 'GEÇİLDİ · ' + done[id] : this.daysTag(f);
+      const tagW = this.tw(tag, "400 10.5px 'IBM Plex Mono'") * 1.07, m = { id, x: p[0], y: p[1], r: 22, w: Math.max(this.tw(f.title, "500 13px 'DM Sans'"), tagW) + 19, h: 39, prio: isFocus ? 100 : isNext ? 93 : isDone ? 92 - i * .1 : u === 'crit' ? 90 - i * .1 : 60 - i, force: isFocus || isDone, alt: isDone ? [tagW + 19, 22] : null };
+      marks.push(m); scr.push({ id, x: p[0], y: p[1], done: isDone });
+      return { m, f, i, isDone, isFocus, isNext, tag, u };
+    });
+    const others = atlas ? this.FR.filter(f => f.status !== 'closed' && !route.includes(f.id)).map(f => {
+      const p = S(pos[f.id]), u = this.urg(f, false), hasTag = u === 'crit' || u === 'near', tag = this.daysTag(f), isSel = ctx.focus === f.id;
+      const m = { id: f.id, x: p[0], y: p[1], r: 12, w: Math.max(this.tw(f.title, "500 12px 'DM Sans'"), hasTag ? this.tw(tag, "400 10px 'IBM Plex Mono'") * 1.07 : 0) + 16, h: hasTag ? 36 : 23, prio: isSel ? 100 : u === 'crit' ? 70 : hasTag ? 40 : 20, force: isSel };
+      marks.push(m); return { m, f, tag, isSel, u, hasTag };
+    }) : [];
+    const extra = atlas ? [[0, 0, sz.w, 128], [sz.w - 60, 0, sz.w, 170], [0, sz.h - 180, sz.w, sz.h], ctx.legend ? [sz.w - 276, sz.h - 452, sz.w - 8, sz.h - 182] : [sz.w - 150, sz.h - 234, sz.w - 8, sz.h - 182]] : [[sz.w - 60, 0, sz.w, 150]];
+    const top = atlas ? 132 : 6, bot = atlas ? sz.h - 184 : sz.h - 6, none = { tf: 'translate(-999 -999)', d: 'none' };
+    const LG = new Map(), cell = 16, addPt = (x, y) => { if (x < -20 || y < -20 || x > sz.w + 20 || y > sz.h + 20) return; const key = Math.floor(x / cell) + ',' + Math.floor(y / cell); let a = LG.get(key); if (!a) LG.set(key, a = []); a.push(x, y); };
+    for (let i = 1; i < nodes.length; i++) { const wp = this.legPts(nodes[i - 1], nodes[i]); let pv = null; for (const q of wp) { const s = S(q); if (pv) { const n = Math.ceil(Math.hypot(s[0] - pv[0], s[1] - pv[1]) / 7); for (let j = 1; j < n; j++) addPt(pv[0] + (s[0] - pv[0]) * j / n, pv[1] + (s[1] - pv[1]) * j / n); } addPt(s[0], s[1]); pv = s; } }
+    const legHit = b => { for (let cx = Math.floor((b[0] - 4) / cell); cx <= Math.floor((b[2] + 4) / cell); cx++) for (let cy = Math.floor((b[1] - 4) / cell); cy <= Math.floor((b[3] + 4) / cell); cy++) { const a = LG.get(cx + ',' + cy); if (!a) continue; for (let i = 0; i < a.length; i += 2) if (a[i] > b[0] - 4 && a[i] < b[2] + 4 && a[i + 1] > b[1] - 4 && a[i + 1] < b[3] + 4) return true; } return false; };
+    let rl = [none, none, none], arc = { arc: 'M0 0', arcD: 'none' }, rl3 = none;
+    const PL = this.placeLabels(marks, sz.w, sz.h, extra, api => {
+      if (!ctx.labels) return;
+      const free = () => false;
+      rl = this.regionLabels(api, S, sz, top, bot, legHit, null);
+      arc = this.genelArc(api, S, k, sz, top, bot, legHit);
+      rl = this.regionLabels(api, S, sz, top, bot, free, rl);
+      if (arc.arcD === 'none') arc = this.genelArc(api, S, k, sz, top, bot, free);
+      if (arc.arcD === 'none') rl3 = this.genelFlat(api, S, sz, top, bot);
+    });
+    const pk = geo.peaks.map(p => { const s = S(p), b = [s[0] - 8, s[1] - 8, s[0] + 8, s[1] + 7]; if (b[0] < 2 || b[2] > sz.w - 2 || b[1] < top || b[3] > bot || PL.hits(b)) return { pts: '0,0', d: 'none' }; PL.placed.push(b); return { pts: (s[0] - 5.5).toFixed(1) + ',' + (s[1] + 4.5).toFixed(1) + ' ' + (s[0] + 5.5).toFixed(1) + ',' + (s[1] + 4.5).toFixed(1) + ' ' + s[0].toFixed(1) + ',' + (s[1] - 5.5).toFixed(1), d: 'inline' }; });
+    while (pk.length < 3) pk.push({ pts: '0,0', d: 'none' });
+    this._scr = this._scr || {}; this._scr[mid] = scr;
+    const tr = (x, y) => 'translate(' + (x - 22).toFixed(1) + 'px,' + (y - 22).toFixed(1) + 'px)';
+    const lxy = lab => ({ lx: lab ? (22 + lab[0]).toFixed(1) + 'px' : '0px', ly: lab ? (22 + lab[1]).toFixed(1) + 'px' : '0px' });
+    const stopVals = stops.map(({ m, f, i, isDone, isFocus, isNext, tag, u }) => {
+      const lifted = drag && drag.id === m.id, over = drag && drag.over === m.id;
+      let st;
+      if (u === 'done') st = { bg: P.flagBg, border: '1.5px solid ' + P.flagBd, fg: P.flagFg, sh: [P.flagSh] };
+      else if (u === 'crit') st = { bg: P.coral, border: '1px solid ' + P.coral, fg: P.critInk, sh: ['0 0 0 5px ' + P.coralSoft, '0 0 22px 4px ' + P.coralGlow] };
+      else if (u === 'near') st = { bg: P.pin, border: '1.5px solid ' + P.coral, fg: P.coralInk, sh: ['0 0 0 4px ' + P.coralSoft, '0 0 14px 2px ' + P.coralGlowSoft] };
+      else st = { bg: P.pin, border: '1px solid ' + P.pinBd, fg: P.plateInk, sh: P.calmSh ? [P.calmSh] : [] };
+      if (isFocus) st.sh = ['0 0 0 3.5px ' + P.ground, '0 0 0 6.5px ' + P.ink].concat(st.sh);
+      else if (isNext) st.sh = ['0 0 0 4px ' + P.ground, '0 0 0 5.5px ' + P.route].concat(st.sh);
+      if (over) st.sh = ['0 0 0 3px ' + P.route, '0 0 0 10px ' + P.routeGlow];
+      const pop = fx && fx.pop === m.id && fx.t < 560 ? 1 + .36 * Math.pow(1 - fx.t / 560, 2) : 1;
+      return { id: m.id, tr: tr(m.x, m.y), op: lifted ? .3 : 1, sc: (pop * (isFocus ? 1.08 : 1)).toFixed(3), bg: st.bg, border: st.border, fg: st.fg, sh: st.sh.length ? st.sh.join(',') : 'none', sonar: u === 'crit' ? this.sonar(38, P) : null, num: this.pad(i + 1), done: isDone, open: !isDone, hasLabel: !!m.lab, titleD: m.compact ? 'none' : 'block', ...lxy(m.lab), title: f.title, tag, tagc: u === 'done' ? P.sealInk : u === 'crit' || u === 'near' ? P.coralInk : P.tagMuted, pbd: u === 'done' ? P.sealBd : u === 'crit' ? P.coral : u === 'near' ? P.coralBd : 'transparent', pglow: u === 'crit' ? '0 0 16px ' + P.coralGlowSoft : 'none', tap: this.tapFn(mid, m.id), aria: this.pad(i + 1) + ' ' + f.title };
+    });
+    const otherVals = others.map(({ m, f, tag, isSel, u, hasTag }) => {
+      const held = f.status === 'held', crit = u === 'crit', near = u === 'near', sh = [];
+      if (isSel) sh.push('0 0 0 3px ' + P.ground, '0 0 0 4.5px ' + P.ink);
+      if (crit) sh.push('0 0 12px 3px ' + P.coralGlow); else if (near) sh.push('0 0 10px 1px ' + P.coralGlowSoft);
+      return { id: f.id, tr: tr(m.x, m.y), op: held ? .75 : 1, bg: crit ? P.coral : P.pin, border: crit || near ? '1.5px solid ' + P.coral : (held ? '1.5px dashed ' : '1.5px solid ') + P.other, sh: sh.length ? sh.join(',') : 'none', dot: crit ? P.critInk : near ? P.coral : held ? 'transparent' : P.other, sonar: crit ? this.sonar(30, P) : null, hasLabel: !!m.lab, ...lxy(m.lab), title: f.title, hasTag, tag, tagc: P.coralInk, pbd: crit ? P.coral : near ? P.coralBd : 'transparent', pglow: crit ? '0 0 14px ' + P.coralGlowSoft : 'none', tap: this.tapFn(mid, f.id) };
+    });
+    const rings = [];
+    if (fx) for (const s of fx.act) { const c = S(s.c), o = Math.pow(1 - s.u, 1.5); rings.push({ x: c[0].toFixed(1), y: c[1].toFixed(1), r: (s.R * k).toFixed(1), op: (.62 * o).toFixed(3) }); if (s.R > s.lam) rings.push({ x: c[0].toFixed(1), y: c[1].toFixed(1), r: ((s.R - s.lam) * k).toFixed(1), op: (.3 * o).toFixed(3) }); }
+    const last = route.length ? S(pos[route[route.length - 1]]) : null, ce = React.createElement;
+    const endGlow = captured && last ? ce('g', { transform: 'translate(' + last[0].toFixed(1) + ' ' + last[1].toFixed(1) + ')', style: { pointerEvents: 'none' } }, ce('g', { style: { animation: this.rm() ? 'none' : 'zirveGiris .9s ease-out both, zirveNabiz 2.8s ease-in-out .9s infinite' } }, ce('circle', { r: 50, style: { fill: P.summitCap, opacity: .14 } }), ce('circle', { r: 36, style: { fill: P.summitCap, opacity: .26 } }), ce('circle', { r: 27, style: { fill: P.summitCap, opacity: .42 } }))) : null;
+    const dn = drag ? route.indexOf(drag.id) + 1 : 0, aid = 'ga-' + vid + '-' + kind;
+    return {
+      ref: H.ref, down: H.down, move: H.move, up: H.up, cancel: H.cancel, click: H.click, zin: H.zin, zout: H.zout, fit: H.fit,
+      tf: 'translate(' + v.x.toFixed(2) + ' ' + v.y.toFixed(2) + ') scale(' + k.toFixed(4) + ')',
+      legs, seals, rings, endGlow, stops: stopVals, others: otherVals,
+      rl0: rl[0], rl1: rl[1], rl2: rl[2], rl3, arcId: aid, arcHref: '#' + aid, arc: arc.arc, arcD: arc.arcD, pk0: pk[0], pk1: pk[1], pk2: pk[2],
+      hq: { tr: 'translate(' + hq[0].toFixed(1) + 'px,' + hq[1].toFixed(1) + 'px)' },
+      ghost: drag ? { show: true, tr: tr(drag.x, drag.y), num: this.pad(dn) } : { show: false, tr: 'translate(0px,0px)', num: '' },
+      dragOn: !!drag, dragText: drag ? (drag.over ? 'Bırakırsan ' + this.pad(dn) + '. sıraya geçer.' : 'Başka bir kampın üstüne bırak.') : ''
+    };
+  }
+  variant(vid, name, sub, P, relief, labels) {
+    const order = this.shownOrder(vid), done = this.doneOf(vid), focus = this.focusOf(vid, order, done), fns = this.vfn(vid), k = this.okey(vid), sel = this.state.sel[vid];
+    const base = this.terrain(P, relief), fxOn = !!this._fx && this._fx.vid === vid && this.state.fxT >= 0, rip = fxOn ? this.rippled(base, this._fx, this.state.fxT) : null, fx = fxOn ? { t: this.state.fxT, act: rip.act, seals: this._fx.seals, pop: this._fx.pop } : null;
+    const legendOpen = !!(this.state.legend && this.state.legend[vid]);
+    const home = this.mapVals(vid, 'home', P, { order, done, focus, labels, fx });
+    const atlas = this.mapVals(vid, 'atlas', P, { order, done, focus: sel, labels, legend: legendOpen && !sel, fx });
+    const firstUndone = order.find(id => !done[id]), f = this.BY[focus], idx = order.indexOf(focus), isDone = !!done[focus];
+    const sheet = {
+      top: this.pad(idx + 1) + ' / ' + (isDone ? 'GEÇİLDİ · ' + done[focus] : focus === firstUndone ? 'SIRADAKİ HAMLE' : 'ROTADAKİ HAMLE'),
+      title: f.title, hasWhere: f.type === 'lane' && !!f.where, where: 'Kaldığın yer: ' + (f.where || ''), move: f.move, reason: '↳ ' + (isDone ? 'Bugün ' + done[focus] + '’de tamamlandı.' : this.reason(f)),
+      moveColor: isDone ? P.U.muted : P.U.ink, deco: isDone ? 'line-through' : 'none', isDone, notDone: !isDone, fop: isDone ? .5 : 1, finish: fns.finish, undo: fns.undo
+    };
+    const RF = this._rf || (this._rf = {});
+    const rows = order.map((id, i) => {
+      const g = this.BY[id], cur = id === focus, dn = !!done[id], rk = vid + ':' + id;
+      return { num: dn ? '✓' : this.pad(i + 1), title: g.title + (dn ? ' · geçildi ' + done[id] : ''), text: g.move, weight: cur ? 600 : 400, color: dn ? P.U.muted : P.U.ink, numColor: cur ? P.U.accent : P.U.muted, deco: dn ? 'line-through' : 'none', tap: RF[rk] || (RF[rk] = () => this.setState(s => ({ focus: { ...s.focus, [vid]: id } }))) };
+    });
+    const nDone = order.filter(id => done[id]).length, allDone = order.length > 0 && nDone === order.length, open = this.FR.filter(x => x.status !== 'closed').length;
+    let card = { show: false, type: '', color: '#94856b', title: '', meta: '', days: '', route: '', move: '', close: fns.close, dayBg: P.U.chip, dayInk: P.U.ink };
+    if (sel && this.BY[sel]) {
+      const g = this.BY[sel], ri = order.indexOf(sel), T = this.TYPES[g.type], u = this.urg(g, !!done[sel]), hot = u === 'crit' || u === 'near';
+      card = { show: true, type: T[0] + ' · ' + T[2], color: T[1], title: g.title, meta: g.event ? g.event + ' · ' + g.when : g.where ? 'Kaldığın yer: ' + g.where : 'Tarihli kalemi yok.', days: g.status === 'held' ? 'BEKLETİLİYOR' : g.days == null ? 'TARİHSİZ' : g.days === 0 ? 'BUGÜN' : g.days === 1 ? 'YARIN' : g.days + ' GÜN KALDI', route: ri >= 0 ? 'ROTADA ' + this.pad(ri + 1) + (done[sel] ? ' · GEÇİLDİ' : '') : 'BUGÜNÜN ROTASINDA DEĞİL', move: g.move, close: fns.close, dayBg: hot ? P.U.hotBg : P.U.chip, dayInk: hot ? P.U.hotInk : P.U.ink };
+    }
+    const kr = this.kritik();
+    return {
+      id: vid, name, sub, P, U: P.U, hotWord: P.hotWord || 'MERCAN', ter: rip ? rip.ter : base, home, atlas, sheet, rows, card,
+      legendChip: !card.show && !legendOpen, legendOn: !card.show && legendOpen, toggleLegend: fns.legend,
+      critTxt: kr === 0 ? 'BUGÜN' : kr + ' GÜN VE ALTI', nearTxt: this.yakin() + ' GÜN VE ALTI',
+      caption: allDone ? 'SEFER TAMAMLANDI · ' + nDone + '/' + order.length : order.length + ' CEPHE / ' + order.length + ' HAMLE' + (nDone ? ' · ' + nDone + ' GEÇİLDİ' : ''),
+      atlasSub: allDone ? open + ' AÇIK CEPHE · SEFER TAMAMLANDI' : open + ' AÇIK CEPHE · BUGÜNÜN ROTASI ' + order.length + ' KAMP',
+      pendOn: !!this.state.pending[k], savePend: fns.save, cancelPend: fns.cancel, showHint: fns.hint, hintOn: !!this.state.hint[vid] && !this.state.drag,
+      toastOn: !!this.state.toast[vid], toast: this.state.toast[vid] || ''
+    };
+  }
+  renderVals() {
+    const relief = this.props.kabartma ?? true, labels = this.props.etiketler ?? true;
+    return {
+      grain: this.GRAIN,
+      stopProp: this._sp2 || (this._sp2 = e => e.stopPropagation()),
+      variants: [
+        this.variant('5a', 'Kül ve Bozkır', 'Kömür grisi zemin, kül tonlu dağlar. Aciliyet paslı turuncu, mühür amber.', this.PALS.kul, relief, labels),
+        this.variant('5b', 'Orman ve Tundra', 'Sisli mat gri vadiler, koyu çam yeşili yamaçlar, kemik rengi etiketler.', this.PALS.orman, relief, labels),
+        this.variant('5c', 'Derin Karargâh', 'Çok koyu petrol zemin, parlayan mercan rota, kamp ateşi gibi yanan kamplar.', this.PALS.derin, relief, labels),
+        this.variant('5d', 'Grafit Gece', 'Önerim. En sakin seçenek: nötr grafit, soluk altın rota; renk yalnız aciliyette.', this.PALS.grafit, relief, labels)
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

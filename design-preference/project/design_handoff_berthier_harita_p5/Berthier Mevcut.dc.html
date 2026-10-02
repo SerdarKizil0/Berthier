@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box}body{margin:0;background:#e7e3d8}a{color:#193d3d;text-decoration:none}a:hover{color:#a24b2b}button{letter-spacing:inherit}</style>
+</helmet>
+<section data-screen-label="Mevcut" style="padding:56px 64px 80px;display:flex;flex-direction:column;gap:32px;min-height:100vh;font-family:'DM Sans','Segoe UI',sans-serif;color:#193d3d">
+<div style="display:flex;flex-direction:column;gap:8px;max-width:760px">
+<p style="margin:0;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#596963">MEVCUT · SerdarKizil0/Berthier@main · 390 × 844</p>
+<h1 style="margin:0;font:400 2.6rem/1.1 'Instrument Serif',Georgia,serif">Bugünkü Karargâh ve Harita</h1>
+<p style="margin:0;font-size:1rem;line-height:1.55;color:#596963;text-wrap:pretty">atlas-order.tsx, berthier.tsx, atlas.css ve globals.css’ten birebir. Duraklar cephe adına göre alfabetik yerleşiyor, çizgi emir sırasıyla çiziliyor; bu yüzden 01→02→03→04 zikzak yapıyor.</p>
+</div>
+<div style="display:flex;gap:56px;flex-wrap:wrap;align-items:flex-start">
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<p style="margin:0;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#596963">KARARGÂH · BUGÜNÜN ARAZİSİ</p>
+<div data-screen-label="Mevcut Karargâh" style="position:relative;width:390px;height:844px;overflow:hidden;background:#f5f2e9;color:#193d3d;font-family:'DM Sans','Segoe UI',sans-serif;font-size:16px;line-height:1.55;box-shadow:0 30px 80px -24px #0f2a2a55">
+<div style="height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none">
+<div style="padding:0 20px">
+<header style="height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #d2d9ca">
+<a href="#" style="display:flex;align-items:center;gap:6px;font-family:'Instrument Serif',Georgia,serif;font-size:2rem;color:#193d3d"><span>berthier</span><span style="font-family:'DM Sans','Segoe UI',sans-serif;font-size:1.6rem;color:#ed845c">✳</span></a>
+<div style="display:flex;align-items:center;gap:10px">
+<button aria-label="Kayıt defteri" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:#193d3d;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg></button>
+<button aria-label="Tercihler" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:#193d3d;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+</div>
+</header>
+<main style="max-width:760px;margin:0 auto;padding:22px 0 205px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+<div style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:14px">
+<p style="margin:0 0 6px;color:#596963;font-size:.875rem">26 Eylül Cumartesi</p>
+<h1 style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:.875rem;font-weight:400;letter-spacing:.12em;line-height:1.2">Karargâh</h1>
+</div>
+</div>
+
+<section style="margin:0 -20px 24px;overflow:hidden;background:#fcfaf4">
+<div style="background:#123f43;color:#edf1e5;padding:24px 0 31px">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 23px">
+<h2 style="margin:0;font:400 2rem/1.12 'Instrument Serif',Georgia,serif">Bugünün arazisi.</h2>
+<span style="font:400 .75rem/1.5 'IBM Plex Mono',monospace;letter-spacing:.06em;max-width:95px;text-align:right;color:#bad0c3">ÖNERİLEN ROTA</span>
+</div>
+<div style="position:relative;margin-top:8px;height:280px">
+<div style="position:absolute;inset:0;background-image:repeating-radial-gradient(ellipse at -12% 35%,transparent 0 27px,#b6cfb517 28px 29px,transparent 30px 42px),repeating-radial-gradient(ellipse at 110% 95%,transparent 0 33px,#b6cfb51a 34px 35px,transparent 36px 47px),linear-gradient(#b6cfb50b 1px,transparent 1px),linear-gradient(90deg,#b6cfb50b 1px,transparent 1px);background-size:auto,auto,32px 32px,32px 32px;pointer-events:none"></div>
+<svg viewBox="0 0 100 280" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;display:block"><path d="M 72 90 L 72 205 L 25 55 L 25 170" style="stroke:#efbd80;stroke-width:1.5;stroke-dasharray:3 6;vector-effect:non-scaling-stroke;fill:none"></path></svg>
+<button style="font:inherit;position:absolute;left:25%;top:55px;transform:translate(-50%,-22px);display:flex;align-items:center;flex-direction:column;background:none;border:0;border-radius:0;color:#edf1e5;padding:0;width:36%;font-weight:400;min-height:44px;cursor:pointer"><span style="display:grid;place-items:center;width:44px;height:44px;background:#123f43;border:1px solid #b4c4b4;border-radius:50%;font:400 .875rem 'IBM Plex Mono',monospace">03</span><span style="max-width:100%;margin-top:7px;padding:2px 7px;background:#123f43;border-radius:5px;font-size:.875rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Biyokimya</span></button>
+<button style="font:inherit;position:absolute;left:72%;top:90px;transform:translate(-50%,-22px);display:flex;align-items:center;flex-direction:column;background:none;border:0;border-radius:0;color:#edf1e5;padding:0;width:36%;font-weight:400;min-height:44px;cursor:pointer"><span style="display:grid;place-items:center;width:44px;height:44px;background:#ed845c;color:#253e33;border:1px solid #ed845c;border-radius:50%;font:400 .875rem 'IBM Plex Mono',monospace;box-shadow:0 0 0 6px #ed845c27,0 0 0 7px #ed845c50">01</span><span style="max-width:100%;margin-top:7px;padding:2px 7px;background:#123f43;border-radius:5px;font-size:.875rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Erasmus+ başvurusu</span><small style="font:400 .75rem 'IBM Plex Mono',monospace;margin-top:4px;letter-spacing:.05em;color:#f4c58e;background:#123f43">İLK HAMLE</small></button>
+<button style="font:inherit;position:absolute;left:25%;top:170px;transform:translate(-50%,-22px);display:flex;align-items:center;flex-direction:column;background:none;border:0;border-radius:0;color:#edf1e5;padding:0;width:36%;font-weight:400;min-height:44px;cursor:pointer"><span style="display:grid;place-items:center;width:44px;height:44px;background:#123f43;border:1px solid #b4c4b4;border-radius:50%;font:400 .875rem 'IBM Plex Mono',monospace">04</span><span style="max-width:100%;margin-top:7px;padding:2px 7px;background:#123f43;border-radius:5px;font-size:.875rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">İstatistik</span></button>
+<button style="font:inherit;position:absolute;left:72%;top:205px;transform:translate(-50%,-22px);display:flex;align-items:center;flex-direction:column;background:none;border:0;border-radius:0;color:#edf1e5;padding:0;width:36%;font-weight:400;min-height:44px;cursor:pointer"><span style="display:grid;place-items:center;width:44px;height:44px;background:#123f43;border:1px solid #b4c4b4;border-radius:50%;font:400 .875rem 'IBM Plex Mono',monospace">02</span><span style="max-width:100%;margin-top:7px;padding:2px 7px;background:#123f43;border-radius:5px;font-size:.875rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Kargo iadesi</span></button>
+</div>
+<div style="padding:10px 23px 0;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px;font:400 .75rem 'IBM Plex Mono',monospace;color:#bad0c3">
+<span>6 CEPHE / 6 HAMLE</span>
+<button style="font:inherit;color:#edf1e5;font-size:.875rem;border:0;background:transparent;padding:8px 0;min-height:44px;font-weight:500;border-radius:10px;cursor:pointer">Tüm rotayı göster (6)</button>
+</div>
+</div>
+<div style="margin-top:-20px;position:relative;background:#fcfaf4;border-radius:23px 23px 0 0;padding:10px 23px 20px">
+<div style="height:3px;width:32px;margin:0 auto 9px;background:#d2d9ca;border-radius:4px"></div>
+<div style="display:flex;gap:6px;justify-content:space-between;align-items:center;margin-bottom:14px">
+<span style="font:400 .75rem 'IBM Plex Mono',monospace;color:#596963;letter-spacing:.03em;max-width:140px">01 / İLK HAMLE</span>
+<button style="font:inherit;background:none;border:0;display:inline-flex;align-items:center;gap:7px;font-size:.8rem;min-height:44px;padding:8px 0;font-weight:500;color:#193d3d;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m3 16 4 4 4-4"></path><path d="M7 20V4"></path><path d="m21 8-4-4-4 4"></path><path d="M17 4v16"></path></svg>Sırayı düzenle</button>
+</div>
+<button style="border:0;background:none;padding:0;min-height:32px;display:flex;align-items:center;gap:6px;color:#a24b2b;font:400 .875rem 'IBM Plex Mono',monospace;border-radius:10px;cursor:pointer">Erasmus+ başvurusu<svg viewBox="0 0 24 24" style="width:14px;height:14px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+<h3 style="font:400 2.2rem/1.13 'Instrument Serif',Georgia,serif;letter-spacing:-.015em;margin:7px 0 15px;overflow-wrap:anywhere">Ayşe Hoca’ya referans ricası mailini gönder.</h3>
+<p style="margin:0;font-size:.875rem;line-height:1.6;color:#596963">↳ Tarihli kalemin hazırlık zamanı geldi.</p>
+<div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:19px">
+<button style="font:inherit;display:flex;align-items:center;gap:8px;background:#e6ebdf;border:1px solid transparent;border-radius:10px;padding:10px 16px;min-height:44px;color:#193d3d;font-weight:500;cursor:pointer"><svg viewBox="0 0 24 24" style="width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M20 6 9 17l-5-5"></path></svg>Hamleyi bitir</button>
+<button style="font:inherit;background:none;border:0;display:flex;align-items:center;gap:8px;font-size:.875rem;min-height:44px;padding:8px 0;font-weight:500;color:#193d3d;border-radius:10px;cursor:pointer">Düzenle</button>
+</div>
+<button style="font:inherit;width:100%;display:flex;align-items:center;justify-content:space-between;margin-top:20px;min-height:50px;background:#193d3d;color:#f7f6ed;border:1px solid #193d3d;border-radius:10px;padding:10px 16px;font-weight:500;cursor:pointer"><span>Bu rotayla ilerle</span><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg></button>
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:2px;flex-wrap:wrap;margin-top:10px">
+<span style="color:#596963;font-size:.75rem;padding-top:13px">Günün emri onayını bekliyor.</span>
+<button style="font:inherit;background:none;border:0;display:inline-flex;align-items:center;gap:7px;font-size:.875rem;min-height:44px;padding:8px 0;font-weight:500;color:#193d3d;border-radius:10px;cursor:pointer">Cephe ekle / çıkar</button>
+</div>
+<div style="margin-top:18px;border-top:1px solid #d2d9ca">
+<button style="font:inherit;display:flex;width:100%;align-items:center;gap:14px;padding:15px 0;border:0;border-bottom:1px solid #d2d9ca;border-radius:0;text-align:left;background:none;font-size:.875rem;font-weight:600;min-height:44px;color:#193d3d;cursor:pointer"><span style="font:400 .75rem 'IBM Plex Mono',monospace;color:#a24b2b">01</span><span style="flex:1;min-width:0"><small style="display:block;color:#596963;font-size:.75rem;margin-bottom:3px">Erasmus+ başvurusu</small>Ayşe Hoca’ya referans ricası mailini gönder.</span><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+<button style="font:inherit;display:flex;width:100%;align-items:center;gap:14px;padding:15px 0;border:0;border-bottom:1px solid #d2d9ca;border-radius:0;text-align:left;background:none;font-size:.875rem;font-weight:400;min-height:44px;color:#193d3d;cursor:pointer"><span style="font:400 .75rem 'IBM Plex Mono',monospace;color:#596963">02</span><span style="flex:1;min-width:0"><small style="display:block;color:#596963;font-size:.75rem;margin-bottom:3px">Kargo iadesi</small>İade paketini PTT şubesine götür.</span><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+<button style="font:inherit;display:flex;width:100%;align-items:center;gap:14px;padding:15px 0;border:0;border-bottom:1px solid #d2d9ca;border-radius:0;text-align:left;background:none;font-size:.875rem;font-weight:400;min-height:44px;color:#193d3d;cursor:pointer"><span style="font:400 .75rem 'IBM Plex Mono',monospace;color:#596963">03</span><span style="flex:1;min-width:0"><small style="display:block;color:#596963;font-size:.75rem;margin-bottom:3px">Biyokimya</small>Sunumun ilk beş slaytını hazırla.</span><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+<button style="font:inherit;display:flex;width:100%;align-items:center;gap:14px;padding:15px 0;border:0;border-bottom:1px solid #d2d9ca;border-radius:0;text-align:left;background:none;font-size:.875rem;font-weight:400;min-height:44px;color:#193d3d;cursor:pointer"><span style="font:400 .75rem 'IBM Plex Mono',monospace;color:#596963">04</span><span style="flex:1;min-width:0"><small style="display:block;color:#596963;font-size:.75rem;margin-bottom:3px">İstatistik</small>Hipotez testleri bölümünden 10 soru çöz.</span><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+<button style="font:inherit;display:flex;width:100%;align-items:center;gap:14px;padding:15px 0;border:0;border-bottom:1px solid #d2d9ca;border-radius:0;text-align:left;background:none;font-size:.875rem;font-weight:400;min-height:44px;color:#193d3d;cursor:pointer"><span style="font:400 .75rem 'IBM Plex Mono',monospace;color:#596963">05</span><span style="flex:1;min-width:0"><small style="display:block;color:#596963;font-size:.75rem;margin-bottom:3px">Mikrobiyom derlemesi</small>13. makaleyi oku ve tabloya ekle.</span><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+<button style="font:inherit;display:flex;width:100%;align-items:center;gap:14px;padding:15px 0;border:0;border-bottom:1px solid #d2d9ca;border-radius:0;text-align:left;background:none;font-size:.875rem;font-weight:400;min-height:44px;color:#193d3d;cursor:pointer"><span style="font:400 .75rem 'IBM Plex Mono',monospace;color:#596963">06</span><span style="flex:1;min-width:0"><small style="display:block;color:#596963;font-size:.75rem;margin-bottom:3px">TÜBİTAK 2209-A</small>Proje özetinin ilk taslağını yaz.</span><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+</div>
+</div>
+</section>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:30px 0 12px">
+<button style="font:inherit;font-weight:400;display:block;width:100%;text-align:left;background:#e6ebdf;border:0;border-radius:16px;padding:17px 14px;position:relative;color:#193d3d;min-height:44px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:21px;height:21px;display:block;margin-bottom:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect width="20" height="5" x="2" y="3" rx="1"></rect><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path><path d="M10 12h4"></path></svg><div><h2 style="margin:0;font-size:1rem;font-weight:500">Fikir deposu</h2><p style="margin:7px 0 0;color:#596963;font-size:.875rem">7 fikir, okuma ve soru</p></div><svg viewBox="0 0 24 24" style="position:absolute;right:16px;top:20px;width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+<button style="font:inherit;font-weight:400;display:block;width:100%;text-align:left;background:#e6ebdf;border:0;border-radius:16px;padding:17px 14px;position:relative;color:#193d3d;min-height:44px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:21px;height:21px;display:block;margin-bottom:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg><div><h2 style="margin:0;font-size:1rem;font-weight:500">Haftalık teftiş</h2><p style="margin:7px 0 0;color:#596963;font-size:.875rem">Pazar 20:00 · İstersen şimdi başlayabilirsin</p></div><svg viewBox="0 0 24 24" style="position:absolute;right:16px;top:20px;width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+</div>
+<button style="font:inherit;font-weight:400;display:flex;align-items:center;gap:15px;width:100%;text-align:left;background:#fcfaf4;border:1px solid #d2d9ca;border-radius:16px;padding:22px;margin-top:15px;color:#193d3d;min-height:44px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;flex-shrink:0;color:#a14c2d;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M8 13h.01"></path><path d="M12 13h.01"></path><path d="M16 13h.01"></path><path d="M8 17h.01"></path><path d="M12 17h.01"></path><path d="M16 17h.01"></path></svg><div style="flex:1"><h2 style="margin:0;display:flex;align-items:baseline;gap:12px;font-family:'Instrument Serif',Georgia,serif;font-size:1.7rem;font-weight:500">Ufuk <span style="color:#596963;font-size:.875rem">14 gün</span></h2><p style="margin:0;color:#596963;font-size:.9rem">6 tarihli kalem · Son iade günü</p></div><svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></button>
+<button style="font:inherit;font-weight:400;display:flex;align-items:center;gap:20px;padding:28px 0;width:100%;border:0;border-bottom:1px solid #d2d9ca;border-radius:0;background:none;text-align:left;color:#193d3d;min-height:44px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg><div style="flex:1"><h2 style="margin:0;font-size:1.25rem;font-weight:500">Harita</h2><p style="margin:0;color:#596963;font-size:.9rem">13 açık cephe, 2 aktif kulvar</p></div><svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+<aside style="display:flex;gap:16px;margin-top:28px;color:#596963;padding:10px 0;opacity:.9"><svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;flex-shrink:0;margin-top:3px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M12 5v16"></path><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"></path></svg><div><h3 style="margin:0;font-size:1rem;font-weight:500">Hiçbir şey aklında kalmak zorunda değil.</h3><p style="margin:6px 0 0;font-size:.875rem">Ham diktelerin kayıt defterinde saklanır. Berthier’in değişikliklerini oradan geri alabilirsin.</p></div></aside>
+</main>
+</div>
+</div>
+<div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:30;width:calc(100% - 20px);padding:10px 12px 34px;background:#f5f2e9;border:1px solid #d2d9ca;border-bottom:0;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px #193d3d0b">
+<button style="font:inherit;display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#e6ebdf;border:0;padding:10px 12px;border-radius:14px;font-size:1rem;font-weight:500;color:#193d3d;min-height:44px;cursor:pointer"><span style="width:42px;height:42px;background:#193d3d;color:#f5b871;display:grid;place-items:center;border-radius:50%;flex-shrink:0"><svg viewBox="0 0 24 24" style="width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M2 10v3"></path><path d="M6 6v11"></path><path d="M10 3v18"></path><path d="M14 8v7"></path><path d="M18 5v13"></path><path d="M22 10v3"></path></svg></span><span style="flex:1">Aklındakini bırak.<small style="display:block;font-size:.75rem;color:#596963;font-weight:400;margin-top:2px">Berthier yerine yerleştirir.</small></span><svg viewBox="0 0 24 24" style="width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+<nav style="display:flex;justify-content:space-around;width:100%;padding:9px 0 0">
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#193d3d;font-weight:700;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"></path></svg>Karargâh</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#596963;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg>Harita</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#596963;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M8 13h.01"></path><path d="M12 13h.01"></path><path d="M16 13h.01"></path><path d="M8 17h.01"></path><path d="M12 17h.01"></path><path d="M16 17h.01"></path></svg>Ufuk</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#596963;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg>Teftiş</button>
+</nav>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<p style="margin:0;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#596963">HARİTA · CEPHE LİSTESİ</p>
+<div data-screen-label="Mevcut Harita" style="position:relative;width:390px;height:844px;overflow:hidden;background:#f5f2e9;color:#193d3d;font-family:'DM Sans','Segoe UI',sans-serif;font-size:16px;line-height:1.55;box-shadow:0 30px 80px -24px #0f2a2a55">
+<div style="height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none">
+<div style="padding:0 20px">
+<header style="height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #d2d9ca">
+<a href="#" style="display:flex;align-items:center;gap:6px;font-family:'Instrument Serif',Georgia,serif;font-size:2rem;color:#193d3d"><span>berthier</span><span style="font-family:'DM Sans','Segoe UI',sans-serif;font-size:1.6rem;color:#ed845c">✳</span></a>
+<div style="display:flex;align-items:center;gap:10px">
+<button aria-label="Kayıt defteri" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:#193d3d;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg></button>
+<button aria-label="Tercihler" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:#193d3d;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+</div>
+</header>
+<main style="max-width:760px;margin:0 auto;padding:22px 0 205px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px">
+<div>
+<button style="font:inherit;border:0;padding:0;margin-bottom:5px;display:flex;gap:8px;align-items:center;font-size:.875rem;background:none;color:#596963;font-weight:500;min-height:44px;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>Karargâh</button>
+<h1 style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-size:2.7rem;line-height:1.2;font-weight:400;letter-spacing:-.025em">Harita</h1>
+</div>
+<span style="display:grid;place-items:center;width:52px;height:52px;background:#e6ebdf;color:#193d3d;border-radius:18px"><svg viewBox="0 0 24 24" style="width:32px;height:32px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"></path></svg></span>
+</div>
+
+<sc-for list="{{ groups }}" as="g" hint-placeholder-count="4">
+<section style="margin-top:26px;margin-bottom:32px">
+<h2 style="margin:0;display:flex;gap:12px;align-items:center;padding-bottom:15px;border-bottom:1px solid #d2d9ca;font:400 .875rem 'IBM Plex Mono',monospace;letter-spacing:.07em">{{ g.label }}<span style="font-size:.875rem;color:#596963;font-weight:400;margin-left:auto;letter-spacing:0">{{ g.count }}</span></h2>
+<sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="3">
+<button style="font:inherit;display:flex;width:100%;gap:14px;align-items:center;border:0;border-bottom:1px solid #d2d9ca;border-radius:0;background:none;text-align:left;padding:20px 0;font-weight:400;color:#193d3d;min-height:44px;cursor:pointer">
+<span style="width:8px;height:28px;background:{{ g.color }};border-radius:4px;flex-shrink:0"></span>
+<span style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0">
+<strong style="font-size:1.125rem;font-weight:500">{{ r.title }}</strong>
+<span style="color:#596963;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5;font-size:.95rem">{{ r.text }}</span>
+<small style="color:#596963;font:400 .75rem 'IBM Plex Mono',monospace;margin-top:3px">{{ r.meta }}</small>
+</span>
+<svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg>
+</button>
+</sc-for>
+</section>
+</sc-for>
+<details style="border-top:1px solid #d2d9ca;padding:20px 0;margin-top:24px"><summary style="cursor:pointer;min-height:44px;font-size:.95rem">Kapanan cepheler (2)</summary></details>
+<button style="font:inherit;border:1px solid #d2d9ca;border-radius:10px;padding:10px 16px;min-height:44px;background:#fcfaf4;color:#193d3d;font-weight:500;cursor:pointer">Aktif kulvarları seç</button>
+</main>
+</div>
+</div>
+<div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:30;width:calc(100% - 20px);padding:10px 12px 34px;background:#f5f2e9;border:1px solid #d2d9ca;border-bottom:0;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px #193d3d0b">
+<button style="font:inherit;display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#e6ebdf;border:0;padding:10px 12px;border-radius:14px;font-size:1rem;font-weight:500;color:#193d3d;min-height:44px;cursor:pointer"><span style="width:42px;height:42px;background:#193d3d;color:#f5b871;display:grid;place-items:center;border-radius:50%;flex-shrink:0"><svg viewBox="0 0 24 24" style="width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M2 10v3"></path><path d="M6 6v11"></path><path d="M10 3v18"></path><path d="M14 8v7"></path><path d="M18 5v13"></path><path d="M22 10v3"></path></svg></span><span style="flex:1">Aklındakini bırak.<small style="display:block;font-size:.75rem;color:#596963;font-weight:400;margin-top:2px">Berthier yerine yerleştirir.</small></span><svg viewBox="0 0 24 24" style="width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+<nav style="display:flex;justify-content:space-around;width:100%;padding:9px 0 0">
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#596963;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"></path></svg>Karargâh</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#193d3d;font-weight:700;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg>Harita</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#596963;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M8 13h.01"></path><path d="M12 13h.01"></path><path d="M16 13h.01"></path><path d="M8 17h.01"></path><path d="M12 17h.01"></path><path d="M16 17h.01"></path></svg>Ufuk</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#596963;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg>Teftiş</button>
+</nav>
+</div>
+</div>
+</div>
+
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const groups = [
+      { label: 'Dersler', color: '#567c8d', rows: [
+        { title: 'Biyokimya', text: 'Sunumun ilk beş slaytını hazırla.', meta: '26 Eyl 09:40' },
+        { title: 'İstatistik', text: 'Hipotez testleri bölümünden 10 soru çöz.', meta: '25 Eyl 22:05' },
+        { title: 'Moleküler Genetik', text: 'Ödev 2’nin ilk sorusunu çöz.', meta: '24 Eyl 18:30' },
+        { title: 'Organik Kimya Lab', text: 'Deney 3 raporunun sonuç bölümünü yaz.', meta: '23 Eyl 16:12' }] },
+      { label: 'Kulvarlar', color: '#507769', rows: [
+        { title: 'Mikrobiyom derlemesi', text: 'Literatür tablosunda 12. makalede kaldın.', meta: '25 Eyl 23:48' },
+        { title: 'Reuteri fermantasyonu', text: 'İlk parti 24 saatte pH 4,3’e indi.', meta: '24 Eyl 08:15' },
+        { title: 'Tez önerisi', text: 'Danışmana soracağın üç soruyu yaz.', meta: 'Bekletiliyor · 12 Eyl 11:20' }] },
+      { label: 'Başvurular', color: '#c7764d', rows: [
+        { title: 'Bursluluk başvurusu', text: 'Başvuru portalını aç ve istenen belgeleri listele.', meta: '21 Eyl 14:02' },
+        { title: 'Erasmus+ başvurusu', text: 'Ayşe Hoca’ya referans ricası mailini gönder.', meta: '26 Eyl 10:12' },
+        { title: 'TÜBİTAK 2209-A', text: 'Proje özetinin ilk taslağını yaz.', meta: '25 Eyl 19:30' }] },
+      { label: 'Genel', color: '#94856b', rows: [
+        { title: 'Dekanlık imzası', text: 'Staj formunu dekanlıkta imzalat.', meta: '24 Eyl 12:44' },
+        { title: 'Kargo iadesi', text: 'İade paketini PTT şubesine götür.', meta: '25 Eyl 17:05' },
+        { title: 'Staj defteri', text: 'Staj defterinin 3. haftasını doldur.', meta: '22 Eyl 20:10' }] }
+    ];
+    return { groups: groups.map(g => ({ ...g, count: g.rows.length })) };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box}body{margin:0;background:#e7e3d8}a{color:#193d3d;text-decoration:underline;text-underline-offset:3px}a:hover{color:#a24b2b}button{letter-spacing:inherit}</style>
+</helmet>
+<section data-screen-label="Tur 1" style="padding:56px 64px 88px;display:flex;flex-direction:column;gap:40px;min-height:100vh;font-family:'DM Sans','Segoe UI',sans-serif;color:#193d3d">
+<div style="display:flex;flex-direction:column;gap:10px;max-width:820px">
+<p style="margin:0;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#596963">TUR 1 · HARİTA YENİLEMESİ · ONAYINI BEKLİYOR, REPOYA GÖNDERİLMEDİ</p>
+<h1 style="margin:0;font:400 2.8rem/1.08 'Instrument Serif',Georgia,serif">Aciliyet arazisi</h1>
+<p style="margin:0;font-size:1rem;line-height:1.6;color:#3f524d;text-wrap:pretty">Yükselti, tarihli kaleme kalan günü gösterir. Zirve bugündür; konturlar 1, 3, 7 ve 14 gün ile 1 ay eşikleridir. Tarihi olmayan cepheler dağın eteğindeki ovada durur. Günün sırası, Karargâh’tan çıkıp kamplar arasında araziyi izleyen tek bir patikadır. Geçilen kamplara bayrak dikilir ve silikleşir.</p>
+<p style="margin:0;font-size:.9375rem;line-height:1.6;color:#596963;text-wrap:pretty">Dene: kampa dokun · haritayı fareyle sürükle, iki parmakla ya da Ctrl + tekerlekle yakınlaştır · bir kampı basılı tutup başka bir kampın üstüne bırak · “Hamleyi bitir” ile kampı geç. Karşılaştırma için <a href="Berthier Mevcut.dc.html">mevcut ekranlar</a>.</p>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:80px;align-items:flex-start">
+<sc-for list="{{ variants }}" as="v" hint-placeholder-count="2">
+<div id="{{ v.id }}" style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;max-width:820px">
+<span style="font:500 .8125rem 'IBM Plex Mono',monospace;padding:4px 9px;border-radius:8px;background:#193d3d;color:#f7f6ed">{{ v.id }}</span>
+<span style="font:400 1.9rem/1 'Instrument Serif',Georgia,serif;color:#193d3d">{{ v.name }}</span>
+<span style="font-size:.9375rem;color:#596963">{{ v.sub }}</span>
+</div>
+<div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap">
+
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="margin:0;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#596963">KARARGÂH · KÜÇÜK ROTA</p>
+<div data-screen-label="Karargâh" style="position:relative;width:390px;height:844px;overflow:hidden;background:#f5f2e9;color:#193d3d;font-family:'DM Sans','Segoe UI',sans-serif;font-size:16px;line-height:1.55;box-shadow:0 30px 80px -24px #0f2a2a55">
+<div style="height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none">
+<div style="padding:0 20px">
+<header style="height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #d2d9ca">
+<a href="#" style="display:flex;align-items:center;gap:6px;font-family:'Instrument Serif',Georgia,serif;font-size:2rem;color:#193d3d;text-decoration:none"><span>berthier</span><span style="font-family:'DM Sans','Segoe UI',sans-serif;font-size:1.6rem;color:#ed845c">✳</span></a>
+<div style="display:flex;align-items:center;gap:10px">
+<button aria-label="Kayıt defteri" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:#193d3d;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg></button>
+<button aria-label="Tercihler" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:#193d3d;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+</div>
+</header>
+<main style="max-width:760px;margin:0 auto;padding:22px 0 205px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+<div style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:14px">
+<p style="margin:0 0 6px;color:#596963;font-size:.875rem">26 Eylül Cumartesi</p>
+<h1 style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:.875rem;font-weight:400;letter-spacing:.12em;line-height:1.2">Karargâh</h1>
+</div>
+</div>
+<section style="margin:0 -20px 24px;overflow:hidden;background:#fcfaf4">
+<div style="background:{{ v.P.ground }};color:{{ v.P.ink }};padding:24px 0 31px">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 23px">
+<h2 style="margin:0;font:400 2rem/1.12 'Instrument Serif',Georgia,serif">Bugünün arazisi.</h2>
+<span style="font:400 .75rem/1.5 'IBM Plex Mono',monospace;letter-spacing:.06em;max-width:95px;text-align:right;color:{{ v.P.muted }}">ÖNERİLEN ROTA</span>
+</div>
+<div ref="{{ v.home.ref }}" onPointerDown="{{ v.home.down }}" onPointerMove="{{ v.home.move }}" onPointerUp="{{ v.home.up }}" onPointerCancel="{{ v.home.cancel }}" onClick="{{ v.home.click }}" style="position:relative;margin-top:8px;height:360px;overflow:hidden;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none;background:{{ v.P.ground }}">
+<svg style="position:absolute;inset:0;width:100%;height:100%;display:block;overflow:hidden">
+<g transform="{{ v.home.tf }}">
+<rect x="-4000" y="-4000" width="8000" height="8000" style="fill:{{ v.P.ground }}"></rect>
+<path d="{{ v.ter.stipple }}" style="fill:{{ v.P.stip }}"></path>
+<sc-for list="{{ v.ter.bands }}" as="b" hint-placeholder-count="0"><g><path d="{{ b.d }}" transform="{{ v.home.lo }}" style="fill:{{ v.P.light }};display:{{ v.ter.rd }}"></path><path d="{{ b.d }}" transform="{{ v.home.dk }}" style="fill:{{ v.P.dark }};display:{{ v.ter.rd }}"></path><path d="{{ b.d }}" style="fill:{{ b.fill }}"></path></g></sc-for>
+<sc-for list="{{ v.ter.lines }}" as="l" hint-placeholder-count="0"><path d="{{ l.d }}" style="fill:none;stroke:{{ l.stroke }};stroke-width:{{ l.sw }};stroke-opacity:{{ l.op }};vector-effect:non-scaling-stroke"></path></sc-for>
+</g>
+<text x="{{ v.home.plains.x }}" y="{{ v.home.plains.y }}" style="font:italic 400 15px 'Instrument Serif',Georgia,serif;letter-spacing:.28em;fill:{{ v.P.label }};opacity:.8;text-anchor:middle">TARİHSİZ OVA</text>
+<sc-for list="{{ v.home.legs }}" as="lg" hint-placeholder-count="0"><path d="{{ lg.d }}" style="fill:none;stroke:{{ v.P.casing }};stroke-width:6;stroke-linecap:round;stroke-linejoin:round"></path></sc-for>
+<sc-for list="{{ v.home.legs }}" as="lg" hint-placeholder-count="0"><path d="{{ lg.d }}" style="fill:none;stroke:{{ lg.stroke }};stroke-width:{{ lg.sw }};stroke-dasharray:{{ lg.dash }};stroke-linecap:round;stroke-linejoin:round"></path></sc-for>
+<text transform="{{ v.home.cl0.tf }}" style="display:{{ v.home.cl0.d }};font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3.5px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">1 GÜN</text><text transform="{{ v.home.cl1.tf }}" style="display:{{ v.home.cl1.d }};font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3.5px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">3 GÜN</text><text transform="{{ v.home.cl2.tf }}" style="display:{{ v.home.cl2.d }};font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3.5px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">7 GÜN</text><text transform="{{ v.home.cl3.tf }}" style="display:{{ v.home.cl3.d }};font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3.5px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">14 GÜN · UFUK</text><text transform="{{ v.home.cl4.tf }}" style="display:{{ v.home.cl4.d }};font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3.5px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">1 AY</text>
+<polygon points="{{ v.home.summit.pts }}" style="fill:{{ v.P.ink }};stroke:{{ v.P.halo }};stroke-width:2px;paint-order:stroke"></polygon>
+<text x="{{ v.home.summit.x }}" y="{{ v.home.summit.ty }}" style="font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.12em;fill:{{ v.P.ink }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3.5px;stroke-linejoin:round;text-anchor:middle">BUGÜN</text>
+</svg>
+<div style="position:absolute;inset:0;pointer-events:none;background:{{ v.P.vig }}"></div>
+<div style="position:absolute;inset:0;pointer-events:none;background-image:{{ grain }};mix-blend-mode:{{ v.P.blend }};opacity:{{ v.P.grainOp }}"></div>
+<div style="position:absolute;left:0;top:0;transform:{{ v.home.hq.tr }};width:0;height:0;pointer-events:none">
+<span style="position:absolute;left:-15px;top:-15px;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:{{ v.P.pin }};border:1px solid {{ v.P.pinBd }};color:#ed845c;font:400 1.1rem/1 'DM Sans',sans-serif">✳</span>
+<span style="position:absolute;left:-50px;top:19px;width:100px;text-align:center;font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:{{ v.P.ink }};text-shadow:{{ v.P.tsh }}">KARARGÂH</span>
+</div>
+<sc-for list="{{ v.home.stops }}" as="s" hint-placeholder-count="0">
+<button data-stop="{{ s.id }}" aria-label="{{ s.aria }}" onClick="{{ s.tap }}" style="position:absolute;left:0;top:0;transform:{{ s.tr }};width:44px;height:44px;padding:0;border:0;border-radius:50%;background:none;display:grid;place-items:center;cursor:pointer;touch-action:none;-webkit-touch-callout:none;user-select:none;opacity:{{ s.op }};font:inherit;color:inherit">
+<span style="position:absolute;inset:-14px;border-radius:50%;background:{{ v.P.clear }};pointer-events:none"></span>
+<span style="position:absolute;inset:-4px;border-radius:50%;border:1px dashed {{ v.P.palisade }};pointer-events:none"></span>
+<span style="position:relative;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:{{ s.bg }};border:{{ s.border }};color:{{ s.fg }};font:400 .8125rem 'IBM Plex Mono',monospace;box-shadow:{{ s.sh }}">
+<sc-if value="{{ s.done }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"></path></svg></sc-if>
+<sc-if value="{{ s.open }}" hint-placeholder-val="{{ true }}">{{ s.num }}</sc-if>
+</span>
+<sc-if value="{{ s.hasLabel }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:{{ s.lx }};top:{{ s.ly }};padding:3px 8px 4px;border-radius:6px;background:{{ v.P.plate }};color:{{ v.P.plateInk }};white-space:nowrap;text-align:left;line-height:1.3;pointer-events:none"><span style="display:block;font-size:13px;font-weight:500">{{ s.title }}</span><span style="display:block;font:400 10.5px/1.35 'IBM Plex Mono',monospace;letter-spacing:.05em;color:{{ s.tagc }}">{{ s.tag }}</span></span></sc-if>
+</button>
+</sc-for>
+<sc-if value="{{ v.home.ghost.show }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:0;top:0;transform:{{ v.home.ghost.tr }};width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#ed845c;color:#253e33;font:400 .875rem 'IBM Plex Mono',monospace;box-shadow:0 12px 26px -6px rgba(4,22,24,.65),0 0 0 6px #ed845c33;pointer-events:none;z-index:4">{{ v.home.ghost.num }}</div></sc-if>
+<div onPointerDown="{{ stopProp }}" style="position:absolute;right:12px;top:10px;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;background:{{ v.P.ctrl }};border:1px solid {{ v.P.ctrlBd }};color:{{ v.P.ctrlInk }};z-index:3">
+<button aria-label="Yakınlaştır" onClick="{{ v.home.zin }}" style="font:inherit;width:44px;height:44px;display:grid;place-items:center;background:transparent;border:0;border-radius:0;color:inherit;cursor:pointer;padding:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+<span style="height:1px;background:{{ v.P.ctrlBd }}"></span>
+<button aria-label="Uzaklaştır" onClick="{{ v.home.zout }}" style="font:inherit;width:44px;height:44px;display:grid;place-items:center;background:transparent;border:0;border-radius:0;color:inherit;cursor:pointer;padding:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path></svg></button>
+<span style="height:1px;background:{{ v.P.ctrlBd }}"></span>
+<button aria-label="Tüm rotayı sığdır" onClick="{{ v.home.fit }}" style="font:inherit;width:44px;height:44px;display:grid;place-items:center;background:transparent;border:0;border-radius:0;color:inherit;cursor:pointer;padding:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path></svg></button>
+</div>
+<sc-if value="{{ v.home.dragOn }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:14px;top:12px;max-width:250px;padding:8px 12px;border-radius:10px;background:#fcfaf4;color:#193d3d;font-size:.8125rem;font-weight:500;box-shadow:0 8px 20px -8px rgba(4,22,24,.5);pointer-events:none;z-index:4">{{ v.home.dragText }}</div></sc-if>
+<sc-if value="{{ v.hintOn }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:14px;top:12px;max-width:260px;padding:8px 12px;border-radius:10px;background:#fcfaf4;color:#193d3d;font-size:.8125rem;line-height:1.45;box-shadow:0 8px 20px -8px rgba(4,22,24,.5);pointer-events:none;z-index:4">Bir kampı basılı tut, sonra başka bir kampın üstüne bırak. Masaüstünde doğrudan sürükle.</div></sc-if>
+<sc-if value="{{ v.toastOn }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:14px;bottom:12px;max-width:300px;padding:8px 12px;border-radius:10px;background:#193d3d;color:#f7f6ed;font-size:.8125rem;box-shadow:0 8px 20px -8px rgba(4,22,24,.5);pointer-events:none;z-index:4">{{ v.toast }}</div></sc-if>
+<sc-if value="{{ v.pendOn }}" hint-placeholder-val="{{ false }}"><div onPointerDown="{{ stopProp }}" style="position:absolute;left:12px;right:12px;bottom:12px;display:flex;align-items:center;gap:4px;padding:5px 5px 5px 14px;border-radius:14px;background:#fcfaf4;color:#193d3d;border:1px solid #d2d9ca;box-shadow:0 12px 30px -10px rgba(4,22,24,.55);z-index:5"><span style="flex:1;font-size:.875rem">Yeni sıra hazır.</span><button onClick="{{ v.cancelPend }}" style="font:inherit;background:none;border:0;min-height:44px;padding:8px 10px;font-size:.875rem;font-weight:500;color:#193d3d;border-radius:10px;cursor:pointer">Vazgeç</button><button onClick="{{ v.savePend }}" style="font:inherit;white-space:nowrap;background:#193d3d;color:#f7f6ed;border:1px solid #193d3d;min-height:44px;padding:8px 14px;font-size:.875rem;font-weight:500;border-radius:10px;cursor:pointer">Sırayı kaydet</button></div></sc-if>
+</div>
+<div style="padding:10px 23px 0;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px;min-height:44px;font:400 .75rem 'IBM Plex Mono',monospace;color:{{ v.P.muted }}">
+<span>{{ v.caption }}</span><span>YÜKSELTİ = KALAN GÜN</span>
+</div>
+</div>
+<div style="margin-top:-20px;position:relative;background:#fcfaf4;border-radius:23px 23px 0 0;padding:10px 23px 20px">
+<div style="height:3px;width:32px;margin:0 auto 9px;background:#d2d9ca;border-radius:4px"></div>
+<div style="display:flex;gap:6px;justify-content:space-between;align-items:center;margin-bottom:14px">
+<span style="font:400 .75rem 'IBM Plex Mono',monospace;color:#596963;letter-spacing:.03em;max-width:200px">{{ v.sheet.top }}</span>
+<button onClick="{{ v.showHint }}" style="font:inherit;background:none;border:0;display:inline-flex;align-items:center;gap:7px;font-size:.8rem;min-height:44px;padding:8px 0;font-weight:500;color:#193d3d;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m3 16 4 4 4-4"></path><path d="M7 20V4"></path><path d="m21 8-4-4-4 4"></path><path d="M17 4v16"></path></svg>Sırayı düzenle</button>
+</div>
+<button style="border:0;background:none;padding:0;min-height:32px;display:flex;align-items:center;gap:6px;color:#a24b2b;font:400 .875rem 'IBM Plex Mono',monospace;border-radius:10px;cursor:pointer">{{ v.sheet.title }}<svg viewBox="0 0 24 24" style="width:14px;height:14px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+<sc-if value="{{ v.sheet.hasWhere }}" hint-placeholder-val="{{ false }}"><p style="font-size:.875rem;color:#596963;border-left:2px solid #d2d9ca;padding-left:10px;margin:6px 0">{{ v.sheet.where }}</p></sc-if>
+<h3 style="font:400 2.2rem/1.13 'Instrument Serif',Georgia,serif;letter-spacing:-.015em;margin:7px 0 15px;overflow-wrap:anywhere;color:{{ v.sheet.moveColor }};text-decoration:{{ v.sheet.deco }}">{{ v.sheet.move }}</h3>
+<p style="margin:0;font-size:.875rem;line-height:1.6;color:#596963">{{ v.sheet.reason }}</p>
+<div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:19px">
+<button onClick="{{ v.sheet.finish }}" disabled="{{ v.sheet.isDone }}" style="font:inherit;display:flex;align-items:center;gap:8px;background:#e6ebdf;border:1px solid transparent;border-radius:10px;padding:10px 16px;min-height:44px;color:#193d3d;font-weight:500;cursor:pointer;opacity:{{ v.sheet.fop }}"><svg viewBox="0 0 24 24" style="width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M20 6 9 17l-5-5"></path></svg>Hamleyi bitir</button>
+<sc-if value="{{ v.sheet.isDone }}" hint-placeholder-val="{{ false }}"><button onClick="{{ v.sheet.undo }}" style="font:inherit;background:none;border:0;display:flex;align-items:center;gap:8px;font-size:.875rem;min-height:44px;padding:8px 0;font-weight:500;color:#193d3d;border-radius:10px;cursor:pointer">Geri al</button></sc-if>
+<sc-if value="{{ v.sheet.notDone }}" hint-placeholder-val="{{ true }}"><button style="font:inherit;background:none;border:0;display:flex;align-items:center;gap:8px;font-size:.875rem;min-height:44px;padding:8px 0;font-weight:500;color:#193d3d;border-radius:10px;cursor:pointer">Düzenle</button></sc-if>
+</div>
+<button style="font:inherit;width:100%;display:flex;align-items:center;justify-content:space-between;margin-top:20px;min-height:50px;background:#193d3d;color:#f7f6ed;border:1px solid #193d3d;border-radius:10px;padding:10px 16px;font-weight:500;cursor:pointer"><span>Bu rotayla ilerle</span><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg></button>
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:2px;flex-wrap:wrap;margin-top:10px">
+<span style="color:#596963;font-size:.75rem;padding-top:13px">Günün emri onayını bekliyor.</span>
+<button style="font:inherit;background:none;border:0;display:inline-flex;align-items:center;gap:7px;font-size:.875rem;min-height:44px;padding:8px 0;font-weight:500;color:#193d3d;border-radius:10px;cursor:pointer">Cephe ekle / çıkar</button>
+</div>
+<div style="margin-top:18px;border-top:1px solid #d2d9ca">
+<sc-for list="{{ v.rows }}" as="r" hint-placeholder-count="6">
+<button onClick="{{ r.tap }}" style="font:inherit;display:flex;width:100%;align-items:center;gap:14px;padding:15px 0;border:0;border-bottom:1px solid #d2d9ca;border-radius:0;text-align:left;background:none;font-size:.875rem;font-weight:{{ r.weight }};min-height:44px;color:{{ r.color }};cursor:pointer">
+<span style="font:400 .75rem 'IBM Plex Mono',monospace;color:{{ r.numColor }};min-width:16px">{{ r.num }}</span>
+<span style="flex:1;min-width:0"><small style="display:block;color:#596963;font-size:.75rem;margin-bottom:3px">{{ r.title }}</small><span style="text-decoration:{{ r.deco }}">{{ r.text }}</span></span>
+<svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg>
+</button>
+</sc-for>
+</div>
+</div>
+</section>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:30px 0 12px">
+<button style="font:inherit;font-weight:400;display:block;width:100%;text-align:left;background:#e6ebdf;border:0;border-radius:16px;padding:17px 14px;position:relative;color:#193d3d;min-height:44px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:21px;height:21px;display:block;margin-bottom:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect width="20" height="5" x="2" y="3" rx="1"></rect><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path><path d="M10 12h4"></path></svg><div><h2 style="margin:0;font-size:1rem;font-weight:500">Fikir deposu</h2><p style="margin:7px 0 0;color:#596963;font-size:.875rem">7 fikir, okuma ve soru</p></div><svg viewBox="0 0 24 24" style="position:absolute;right:16px;top:20px;width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+<button style="font:inherit;font-weight:400;display:block;width:100%;text-align:left;background:#e6ebdf;border:0;border-radius:16px;padding:17px 14px;position:relative;color:#193d3d;min-height:44px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:21px;height:21px;display:block;margin-bottom:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg><div><h2 style="margin:0;font-size:1rem;font-weight:500">Haftalık teftiş</h2><p style="margin:7px 0 0;color:#596963;font-size:.875rem">Pazar 20:00 · İstersen şimdi başlayabilirsin</p></div><svg viewBox="0 0 24 24" style="position:absolute;right:16px;top:20px;width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+</div>
+<button style="font:inherit;font-weight:400;display:flex;align-items:center;gap:15px;width:100%;text-align:left;background:#fcfaf4;border:1px solid #d2d9ca;border-radius:16px;padding:22px;margin-top:15px;color:#193d3d;min-height:44px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;flex-shrink:0;color:#a14c2d;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M8 13h.01"></path><path d="M12 13h.01"></path><path d="M16 13h.01"></path><path d="M8 17h.01"></path><path d="M12 17h.01"></path><path d="M16 17h.01"></path></svg><div style="flex:1"><h2 style="margin:0;display:flex;align-items:baseline;gap:12px;font-family:'Instrument Serif',Georgia,serif;font-size:1.7rem;font-weight:500">Ufuk <span style="color:#596963;font-size:.875rem">14 gün</span></h2><p style="margin:0;color:#596963;font-size:.9rem">6 tarihli kalem · Son iade günü</p></div><svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></button>
+<button style="font:inherit;font-weight:400;display:flex;align-items:center;gap:20px;padding:28px 0;width:100%;border:0;border-bottom:1px solid #d2d9ca;border-radius:0;background:none;text-align:left;color:#193d3d;min-height:44px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg><div style="flex:1"><h2 style="margin:0;font-size:1.25rem;font-weight:500">Harita</h2><p style="margin:0;color:#596963;font-size:.9rem">13 açık cephe, 2 aktif kulvar</p></div><svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+<aside style="display:flex;gap:16px;margin-top:28px;color:#596963;padding:10px 0;opacity:.9"><svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;flex-shrink:0;margin-top:3px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M12 5v16"></path><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"></path></svg><div><h3 style="margin:0;font-size:1rem;font-weight:500">Hiçbir şey aklında kalmak zorunda değil.</h3><p style="margin:6px 0 0;font-size:.875rem">Ham diktelerin kayıt defterinde saklanır. Berthier’in değişikliklerini oradan geri alabilirsin.</p></div></aside>
+</main>
+</div>
+</div>
+<div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:30;width:calc(100% - 20px);padding:10px 12px 34px;background:#f5f2e9;border:1px solid #d2d9ca;border-bottom:0;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px #193d3d0b">
+<button style="font:inherit;display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#e6ebdf;border:0;padding:10px 12px;border-radius:14px;font-size:1rem;font-weight:500;color:#193d3d;min-height:44px;cursor:pointer"><span style="width:42px;height:42px;background:#193d3d;color:#f5b871;display:grid;place-items:center;border-radius:50%;flex-shrink:0"><svg viewBox="0 0 24 24" style="width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M2 10v3"></path><path d="M6 6v11"></path><path d="M10 3v18"></path><path d="M14 8v7"></path><path d="M18 5v13"></path><path d="M22 10v3"></path></svg></span><span style="flex:1">Aklındakini bırak.<small style="display:block;font-size:.75rem;color:#596963;font-weight:400;margin-top:2px">Berthier yerine yerleştirir.</small></span><svg viewBox="0 0 24 24" style="width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+<nav style="display:flex;justify-content:space-around;width:100%;padding:9px 0 0">
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#193d3d;font-weight:700;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"></path></svg>Karargâh</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#596963;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg>Harita</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#596963;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M8 13h.01"></path><path d="M12 13h.01"></path><path d="M16 13h.01"></path><path d="M8 17h.01"></path><path d="M12 17h.01"></path><path d="M16 17h.01"></path></svg>Ufuk</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#596963;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg>Teftiş</button>
+</nav>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="margin:0;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#596963">HARİTA · TAM EKRAN ATLAS</p>
+<div data-screen-label="Harita" style="position:relative;width:390px;height:844px;overflow:hidden;background:#f5f2e9;color:#193d3d;font-family:'DM Sans','Segoe UI',sans-serif;font-size:16px;line-height:1.55;box-shadow:0 30px 80px -24px #0f2a2a55">
+<header style="position:absolute;left:0;right:0;top:0;height:76px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;background:#f5f2e9;border-bottom:1px solid #d2d9ca;z-index:6">
+<a href="#" style="display:flex;align-items:center;gap:6px;font-family:'Instrument Serif',Georgia,serif;font-size:2rem;color:#193d3d;text-decoration:none"><span>berthier</span><span style="font-family:'DM Sans','Segoe UI',sans-serif;font-size:1.6rem;color:#ed845c">✳</span></a>
+<div style="display:flex;align-items:center;gap:10px">
+<button aria-label="Kayıt defteri" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:#193d3d;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg></button>
+<button aria-label="Tercihler" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:#193d3d;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+</div>
+</header>
+<div ref="{{ v.atlas.ref }}" onPointerDown="{{ v.atlas.down }}" onPointerMove="{{ v.atlas.move }}" onPointerUp="{{ v.atlas.up }}" onPointerCancel="{{ v.atlas.cancel }}" onClick="{{ v.atlas.click }}" style="position:absolute;left:0;right:0;top:76px;bottom:0;overflow:hidden;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;background:{{ v.P.ground }}">
+<svg style="position:absolute;inset:0;width:100%;height:100%;display:block;overflow:hidden">
+<g transform="{{ v.atlas.tf }}">
+<rect x="-4000" y="-4000" width="8000" height="8000" style="fill:{{ v.P.ground }}"></rect>
+<path d="{{ v.ter.stipple }}" style="fill:{{ v.P.stip }}"></path>
+<sc-for list="{{ v.ter.bands }}" as="b" hint-placeholder-count="0"><g><path d="{{ b.d }}" transform="{{ v.atlas.lo }}" style="fill:{{ v.P.light }};display:{{ v.ter.rd }}"></path><path d="{{ b.d }}" transform="{{ v.atlas.dk }}" style="fill:{{ v.P.dark }};display:{{ v.ter.rd }}"></path><path d="{{ b.d }}" style="fill:{{ b.fill }}"></path></g></sc-for>
+<sc-for list="{{ v.ter.lines }}" as="l" hint-placeholder-count="0"><path d="{{ l.d }}" style="fill:none;stroke:{{ l.stroke }};stroke-width:{{ l.sw }};stroke-opacity:{{ l.op }};vector-effect:non-scaling-stroke"></path></sc-for>
+</g>
+<text x="{{ v.atlas.plains.x }}" y="{{ v.atlas.plains.y }}" style="font:italic 400 16px 'Instrument Serif',Georgia,serif;letter-spacing:.3em;fill:{{ v.P.label }};opacity:.8;text-anchor:middle">TARİHSİZ OVA</text>
+<sc-for list="{{ v.atlas.legs }}" as="lg" hint-placeholder-count="0"><path d="{{ lg.d }}" style="fill:none;stroke:{{ v.P.casing }};stroke-width:6;stroke-linecap:round;stroke-linejoin:round"></path></sc-for>
+<sc-for list="{{ v.atlas.legs }}" as="lg" hint-placeholder-count="0"><path d="{{ lg.d }}" style="fill:none;stroke:{{ lg.stroke }};stroke-width:{{ lg.sw }};stroke-dasharray:{{ lg.dash }};stroke-linecap:round;stroke-linejoin:round"></path></sc-for>
+<text transform="{{ v.atlas.cl0.tf }}" style="display:{{ v.atlas.cl0.d }};font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3.5px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">1 GÜN</text><text transform="{{ v.atlas.cl1.tf }}" style="display:{{ v.atlas.cl1.d }};font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3.5px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">3 GÜN</text><text transform="{{ v.atlas.cl2.tf }}" style="display:{{ v.atlas.cl2.d }};font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3.5px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">7 GÜN</text><text transform="{{ v.atlas.cl3.tf }}" style="display:{{ v.atlas.cl3.d }};font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3.5px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">14 GÜN · UFUK</text><text transform="{{ v.atlas.cl4.tf }}" style="display:{{ v.atlas.cl4.d }};font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;fill:{{ v.P.label }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3.5px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central">1 AY</text>
+<polygon points="{{ v.atlas.summit.pts }}" style="fill:{{ v.P.ink }};stroke:{{ v.P.halo }};stroke-width:2px;paint-order:stroke"></polygon>
+<text x="{{ v.atlas.summit.x }}" y="{{ v.atlas.summit.ty }}" style="font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.12em;fill:{{ v.P.ink }};paint-order:stroke;stroke:{{ v.P.halo }};stroke-width:3.5px;stroke-linejoin:round;text-anchor:middle">BUGÜN</text>
+</svg>
+<div style="position:absolute;inset:0;pointer-events:none;background:{{ v.P.vig }}"></div>
+<div style="position:absolute;inset:0;pointer-events:none;background-image:{{ grain }};mix-blend-mode:{{ v.P.blend }};opacity:{{ v.P.grainOp }}"></div>
+<div style="position:absolute;left:0;top:0;transform:{{ v.atlas.hq.tr }};width:0;height:0;pointer-events:none">
+<span style="position:absolute;left:-15px;top:-15px;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:{{ v.P.pin }};border:1px solid {{ v.P.pinBd }};color:#ed845c;font:400 1.1rem/1 'DM Sans',sans-serif">✳</span>
+<span style="position:absolute;left:-50px;top:19px;width:100px;text-align:center;font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:{{ v.P.ink }};text-shadow:{{ v.P.tsh }}">KARARGÂH</span>
+</div>
+<sc-for list="{{ v.atlas.others }}" as="o" hint-placeholder-count="0">
+<button data-front="{{ o.id }}" aria-label="{{ o.title }}" onClick="{{ o.tap }}" style="position:absolute;left:0;top:0;transform:{{ o.tr }};width:44px;height:44px;padding:0;border:0;border-radius:50%;background:none;display:grid;place-items:center;cursor:pointer;font:inherit;color:inherit;opacity:{{ o.op }};-webkit-touch-callout:none">
+<span style="width:14px;height:14px;border-radius:50%;background:{{ o.bg }};border:{{ o.border }};box-shadow:{{ o.sh }};display:grid;place-items:center"><span style="width:4px;height:4px;border-radius:50%;background:{{ o.dot }}"></span></span>
+<sc-if value="{{ o.hasLabel }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:{{ o.lx }};top:{{ o.ly }};padding:3px 7px;border-radius:6px;background:{{ v.P.plate }};color:{{ v.P.plateInk }};white-space:nowrap;text-align:left;line-height:1.3;pointer-events:none;opacity:.94"><span style="display:block;font-size:12px;font-weight:500">{{ o.title }}</span></span></sc-if>
+</button>
+</sc-for>
+<sc-for list="{{ v.atlas.stops }}" as="s" hint-placeholder-count="0">
+<button data-stop="{{ s.id }}" aria-label="{{ s.aria }}" onClick="{{ s.tap }}" style="position:absolute;left:0;top:0;transform:{{ s.tr }};width:44px;height:44px;padding:0;border:0;border-radius:50%;background:none;display:grid;place-items:center;cursor:pointer;touch-action:none;-webkit-touch-callout:none;user-select:none;opacity:{{ s.op }};font:inherit;color:inherit">
+<span style="position:absolute;inset:-14px;border-radius:50%;background:{{ v.P.clear }};pointer-events:none"></span>
+<span style="position:absolute;inset:-4px;border-radius:50%;border:1px dashed {{ v.P.palisade }};pointer-events:none"></span>
+<span style="position:relative;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:{{ s.bg }};border:{{ s.border }};color:{{ s.fg }};font:400 .8125rem 'IBM Plex Mono',monospace;box-shadow:{{ s.sh }}">
+<sc-if value="{{ s.done }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"></path></svg></sc-if>
+<sc-if value="{{ s.open }}" hint-placeholder-val="{{ true }}">{{ s.num }}</sc-if>
+</span>
+<sc-if value="{{ s.hasLabel }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:{{ s.lx }};top:{{ s.ly }};padding:3px 8px 4px;border-radius:6px;background:{{ v.P.plate }};color:{{ v.P.plateInk }};white-space:nowrap;text-align:left;line-height:1.3;pointer-events:none"><span style="display:block;font-size:13px;font-weight:500">{{ s.title }}</span><span style="display:block;font:400 10.5px/1.35 'IBM Plex Mono',monospace;letter-spacing:.05em;color:{{ s.tagc }}">{{ s.tag }}</span></span></sc-if>
+</button>
+</sc-for>
+<sc-if value="{{ v.atlas.ghost.show }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:0;top:0;transform:{{ v.atlas.ghost.tr }};width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#ed845c;color:#253e33;font:400 .875rem 'IBM Plex Mono',monospace;box-shadow:0 12px 26px -6px rgba(4,22,24,.65),0 0 0 6px #ed845c33;pointer-events:none;z-index:4">{{ v.atlas.ghost.num }}</div></sc-if>
+<div style="position:absolute;left:0;right:0;top:0;padding:10px 20px 44px;background:{{ v.P.scrim }};pointer-events:none;z-index:2">
+<button onPointerDown="{{ stopProp }}" style="font:inherit;border:0;padding:0;display:flex;gap:8px;align-items:center;font-size:.875rem;background:none;color:{{ v.P.muted }};font-weight:500;min-height:44px;border-radius:10px;cursor:pointer;pointer-events:auto"><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>Karargâh</button>
+<h1 style="margin:0;font:400 2.7rem/1.05 'Instrument Serif',Georgia,serif;letter-spacing:-.025em;color:{{ v.P.ink }}">Harita</h1>
+<p style="margin:8px 0 0;font:400 .75rem/1.5 'IBM Plex Mono',monospace;letter-spacing:.06em;color:{{ v.P.muted }};max-width:250px">{{ v.atlasSub }}</p>
+</div>
+<div onPointerDown="{{ stopProp }}" style="position:absolute;right:12px;top:16px;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;background:{{ v.P.ctrl }};border:1px solid {{ v.P.ctrlBd }};color:{{ v.P.ctrlInk }};z-index:3">
+<button aria-label="Yakınlaştır" onClick="{{ v.atlas.zin }}" style="font:inherit;width:44px;height:44px;display:grid;place-items:center;background:transparent;border:0;border-radius:0;color:inherit;cursor:pointer;padding:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+<span style="height:1px;background:{{ v.P.ctrlBd }}"></span>
+<button aria-label="Uzaklaştır" onClick="{{ v.atlas.zout }}" style="font:inherit;width:44px;height:44px;display:grid;place-items:center;background:transparent;border:0;border-radius:0;color:inherit;cursor:pointer;padding:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path></svg></button>
+<span style="height:1px;background:{{ v.P.ctrlBd }}"></span>
+<button aria-label="Tüm cepheleri sığdır" onClick="{{ v.atlas.fit }}" style="font:inherit;width:44px;height:44px;display:grid;place-items:center;background:transparent;border:0;border-radius:0;color:inherit;cursor:pointer;padding:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path></svg></button>
+</div>
+<sc-if value="{{ v.atlas.dragOn }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:20px;top:150px;max-width:260px;padding:8px 12px;border-radius:10px;background:#fcfaf4;color:#193d3d;font-size:.8125rem;font-weight:500;box-shadow:0 8px 20px -8px rgba(4,22,24,.5);pointer-events:none;z-index:4">{{ v.atlas.dragText }}</div></sc-if>
+<sc-if value="{{ v.legendChip }}" hint-placeholder-val="{{ true }}"><button onClick="{{ v.toggleLegend }}" onPointerDown="{{ stopProp }}" style="position:absolute;right:12px;bottom:186px;min-height:44px;padding:0 14px;white-space:nowrap;border-radius:12px;background:{{ v.P.ctrl }};border:1px solid {{ v.P.ctrlBd }};color:{{ v.P.ctrlInk }};font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.05em;cursor:pointer;z-index:3">NASIL OKUNUR?</button></sc-if>
+<sc-if value="{{ v.legendOn }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ v.toggleLegend }}" onPointerDown="{{ stopProp }}" style="position:absolute;right:12px;bottom:186px;padding:10px 12px;border-radius:12px;background:{{ v.P.ctrl }};border:1px solid {{ v.P.ctrlBd }};color:{{ v.P.muted }};display:flex;flex-direction:column;gap:7px;font:400 .6875rem/1.3 'IBM Plex Mono',monospace;letter-spacing:.05em;cursor:pointer;z-index:3">
+<span style="display:flex;align-items:center;gap:9px"><svg viewBox="0 0 16 12" style="width:16px;height:12px;display:block;flex-shrink:0;fill:currentColor"><path d="M8 1 14 11H2z"></path></svg>ZİRVE · BUGÜN</span>
+<span style="display:flex;align-items:center;gap:9px"><svg viewBox="0 0 16 12" style="width:16px;height:12px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.3"><path d="M1 8c3-5 5-5 7-2s4 3 7-2"></path></svg>KONTUR · KALAN GÜN</span>
+<span style="display:flex;align-items:center;gap:9px"><svg viewBox="0 0 16 12" style="width:16px;height:12px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-dasharray:.1 4"><path d="M1 6h14"></path></svg>PATİKA · GÜNÜN SIRASI</span>
+<span style="display:flex;align-items:center;gap:9px"><svg viewBox="0 0 24 24" style="width:16px;height:14px;display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"></path></svg>BAYRAK · GEÇİLDİ</span>
+</div>
+</sc-if>
+<sc-if value="{{ v.card.show }}" hint-placeholder-val="{{ false }}">
+<div onPointerDown="{{ stopProp }}" style="position:absolute;left:10px;right:10px;bottom:184px;background:#fcfaf4;color:#193d3d;border:1px solid #d2d9ca;border-radius:20px;padding:12px 16px 16px 18px;box-shadow:0 18px 40px -14px rgba(4,22,24,.6);z-index:5;cursor:auto">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+<span style="display:flex;align-items:center;gap:8px;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.05em;color:#596963"><span style="width:6px;height:16px;border-radius:3px;background:{{ v.card.color }}"></span>{{ v.card.type }}</span>
+<button aria-label="Kapat" onClick="{{ v.card.close }}" style="font:inherit;width:44px;height:44px;margin:-6px -10px -6px 0;display:grid;place-items:center;background:transparent;border:0;border-radius:10px;color:#193d3d;cursor:pointer;padding:0"><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+</div>
+<h3 style="margin:0;font:400 1.9rem/1.12 'Instrument Serif',Georgia,serif">{{ v.card.title }}</h3>
+<p style="margin:6px 0 0;font-size:.875rem;color:#596963">{{ v.card.meta }}</p>
+<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">
+<span style="font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.04em;padding:5px 9px;border-radius:12px;background:#e6ebdf;color:#193d3d">{{ v.card.days }}</span>
+<span style="font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.04em;padding:5px 9px;border-radius:12px;background:#e6ebdf;color:#193d3d">{{ v.card.route }}</span>
+</div>
+<p style="margin:14px 0 0;font-size:1rem;line-height:1.45"><span style="display:block;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.04em;color:#a24b2b;margin-bottom:4px">SIRADAKİ HAMLE</span>{{ v.card.move }}</p>
+<button style="font:inherit;width:100%;display:flex;align-items:center;justify-content:space-between;margin-top:14px;min-height:48px;background:#193d3d;color:#f7f6ed;border:1px solid #193d3d;border-radius:10px;padding:10px 16px;font-weight:500;cursor:pointer"><span>Cepheyi aç</span><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></button>
+</div>
+</sc-if>
+<sc-if value="{{ v.toastOn }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:20px;top:150px;max-width:300px;padding:8px 12px;border-radius:10px;background:#193d3d;color:#f7f6ed;font-size:.8125rem;box-shadow:0 8px 20px -8px rgba(4,22,24,.5);pointer-events:none;z-index:4">{{ v.toast }}</div></sc-if>
+<sc-if value="{{ v.pendOn }}" hint-placeholder-val="{{ false }}"><div onPointerDown="{{ stopProp }}" style="position:absolute;left:12px;right:12px;bottom:186px;display:flex;align-items:center;gap:4px;padding:5px 5px 5px 14px;border-radius:14px;background:#fcfaf4;color:#193d3d;border:1px solid #d2d9ca;box-shadow:0 12px 30px -10px rgba(4,22,24,.55);z-index:6"><span style="flex:1;font-size:.875rem">Yeni sıra hazır.</span><button onClick="{{ v.cancelPend }}" style="font:inherit;background:none;border:0;min-height:44px;padding:8px 10px;font-size:.875rem;font-weight:500;color:#193d3d;border-radius:10px;cursor:pointer">Vazgeç</button><button onClick="{{ v.savePend }}" style="font:inherit;white-space:nowrap;background:#193d3d;color:#f7f6ed;border:1px solid #193d3d;min-height:44px;padding:8px 14px;font-size:.875rem;font-weight:500;border-radius:10px;cursor:pointer">Sırayı kaydet</button></div></sc-if>
+</div>
+<div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:30;width:calc(100% - 20px);padding:10px 12px 34px;background:#f5f2e9;border:1px solid #d2d9ca;border-bottom:0;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px #193d3d0b">
+<button style="font:inherit;display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#e6ebdf;border:0;padding:10px 12px;border-radius:14px;font-size:1rem;font-weight:500;color:#193d3d;min-height:44px;cursor:pointer"><span style="width:42px;height:42px;background:#193d3d;color:#f5b871;display:grid;place-items:center;border-radius:50%;flex-shrink:0"><svg viewBox="0 0 24 24" style="width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M2 10v3"></path><path d="M6 6v11"></path><path d="M10 3v18"></path><path d="M14 8v7"></path><path d="M18 5v13"></path><path d="M22 10v3"></path></svg></span><span style="flex:1">Aklındakini bırak.<small style="display:block;font-size:.75rem;color:#596963;font-weight:400;margin-top:2px">Berthier yerine yerleştirir.</small></span><svg viewBox="0 0 24 24" style="width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+<nav style="display:flex;justify-content:space-around;width:100%;padding:9px 0 0">
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#596963;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"></path></svg>Karargâh</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#193d3d;font-weight:700;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg>Harita</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#596963;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M8 13h.01"></path><path d="M12 13h.01"></path><path d="M16 13h.01"></path><path d="M8 17h.01"></path><path d="M12 17h.01"></path><path d="M16 17h.01"></path></svg>Ufuk</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#596963;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg>Teftiş</button>
+</nav>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;gun&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;3 cephe&quot;,&quot;6 cephe&quot;,&quot;12 cephe&quot;],&quot;default&quot;:&quot;6 cephe&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Örnek gün&quot;},&quot;kabartma&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Arazi&quot;},&quot;etiketler&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Arazi&quot;}}">
+class Component extends DCLogic {
+  state = { views: {}, focus: {}, sel: {}, orders: {}, pending: {}, done: {}, drag: null, hint: {}, toast: {} };
+
+  componentDidMount() {
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { this._tw = {}; this.forceUpdate(); });
+  }
+  componentWillUnmount() {
+    const M = this._maps || {};
+    for (const k in M) if (M[k].el) M[k].el.removeEventListener('wheel', M[k].wheel);
+    cancelAnimationFrame(this._raf); cancelAnimationFrame(this._anim);
+  }
+
+  get C() {
+    return this._C || (this._C = {
+      R: 100, SX: .94, SY: 1.16,
+      H: [[1, .34, .7, .5], [2, .30, 2.1, 1.2], [3, .22, 4.0, -.9], [4, .12, 1.3, .9], [6, .08, 5.2, -1.1], [9, .05, .4, 1.4], [13, .035, 3.3, -1.6], [19, .022, 1.1, 2.1], [27, .014, 4.4, -2.4]], HS: 1.181,
+      SP: [[-0.95, .36, .34], [2.25, .42, .28], [0.75, .3, -.1], [-2.4, .28, .16]],
+      IDX: [[1, '1 GÜN'], [3, '3 GÜN'], [7, '7 GÜN'], [14, '14 GÜN · UFUK'], [30, '1 AY']], MINORS: [2, 4, 4, 4, 4],
+      HOME: { w: 390, h: 360 }, ATLAS: { w: 390, h: 768 }
+    });
+  }
+  get PAL() {
+    return this._pal || (this._pal = {
+      petrol: { id: 'petrol', ground: '#123f43', peak: '#bad0c3', peakMix: .5, heat: .42, light: 'rgba(226,238,228,.42)', dark: 'rgba(2,18,20,.78)', minor: 'rgba(186,208,195,.14)', index: 'rgba(222,236,226,.5)', stip: 'rgba(186,208,195,.28)', ink: '#edf1e5', muted: '#bad0c3', route: '#efbd80', routeDim: 'rgba(239,189,128,.72)', routeGlow: 'rgba(239,189,128,.28)', trail: 'rgba(237,241,229,.45)', casing: 'rgba(6,30,33,.5)', pin: '#123f43', pinBd: '#b4c4b4', plate: 'rgba(18,63,67,.92)', plateInk: '#edf1e5', tag: '#f4c58e', tagMuted: '#bad0c3', label: '#d3e1d6', halo: 'rgba(18,63,67,.82)', ctrl: 'rgba(18,63,67,.9)', ctrlBd: 'rgba(180,196,180,.4)', ctrlInk: '#edf1e5', vig: 'radial-gradient(ellipse at 50% 45%, rgba(3,21,23,0) 55%, rgba(3,21,23,.5) 100%)', blend: 'soft-light', grainOp: .45, other: '#edf1e5', clear: 'radial-gradient(circle, rgba(237,241,229,.13) 0%, rgba(237,241,229,0) 70%)', palisade: 'rgba(237,241,229,.3)', scrim: 'linear-gradient(#123f43 0%, rgba(18,63,67,.88) 45%, rgba(18,63,67,0) 100%)', tsh: '0 0 3px #123f43, 0 0 6px #123f43' },
+      kum: { id: 'kum', ground: '#ebe2ce', peak: '#94856b', peakMix: .5, heat: .3, light: 'rgba(255,253,247,.92)', dark: 'rgba(88,68,40,.34)', minor: 'rgba(84,68,44,.15)', index: 'rgba(25,61,61,.45)', stip: 'rgba(96,76,48,.32)', ink: '#193d3d', muted: '#596963', route: '#a24b2b', routeDim: 'rgba(162,75,43,.75)', routeGlow: 'rgba(162,75,43,.22)', trail: 'rgba(25,61,61,.4)', casing: 'rgba(250,246,236,.72)', pin: '#fcfaf4', pinBd: '#193d3d', plate: 'rgba(252,250,244,.94)', plateInk: '#193d3d', tag: '#a24b2b', tagMuted: '#596963', label: '#3f524d', halo: 'rgba(235,226,206,.88)', ctrl: 'rgba(252,250,244,.94)', ctrlBd: '#d2d9ca', ctrlInk: '#193d3d', vig: 'radial-gradient(ellipse at 50% 45%, rgba(110,86,52,0) 55%, rgba(110,86,52,.22) 100%)', blend: 'multiply', grainOp: .32, other: '#193d3d', clear: 'radial-gradient(circle, rgba(255,253,247,.7) 0%, rgba(255,253,247,0) 70%)', palisade: 'rgba(25,61,61,.32)', scrim: 'linear-gradient(#ebe2ce 0%, rgba(235,226,206,.9) 45%, rgba(235,226,206,0) 100%)', tsh: '0 0 3px #ebe2ce, 0 0 6px #ebe2ce' }
+    });
+  }
+  get FR() {
+    return this._fr || (this._fr = [
+      { id: 'bio', title: 'Biyokimya', type: 'course', status: 'active', days: 3, event: 'Enzim kinetiği sunumu', when: 'Sal 29 Eyl · 10:00', move: 'Sunumun ilk beş slaytını hazırla.' },
+      { id: 'ist', title: 'İstatistik', type: 'course', status: 'active', days: 9, event: 'İstatistik vizesi', when: 'Pzt 5 Eki · 13:30', move: 'Hipotez testleri bölümünden 10 soru çöz.' },
+      { id: 'gen', title: 'Moleküler Genetik', type: 'course', status: 'active', days: 20, event: 'Ödev 2 teslimi', when: 'Cum 16 Eki', move: 'Ödev 2’nin ilk sorusunu çöz.' },
+      { id: 'org', title: 'Organik Kimya Lab', type: 'course', status: 'active', days: 6, event: 'Deney 3 raporu', when: 'Cum 2 Eki · 17:00', move: 'Deney 3 raporunun sonuç bölümünü yaz.' },
+      { id: 'era', title: 'Erasmus+ başvurusu', type: 'application', status: 'active', days: 4, event: 'Erasmus+ son başvuru', when: 'Çar 30 Eyl · 23:59', move: 'Ayşe Hoca’ya referans ricası mailini gönder.', doneAt: '10:12' },
+      { id: 'tub', title: 'TÜBİTAK 2209-A', type: 'application', status: 'active', days: 18, event: '2209-A son başvuru', when: 'Çar 14 Eki', move: 'Proje özetinin ilk taslağını yaz.' },
+      { id: 'bur', title: 'Bursluluk başvurusu', type: 'application', status: 'active', days: 44, event: 'Burs son başvuru', when: 'Pzt 9 Kas', move: 'Başvuru portalını aç ve istenen belgeleri listele.' },
+      { id: 'mik', title: 'Mikrobiyom derlemesi', type: 'lane', status: 'active', days: null, where: 'Literatür tablosunda 12. makalede kaldın.', move: '13. makaleyi oku ve tabloya ekle.' },
+      { id: 'reu', title: 'Reuteri fermantasyonu', type: 'lane', status: 'active', days: null, where: 'İlk parti 24 saatte pH 4,3’e indi.', move: 'İkinci partinin pH ölçümünü kaydet.' },
+      { id: 'tez', title: 'Tez önerisi', type: 'lane', status: 'held', days: null, where: '', move: 'Danışmana soracağın üç soruyu yaz.' },
+      { id: 'kar', title: 'Kargo iadesi', type: 'general', status: 'active', days: 1, event: 'Son iade günü', when: 'Paz 27 Eyl', move: 'İade paketini PTT şubesine götür.' },
+      { id: 'dek', title: 'Dekanlık imzası', type: 'general', status: 'active', days: 2, event: 'Dekanlık randevusu', when: 'Pzt 28 Eyl · 14:00', move: 'Staj formunu dekanlıkta imzalat.' },
+      { id: 'sta', title: 'Staj defteri', type: 'general', status: 'active', days: 16, event: 'Defter teslimi', when: 'Pzt 12 Eki', move: 'Staj defterinin 3. haftasını doldur.' }
+    ]);
+  }
+  get BY() { if (!this._by) { this._by = {}; for (const f of this.FR) this._by[f.id] = f; } return this._by; }
+  get PRESETS() { return this._pr || (this._pr = { '3 cephe': ['kar', 'bio', 'mik'], '6 cephe': ['era', 'kar', 'bio', 'ist', 'mik', 'tub'], '12 cephe': ['era', 'kar', 'dek', 'bio', 'org', 'ist', 'mik', 'reu', 'sta', 'tub', 'gen', 'bur'] }); }
+  get TYPES() { return { course: ['DERSLER', '#567c8d'], lane: ['KULVARLAR', '#507769'], application: ['BAŞVURULAR', '#c7764d'], general: ['GENEL', '#94856b'] }; }
+  get GRAIN() { return "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")"; }
+
+  pad(n) { return String(n).padStart(2, '0'); }
+  hash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  rho(d) { return Math.max(.14, Math.pow(Math.log(1 + d) / Math.log(15), .8)); }
+  rgb(h) { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+  warp(th, rho) {
+    const C = this.C; let s = 0;
+    for (const [k, a, p, d] of C.H) { const g = k >= 6 ? .35 + .65 * Math.min(rho / 1.2, 1) : 1; s += a * g * Math.sin(k * th + p + d * rho); }
+    const S = .14 + .24 * Math.min(rho / 1.3, 1);
+    const q = Math.min(1, Math.max(0, (rho - .2) / .9)), sm = q * q * (3 - 2 * q);
+    let sp = 0; for (const [t0, w, a] of C.SP) { const dt = Math.atan2(Math.sin(th - t0), Math.cos(th - t0)); sp += a * Math.exp(-(dt * dt) / (w * w)); }
+    const r = C.R * rho * Math.max(.3, 1 + S * s / C.HS + sp * sm);
+    return [Math.cos(th) * r * C.SX, Math.sin(th) * r * C.SY];
+  }
+  cr(p) {
+    const n = p.length, f = v => Math.round(v * 10) / 10; let d = `M${f(p[0][0])} ${f(p[0][1])}`;
+    for (let i = 0; i < n; i++) {
+      const p0 = p[(i - 1 + n) % n], p1 = p[i], p2 = p[(i + 1) % n], p3 = p[(i + 2) % n];
+      d += `C${f(p1[0] + (p2[0] - p0[0]) / 6)} ${f(p1[1] + (p2[1] - p0[1]) / 6)} ${f(p2[0] - (p3[0] - p1[0]) / 6)} ${f(p2[1] - (p3[1] - p1[1]) / 6)} ${f(p2[0])} ${f(p2[1])}`;
+    }
+    return d + 'Z';
+  }
+  ring(rho) { const n = 120, p = []; for (let i = 0; i < n; i++) p.push(this.warp(i / n * Math.PI * 2, rho)); return this.cr(p); }
+  geo() {
+    if (this._geo) return this._geo;
+    const C = this.C, idx = [0].concat(C.IDX.map(x => this.rho(x[0]))), levels = [], n = 120;
+    for (let i = 0; i < C.IDX.length; i++) { const m = C.MINORS[i]; for (let j = 1; j <= m; j++) levels.push({ rho: idx[i] + (idx[i + 1] - idx[i]) * j / m, index: j === m }); }
+    const prev = new Array(n).fill(0);
+    for (const l of levels) {
+      const p = [];
+      for (let i = 0; i < n; i++) {
+        const th = i / n * Math.PI * 2; let [x, y] = this.warp(th, l.rho);
+        const rr = Math.hypot(x / C.SX, y / C.SY);
+        if (rr < prev[i] + 1.2) { const f = (prev[i] + 1.2) / (rr || 1); x *= f; y *= f; }
+        prev[i] = Math.hypot(x / C.SX, y / C.SY); p.push([x, y]);
+      }
+      l.d = this.cr(p);
+    }
+    levels.reverse();
+    let st = '', seed = 11; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    for (let i = 0; i < 1100; i++) { const th = rnd() * Math.PI * 2, rh = 1.24 + Math.pow(rnd(), .9) * 2.6; const [x, y] = this.warp(th, rh); const r = .5 + rnd() * .6; st += `M${(x - r).toFixed(1)} ${y.toFixed(1)}a${r.toFixed(2)} ${r.toFixed(2)} 0 1 0 ${(2 * r).toFixed(2)} 0a${r.toFixed(2)} ${r.toFixed(2)} 0 1 0 ${(-2 * r).toFixed(2)} 0`; }
+    return this._geo = { levels, stipple: st };
+  }
+  terrain(P, relief) {
+    const T = this._ter || (this._ter = {}), key = P.id + (relief ? 1 : 0);
+    if (T[key]) return T[key];
+    const g = this.geo(), top = g.levels[0].rho, G = this.rgb(P.ground), K = this.rgb(P.peak), Co = [237, 132, 92];
+    const bands = g.levels.map(l => {
+      const e = Math.pow(Math.max(0, 1 - l.rho / (top * 1.02)), 1.1) * P.peakMix;
+      let c = G.map((x, i) => x + (K[i] - x) * e);
+      const h = P.heat * Math.pow(Math.max(0, 1 - l.rho / .62), 1.4);
+      c = c.map((x, i) => x + (Co[i] - x) * h);
+      return { d: l.d, fill: `rgb(${c.map(Math.round).join(',')})` };
+    });
+    const lines = g.levels.map(l => ({ d: l.d, stroke: l.index ? P.index : P.minor, sw: l.index ? 1.3 : .8, op: l.index ? 1 : Math.min(1, .45 + l.rho) }));
+    return T[key] = { bands, lines, stipple: g.stipple, rd: relief ? 'inline' : 'none' };
+  }
+  layout() {
+    if (this._pos) return this._pos;
+    const TAU = Math.PI * 2, D = 58;
+    const N = this.FR.map(f => { const h = this.hash(f.id); const r0 = f.days == null ? 1.27 + ((h >>> 8) % 1000) / 1000 * .09 : this.rho(f.days); return { id: f.id, th: (h % 3600) / 3600 * TAU, rho: r0, lo: r0 - .05, hi: r0 + .05 }; });
+    const hq = { th: Math.PI / 2, rho: 1.44 }, hp = this.warp(hq.th, hq.rho);
+    const fixed = [[0, 0, 36], [hp[0], hp[1], 46]];
+    for (let it = 0; it < 320; it++) {
+      const P = N.map(n => this.warp(n.th, n.rho)), disp = N.map(() => [0, 0]);
+      for (let i = 0; i < N.length; i++) {
+        for (let j = i + 1; j < N.length; j++) {
+          let dx = P[i][0] - P[j][0], dy = (P[i][1] - P[j][1]) * 1.3; const d = Math.hypot(dx, dy) || .01;
+          if (d < D) { const o = (D - d) * .25; dx /= d; dy /= d; disp[i][0] += dx * o; disp[i][1] += dy * o; disp[j][0] -= dx * o; disp[j][1] -= dy * o; }
+        }
+        for (const [fx, fy, fr] of fixed) { const dx = P[i][0] - fx, dy = P[i][1] - fy, d = Math.hypot(dx, dy) || .01; if (d < fr) { const o = (fr - d) * .5; disp[i][0] += dx / d * o; disp[i][1] += dy / d * o; } }
+      }
+      for (let i = 0; i < N.length; i++) {
+        const n = N[i], [dx, dy] = disp[i]; if (!dx && !dy) continue;
+        const e = 1e-3, a = this.warp(n.th + e, n.rho), b = this.warp(n.th - e, n.rho), c = this.warp(n.th, n.rho + e), dd = this.warp(n.th, n.rho - e);
+        const j11 = (a[0] - b[0]) / (2 * e), j21 = (a[1] - b[1]) / (2 * e), j12 = (c[0] - dd[0]) / (2 * e), j22 = (c[1] - dd[1]) / (2 * e), det = j11 * j22 - j12 * j21;
+        if (Math.abs(det) < 1e-6) continue;
+        n.th += (j22 * dx - j12 * dy) / det;
+        n.rho = Math.min(n.hi, Math.max(n.lo, n.rho + (-j21 * dx + j11 * dy) / det));
+      }
+    }
+    const out = {}; N.forEach(n => { out[n.id] = { th: n.th, rho: n.rho, p: this.warp(n.th, n.rho) }; });
+    out.__hq = { th: hq.th, rho: hq.rho, p: hp };
+    return this._pos = out;
+  }
+  legPts(a, b) {
+    const c = this._lp || (this._lp = {}), key = a.id + '>' + b.id; if (c[key]) return c[key];
+    const TAU = Math.PI * 2, seed = this.hash(key) % 7;
+    let dth = b.th - a.th; dth = ((dth + Math.PI) % TAU + TAU) % TAU - Math.PI;
+    const rm = this.C.R * Math.max(.25, (a.rho + b.rho) / 2);
+    const steep = Math.abs(b.rho - a.rho) * this.C.R / (Math.abs(dth) * rm + 18);
+    const nsw = steep > 1.3 ? 2 : steep > .6 ? 1 : 0, amp = nsw ? Math.min(.5, 14 / rm) : 0, sg = seed % 2 ? 1 : -1;
+    const pts = [];
+    for (let i = 0; i <= 40; i++) {
+      const t = i / 40, e = t * t * (3 - 2 * t);
+      const th = a.th + dth * t + amp * Math.sin(Math.PI * t * nsw * 2) * Math.sin(Math.PI * t);
+      const rho = a.rho + (b.rho - a.rho) * e + .035 * sg * Math.sin(Math.PI * t) + .01 * Math.sin(Math.PI * t * 5 + seed);
+      pts.push(this.warp(th, Math.max(.06, rho)));
+    }
+    return c[key] = pts;
+  }
+  spine(mid, ids) {
+    const c = this._sp || (this._sp = {}), key = mid + '|' + ids.join(); if (c[key] != null) return c[key];
+    const pos = this.layout(), P = ids.map(id => pos[id].p).concat([pos.__hq.p]);
+    let best = -.55, bs = -1;
+    for (const th of [-1.57, -1.3, -1.85, 1.3, 1.85, -1.05, -2.1, 1.05, 2.1]) {
+      let m = Infinity;
+      for (const [d] of this.C.IDX) { const q = this.warp(th, this.rho(d)); for (const p of P) m = Math.min(m, Math.hypot(q[0] - p[0], q[1] - p[1])); }
+      m *= .6 + .4 * Math.abs(Math.sin(th));
+      if (m > bs) { bs = m; best = th; }
+    }
+    return c[key] = best;
+  }
+  plainsPt(mid, ids) {
+    const c = this._pp || (this._pp = {}), key = mid + '|' + ids.join(); if (c[key]) return c[key];
+    const pos = this.layout(), P = ids.map(id => pos[id].p).concat([pos.__hq.p]);
+    let best = null, bs = -1;
+    for (let i = 0; i < 16; i++) { const th = i / 16 * Math.PI * 2, q = this.warp(th, 1.45); let m = Infinity; for (const p of P) m = Math.min(m, Math.hypot(q[0] - p[0], (q[1] - p[1]) * 1.6)); if (m > bs) { bs = m; best = q; } }
+    return c[key] = best;
+  }
+  tw(t, font) {
+    const c = this._tw || (this._tw = {}), k = font + '|' + t; if (c[k]) return c[k];
+    const cv = this._cv || (this._cv = document.createElement('canvas').getContext('2d'));
+    cv.font = font; return c[k] = cv.measureText(t).width;
+  }
+  daysTag(f) { if (f.status === 'held') return 'BEKLETİLİYOR'; if (f.days == null) return 'TARİHSİZ'; return f.days + ' GÜN'; }
+  reason(f) { if (f.type === 'lane') return 'Bu hafta aktif seçtiğin kulvar.'; if (f.days != null && f.days <= 14) return 'Tarihli kalemin hazırlık zamanı geldi.'; if (f.type === 'application') return 'Başvurunun sıradaki açık hamlesi.'; return 'Sıradaki açık hamle.'; }
+
+  preset() { const p = this.props.gun; return this.PRESETS[p] ? p : '6 cephe'; }
+  okey(vid) { return vid + '|' + this.preset(); }
+  vkey(mid) { return mid + '|' + this.preset(); }
+  orderOf(vid) { return this.state.orders[this.okey(vid)] || this.PRESETS[this.preset()]; }
+  baseOrder(vid) { return this.state.pending[this.okey(vid)] || this.orderOf(vid); }
+  moved(list, id, over) { const a = [...list], from = a.indexOf(id), to = a.indexOf(over); if (from < 0 || to < 0) return a; a.splice(from, 1); a.splice(to, 0, id); return a; }
+  shownOrder(vid) { const b = this.baseOrder(vid), d = this.state.drag; if (d && d.mid.indexOf(vid + '-') === 0 && d.over) return this.moved(b, d.id, d.over); return b; }
+  doneOf(vid) { const k = this.okey(vid); if (this.state.done[k]) return this.state.done[k]; const o = {}; for (const id of this.PRESETS[this.preset()]) if (this.BY[id].doneAt) o[id] = this.BY[id].doneAt; return o; }
+  focusOf(vid, order, done) { const f = this.state.focus[vid]; if (f && order.includes(f)) return f; return order.find(x => !done[x]) || order[0]; }
+
+  size(mid) { return mid.slice(-4) === 'home' ? this.C.HOME : this.C.ATLAS; }
+  fitView(mid) {
+    const c = this._fit || (this._fit = {}), key = this.vkey(mid); if (c[key]) return c[key];
+    const vid = mid.split('-')[0], home = mid.slice(-4) === 'home', pos = this.layout();
+    const ids = home ? this.orderOf(vid) : this.FR.filter(f => f.status !== 'closed').map(f => f.id);
+    const pts = ids.map(id => pos[id].p).concat([pos.__hq.p, [0, 0]]);
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const [x, y] of pts) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+    const { w, h } = this.size(mid), pad = home ? { t: 36, r: 70, b: 58, l: 56 } : { t: 150, r: 74, b: 214, l: 52 };
+    const k = Math.min((w - pad.l - pad.r) / Math.max(1, x1 - x0), (h - pad.t - pad.b) / Math.max(1, y1 - y0));
+    return c[key] = { k, x: pad.l + ((w - pad.l - pad.r) - (x1 - x0) * k) / 2 - x0 * k, y: pad.t + ((h - pad.t - pad.b) - (y1 - y0) * k) / 2 - y0 * k };
+  }
+  clampK(mid, k) { const f = this.fitView(mid).k; return Math.min(f * 5, Math.max(f * .55, k)); }
+  getView(mid) { const key = this.vkey(mid); return (this._pv && this._pv[key]) || this.state.views[key] || this.fitView(mid); }
+  setView(mid, v) {
+    this._pv = this._pv || {}; this._pv[this.vkey(mid)] = v;
+    if (!this._raf) this._raf = requestAnimationFrame(() => { const pv = this._pv; this._pv = {}; this._raf = 0; this.setState(s => ({ views: { ...s.views, ...pv } })); });
+  }
+  animate(mid, to) {
+    const from = { ...this.getView(mid) }, t0 = performance.now();
+    cancelAnimationFrame(this._anim);
+    const step = now => { const t = Math.min(1, (now - t0) / 300), e = 1 - Math.pow(1 - t, 3); this.setView(mid, { k: from.k + (to.k - from.k) * e, x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e }); if (t < 1) this._anim = requestAnimationFrame(step); };
+    this._anim = requestAnimationFrame(step);
+  }
+  zoomBy(mid, f) { const v = this.getView(mid), { w, h } = this.size(mid), k = this.clampK(mid, v.k * f), cx = w / 2, cy = h / 2, wx = (cx - v.x) / v.k, wy = (cy - v.y) / v.k; this.animate(mid, { k, x: cx - wx * k, y: cy - wy * k }); }
+  refit(mid) { this.animate(mid, this.fitView(mid)); }
+  loc(e, el) { const r = el.getBoundingClientRect(), s = (r.width / el.offsetWidth) || 1; return [(e.clientX - r.left) / s, (e.clientY - r.top) / s]; }
+  bindWheel(mid, el) {
+    const M = this._maps || (this._maps = {}), cur = M[mid];
+    if (cur && cur.el === el) return;
+    if (cur && cur.el) cur.el.removeEventListener('wheel', cur.wheel);
+    if (!el) { delete M[mid]; return; }
+    const wheel = e => {
+      if (mid.slice(-4) === 'home' && !e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      const v = this.getView(mid), p = this.loc(e, el), k = this.clampK(mid, v.k * Math.exp(-e.deltaY * (e.ctrlKey ? .01 : .0016))), wx = (p[0] - v.x) / v.k, wy = (p[1] - v.y) / v.k;
+      this.setView(mid, { k, x: p[0] - wx * k, y: p[1] - wy * k });
+    };
+    el.addEventListener('wheel', wheel, { passive: false });
+    M[mid] = { el, wheel };
+  }
+  handlers(mid) {
+    const H = this._h || (this._h = {}); if (H[mid]) return H[mid];
+    return H[mid] = {
+      ref: el => this.bindWheel(mid, el), down: e => this.pDown(mid, e), move: e => this.pMove(mid, e), up: e => this.pUp(mid, e, false), cancel: e => this.pUp(mid, e, true), click: e => this.pClick(mid, e),
+      zin: () => this.zoomBy(mid, 1.45), zout: () => this.zoomBy(mid, 1 / 1.45), fit: () => this.refit(mid)
+    };
+  }
+  canDrag(mid, id) { const vid = mid.split('-')[0]; return !this.doneOf(vid)[id] && this.baseOrder(vid).includes(id); }
+  pDown(mid, e) {
+    const el = e.currentTarget, G = this._g || (this._g = {}), g = G[mid] || (G[mid] = { ptr: new Map() });
+    g.el = el; const p = this.loc(e, el); g.ptr.set(e.pointerId, p);
+    if (g.ptr.size === 2) {
+      clearTimeout(g.hold); const [a, b] = [...g.ptr.values()];
+      g.mode = 'pinch'; g.suppress = true; g.p0 = { dist: Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, mid: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], v: { ...this.getView(mid) } };
+      for (const id of g.ptr.keys()) { try { el.setPointerCapture(id); } catch (_) { } }
+      if (this.state.drag) this.setState({ drag: null });
+      return;
+    }
+    if (g.ptr.size > 2) return;
+    const st = e.target.closest ? e.target.closest('[data-stop]') : null;
+    g.mode = 'pending'; g.suppress = false; g.start = p; g.v0 = { ...this.getView(mid) }; g.stop = st ? st.getAttribute('data-stop') : null; g.type = e.pointerType; g.pid = e.pointerId;
+    if (g.stop && e.pointerType !== 'mouse' && this.canDrag(mid, g.stop)) g.hold = setTimeout(() => { if (g.mode === 'pending') this.lift(mid, g.stop, g.start); }, 350);
+  }
+  pMove(mid, e) {
+    const g = this._g && this._g[mid]; if (!g || !g.ptr.has(e.pointerId)) return;
+    const p = this.loc(e, g.el); g.ptr.set(e.pointerId, p);
+    if (g.mode === 'pinch') {
+      const [a, b] = [...g.ptr.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], v = g.p0.v, k = this.clampK(mid, v.k * d / g.p0.dist), wx = (g.p0.mid[0] - v.x) / v.k, wy = (g.p0.mid[1] - v.y) / v.k;
+      this.setView(mid, { k, x: m[0] - wx * k, y: m[1] - wy * k }); return;
+    }
+    if (g.mode === 'drag') { e.preventDefault(); this.dragTo(mid, p); return; }
+    if (g.mode !== 'pending' && g.mode !== 'pan') return;
+    const dx = p[0] - g.start[0], dy = p[1] - g.start[1];
+    if (g.mode === 'pending') {
+      if (Math.hypot(dx, dy) < 6) return;
+      clearTimeout(g.hold); g.suppress = true;
+      if (g.stop && g.type === 'mouse' && this.canDrag(mid, g.stop)) { this.lift(mid, g.stop, p); return; }
+      if (g.type === 'mouse' || mid.slice(-5) === 'atlas') { g.mode = 'pan'; try { g.el.setPointerCapture(e.pointerId); } catch (_) { } } else { g.mode = 'scroll'; return; }
+    }
+    this.setView(mid, { k: g.v0.k, x: g.v0.x + dx, y: g.v0.y + dy });
+  }
+  pUp(mid, e, cancel) {
+    const g = this._g && this._g[mid]; if (!g || !g.ptr.has(e.pointerId)) return;
+    clearTimeout(g.hold); g.ptr.delete(e.pointerId);
+    if (g.mode === 'pinch') { if (g.ptr.size === 1) { const [p] = [...g.ptr.values()]; g.mode = 'pan'; g.start = p; g.v0 = { ...this.getView(mid) }; } else if (!g.ptr.size) g.mode = null; return; }
+    if (g.mode === 'drag') this.drop(mid, cancel);
+    if (!g.ptr.size) g.mode = null;
+  }
+  pClick(mid, e) {
+    const g = this._g && this._g[mid];
+    if (g && g.suppress) { g.suppress = false; return; }
+    const t = e.target; if (t.closest && (t.closest('[data-stop]') || t.closest('[data-front]') || t.closest('button'))) return;
+    if (mid.slice(-5) === 'atlas') { const vid = mid.split('-')[0]; this.setState(s => ({ sel: { ...s.sel, [vid]: null } })); }
+  }
+  lift(mid, id, p) {
+    const g = this._g[mid]; g.mode = 'drag'; g.suppress = true;
+    try { g.el.setPointerCapture(g.pid); } catch (_) { }
+    this.setState({ drag: { mid, id, x: p[0], y: p[1], over: null } });
+    try { if (navigator.vibrate) navigator.vibrate(12); } catch (_) { }
+  }
+  dragTo(mid, p) {
+    const d = this.state.drag; if (!d || d.mid !== mid) return;
+    let over = null, best = 38;
+    for (const s of (this._scr && this._scr[mid]) || []) { if (s.id === d.id || s.done) continue; const dd = Math.hypot(s.x - p[0], s.y - p[1]); if (dd < best) { best = dd; over = s.id; } }
+    this.setState({ drag: { ...d, x: p[0], y: p[1], over } });
+  }
+  drop(mid, cancel) {
+    const d = this.state.drag; if (!d) return;
+    const vid = mid.split('-')[0], base = this.baseOrder(vid);
+    if (!cancel && d.over) { const next = this.moved(base, d.id, d.over); if (next.join() !== base.join()) { const k = this.okey(vid); this.setState(s => ({ pending: { ...s.pending, [k]: next } })); } }
+    this.setState({ drag: null });
+  }
+  tapFn(mid, id) {
+    const T = this._tap || (this._tap = {}), k = mid + ':' + id; if (T[k]) return T[k];
+    return T[k] = () => {
+      const g = this._g && this._g[mid]; if (g && g.suppress) { g.suppress = false; return; }
+      const vid = mid.split('-')[0];
+      if (mid.slice(-5) === 'atlas') this.setState(s => ({ sel: { ...s.sel, [vid]: id } }));
+      else this.setState(s => ({ focus: { ...s.focus, [vid]: id } }));
+    };
+  }
+  flash(vid, text) {
+    this._tt = this._tt || {}; clearTimeout(this._tt[vid]);
+    this.setState(s => ({ toast: { ...s.toast, [vid]: text } }));
+    this._tt[vid] = setTimeout(() => this.setState(s => ({ toast: { ...s.toast, [vid]: null } })), 2800);
+  }
+  vfn(vid) {
+    const F = this._vf || (this._vf = {}); if (F[vid]) return F[vid];
+    return F[vid] = {
+      save: () => { const k = this.okey(vid), p = this.state.pending[k]; if (!p) return; this.setState(s => ({ orders: { ...s.orders, [k]: p }, pending: { ...s.pending, [k]: null } })); this.flash(vid, 'Sıra kaydedildi. Kayıt defterinden geri alabilirsin.'); },
+      cancel: () => { const k = this.okey(vid); this.setState(s => ({ pending: { ...s.pending, [k]: null } })); },
+      hint: () => { this._ht = this._ht || {}; clearTimeout(this._ht[vid]); this.setState(s => ({ hint: { ...s.hint, [vid]: true } })); this._ht[vid] = setTimeout(() => this.setState(s => ({ hint: { ...s.hint, [vid]: false } })), 4200); },
+      close: () => this.setState(s => ({ sel: { ...s.sel, [vid]: null } })),
+      legend: () => this.setState(s => ({ legend: { ...(s.legend || {}), [vid]: !(s.legend && s.legend[vid]) } })),
+      finish: () => {
+        const k = this.okey(vid), order = this.shownOrder(vid), cur = { ...this.doneOf(vid) }, id = this.focusOf(vid, order, cur); if (cur[id]) return;
+        cur[id] = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Istanbul' });
+        const next = order.find(x => !cur[x]);
+        this.setState(s => ({ done: { ...s.done, [k]: cur }, focus: { ...s.focus, [vid]: next || id } }));
+        this.flash(vid, 'Hamle tamamlandı. Kampa bayrak dikildi.');
+      },
+      undo: () => { const k = this.okey(vid), order = this.shownOrder(vid), cur = { ...this.doneOf(vid) }, id = this.focusOf(vid, order, cur); delete cur[id]; this.setState(s => ({ done: { ...s.done, [k]: cur } })); }
+    };
+  }
+  placeLabels(marks, w, h, extra) {
+    const boxes = marks.map(m => [m.x - m.r, m.y - m.r, m.x + m.r, m.y + m.r]).concat(extra), placed = [];
+    const hits = b => { for (const q of boxes) if (b[0] < q[2] && b[2] > q[0] && b[1] < q[3] && b[3] > q[1]) return true; for (const q of placed) if (b[0] < q[2] && b[2] > q[0] && b[1] < q[3] && b[3] > q[1]) return true; return false; };
+    for (const m of marks.filter(m => m.w).sort((a, b) => b.prio - a.prio)) {
+      m.lab = null;
+      if (m.x < -20 || m.x > w + 20 || m.y < -20 || m.y > h + 20) continue;
+      const g = m.r + 3;
+      const cands = [[-m.w / 2, g], [g, -m.h / 2], [-g - m.w, -m.h / 2], [-m.w / 2, -g - m.h], [g - 2, g - 2], [-g - m.w + 2, g - 2], [g - 2, -g - m.h + 2], [-g - m.w + 2, -g - m.h + 2]];
+      for (const [dx, dy] of cands) { const b = [m.x + dx, m.y + dy, m.x + dx + m.w, m.y + dy + m.h]; if (b[0] < 2 || b[2] > w - 2 || b[1] < 2 || b[3] > h - 2) continue; if (!hits(b)) { placed.push(b); m.lab = [dx, dy]; break; } }
+      if (!m.lab && m.force) { m.lab = [-m.w / 2, g]; placed.push([m.x - m.w / 2, m.y + g, m.x + m.w / 2, m.y + g + m.h]); }
+    }
+    return { boxes, placed, hits };
+  }
+  mapVals(vid, kind, P, ctx) {
+    const mid = vid + '-' + kind, atlas = kind === 'atlas', v = this.getView(mid), sz = this.size(mid), pos = this.layout(), k = v.k, H = this.handlers(mid);
+    const S = p => [p[0] * k + v.x, p[1] * k + v.y];
+    const route = ctx.order, done = ctx.done, firstUndone = route.find(id => !done[id]);
+    const drag = this.state.drag && this.state.drag.mid === mid ? this.state.drag : null;
+    const nodes = [{ id: '__hq', ...pos.__hq }].concat(route.map(id => ({ id, ...pos[id] })));
+    const legs = [];
+    for (let i = 1; i < nodes.length; i++) {
+      const b = nodes[i], wp = this.legPts(nodes[i - 1], b); let d = '';
+      for (let j = 0; j < wp.length; j++) { const s = S(wp[j]); d += (j ? 'L' : 'M') + s[0].toFixed(1) + ' ' + s[1].toFixed(1); }
+      const st = done[b.id] ? 'done' : b.id === firstUndone ? 'next' : 'future';
+      legs.push({ d, stroke: st === 'done' ? P.trail : st === 'next' ? P.route : P.routeDim, sw: st === 'done' ? 1.6 : st === 'next' ? 2.4 : 2.2, dash: st === 'done' ? 'none' : st === 'next' ? '7 5' : '0.1 6.5' });
+    }
+    const hq = S(pos.__hq.p), sm = S([0, 0]), sumM = { x: sm[0], y: sm[1], r: 8, w: this.tw('BUGÜN', "500 10px 'IBM Plex Mono'") * 1.16 + 6, h: 14, prio: 95 }, marks = [{ x: hq[0], y: hq[1] + 10, r: 24 }, sumM], scr = [];
+    const stops = route.map((id, i) => {
+      const f = this.BY[id], p = S(pos[id].p), isDone = !!done[id], isFocus = id === ctx.focus, isNext = id === firstUndone, tag = isDone ? 'GEÇİLDİ · ' + done[id] : this.daysTag(f);
+      const m = { id, x: p[0], y: p[1], r: 22, w: Math.max(this.tw(f.title, "500 13px 'DM Sans'"), this.tw(tag, "400 10.5px 'IBM Plex Mono'") * 1.07) + 17, h: 37, prio: isFocus ? 100 : isNext ? 90 : 60 - i, force: isFocus };
+      marks.push(m); scr.push({ id, x: p[0], y: p[1], done: isDone });
+      return { m, f, i, isDone, isFocus, isNext, tag };
+    });
+    const others = atlas ? this.FR.filter(f => f.status !== 'closed' && !route.includes(f.id)).map(f => {
+      const p = S(pos[f.id].p), tag = this.daysTag(f), isSel = ctx.focus === f.id;
+      const m = { id: f.id, x: p[0], y: p[1], r: 11, w: this.tw(f.title, "500 12px 'DM Sans'") + 15, h: 22, prio: isSel ? 100 : 20, force: isSel };
+      marks.push(m); return { m, f, tag, isSel };
+    }) : [];
+    const extra = atlas ? [[0, 0, sz.w, 128], [sz.w - 60, 0, sz.w, 170], [0, sz.h - 180, sz.w, sz.h], ctx.legend ? [sz.w - 236, sz.h - 316, sz.w - 8, sz.h - 182] : [sz.w - 160, sz.h - 234, sz.w - 8, sz.h - 182]] : [[sz.w - 60, 0, sz.w, 150]];
+    const PL = this.placeLabels(marks, sz.w, sz.h, extra);
+    this._scr = this._scr || {}; this._scr[mid] = scr;
+    const tr = (x, y) => `translate(${(x - 22).toFixed(1)}px,${(y - 22).toFixed(1)}px)`;
+    const stopVals = stops.map(({ m, f, i, isDone, isFocus, isNext, tag }) => {
+      const lifted = drag && drag.id === m.id, over = drag && drag.over === m.id;
+      let st = { bg: P.pin, border: '1px solid ' + P.pinBd, fg: P.plateInk, sh: 'none' };
+      if (isNext) st = { ...st, border: '1.5px solid ' + P.route, sh: '0 0 0 4px ' + P.routeGlow };
+      if (isFocus) st = { bg: '#ed845c', border: '1px solid #ed845c', fg: '#253e33', sh: '0 0 0 6px #ed845c27,0 0 0 7px #ed845c50' };
+      if (isDone) st = isFocus ? { bg: P.pin, border: '1.5px solid #ed845c', fg: P.plateInk, sh: '0 0 0 5px #ed845c40' } : { bg: P.pin, border: '1px dashed ' + P.trail, fg: P.muted, sh: 'none' };
+      if (over) st = { ...st, sh: '0 0 0 3px ' + P.route + ',0 0 0 10px ' + P.routeGlow };
+      const lab = m.lab;
+      return { id: m.id, tr: tr(m.x, m.y), op: lifted ? .3 : isDone && !isFocus ? .62 : 1, ...st, num: this.pad(i + 1), done: isDone, open: !isDone, hasLabel: !!lab, lx: lab ? (22 + lab[0]).toFixed(1) + 'px' : '0px', ly: lab ? (22 + lab[1]).toFixed(1) + 'px' : '0px', title: f.title, tag, tagc: isDone ? P.tagMuted : (isFocus || isNext) ? P.tag : P.tagMuted, tap: this.tapFn(mid, m.id), aria: this.pad(i + 1) + ' ' + f.title };
+    });
+    const otherVals = others.map(({ m, f, tag, isSel }) => {
+      const held = f.status === 'held', lab = m.lab;
+      return { id: f.id, tr: tr(m.x, m.y), op: held ? .7 : 1, bg: isSel ? '#ed845c' : P.pin, border: isSel ? '1.5px solid #ed845c' : (held ? '1.5px dashed ' : '1.5px solid ') + P.other, sh: isSel ? '0 0 0 5px #ed845c33' : 'none', dot: isSel ? '#253e33' : held ? 'transparent' : P.other, hasLabel: !!lab, lx: lab ? (22 + lab[0]).toFixed(1) + 'px' : '0px', ly: lab ? (22 + lab[1]).toFixed(1) + 'px' : '0px', title: f.title, tag, tap: this.tapFn(mid, f.id) };
+    });
+    const cl = this.C.IDX.map(() => ({ tf: 'translate(-999 -999)', d: 'none' }));
+    if (ctx.labels) {
+      const th0 = this.spine(mid, route.concat(others.map(o => o.f.id)));
+      for (let li = 0; li < this.C.IDX.length; li++) {
+        const [d, t] = this.C.IDX[li], r = this.rho(d);
+        for (const dt of [0, .16, -.16, .32, -.32, .5, -.5, .7, -.7, .95, -.95]) {
+          const th = th0 + dt, a = this.warp(th - .004, r), b = this.warp(th + .004, r), s = S(this.warp(th, r));
+          let ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI; if (ang > 90) ang -= 180; if (ang < -90) ang += 180;
+          const lw = t.length * 7 + 6, ar = ang * Math.PI / 180, W = Math.abs(lw * Math.cos(ar)) + Math.abs(12 * Math.sin(ar)), Hh = Math.abs(lw * Math.sin(ar)) + Math.abs(12 * Math.cos(ar));
+          const box = [s[0] - W / 2, s[1] - Hh / 2, s[0] + W / 2, s[1] + Hh / 2];
+          if (box[0] < 2 || box[2] > sz.w - 2 || box[1] < 2 || box[3] > sz.h - 2 || PL.hits(box)) continue;
+          PL.placed.push(box); cl[li] = { tf: `translate(${s[0].toFixed(1)} ${s[1].toFixed(1)}) rotate(${ang.toFixed(1)})`, d: 'inline' }; break;
+        }
+      }
+    }
+    let pp = [-999, -999];
+    { const top = atlas ? 150 : 24, bot = atlas ? sz.h - 196 : sz.h - 14, tw2 = 170; let bs = -1;
+      for (let i = 0; i < 72; i++) { const s = S(this.warp((i % 24) / 24 * Math.PI * 2, [1.62, 1.78, 1.95][Math.floor(i / 24)])); if (s[0] < tw2 / 2 + 6 || s[0] > sz.w - tw2 / 2 - 6 || s[1] < top || s[1] > bot) continue; const b = [s[0] - tw2 / 2, s[1] - 14, s[0] + tw2 / 2, s[1] + 4]; if (PL.hits(b)) continue; let m = Infinity; for (const q of marks) m = Math.min(m, Math.hypot(q.x - s[0], q.y - s[1])); if (m > bs) { bs = m; pp = s; } } }
+    const off = (1.4 / k).toFixed(3), sl = sumM.lab || [-sumM.w / 2, -24];
+    const dn = drag ? route.indexOf(drag.id) + 1 : 0;
+    return {
+      ref: H.ref, down: H.down, move: H.move, up: H.up, cancel: H.cancel, click: H.click, zin: H.zin, zout: H.zout, fit: H.fit,
+      tf: `translate(${v.x.toFixed(2)} ${v.y.toFixed(2)}) scale(${k.toFixed(4)})`, lo: `translate(-${off} -${off})`, dk: `translate(${off} ${off})`,
+      legs, stops: stopVals, others: otherVals, cl0: cl[0], cl1: cl[1], cl2: cl[2], cl3: cl[3], cl4: cl[4],
+      hq: { tr: `translate(${hq[0].toFixed(1)}px,${hq[1].toFixed(1)}px)` },
+      summit: { pts: `${(sm[0] - 6).toFixed(1)},${(sm[1] + 5).toFixed(1)} ${(sm[0] + 6).toFixed(1)},${(sm[1] + 5).toFixed(1)} ${sm[0].toFixed(1)},${(sm[1] - 6).toFixed(1)}`, x: (sm[0] + sl[0] + sumM.w / 2).toFixed(1), ty: (sm[1] + sl[1] + 11).toFixed(1) },
+      plains: { x: pp[0].toFixed(1), y: pp[1].toFixed(1) },
+      ghost: drag ? { show: true, tr: tr(drag.x, drag.y), num: this.pad(dn) } : { show: false, tr: 'translate(0px,0px)', num: '' },
+      dragOn: !!drag, dragText: drag ? (drag.over ? `Bırakırsan ${this.pad(dn)}. sıraya geçer.` : 'Başka bir kampın üstüne bırak.') : ''
+    };
+  }
+  variant(vid, name, sub, P, relief, labels) {
+    const order = this.shownOrder(vid), done = this.doneOf(vid), focus = this.focusOf(vid, order, done), fns = this.vfn(vid), k = this.okey(vid);
+    const sel = this.state.sel[vid];
+    const home = this.mapVals(vid, 'home', P, { order, done, focus, labels });
+    const legendOpen = !!(this.state.legend && this.state.legend[vid]);
+    const atlas = this.mapVals(vid, 'atlas', P, { order, done, focus: sel, labels, legend: legendOpen && !sel });
+    const firstUndone = order.find(id => !done[id]), f = this.BY[focus], idx = order.indexOf(focus), isDone = !!done[focus];
+    const sheet = {
+      top: `${this.pad(idx + 1)} / ${isDone ? 'GEÇİLDİ · ' + done[focus] : focus === firstUndone ? 'SIRADAKİ HAMLE' : 'ROTADAKİ HAMLE'}`,
+      title: f.title, hasWhere: f.type === 'lane' && !!f.where, where: 'Kaldığın yer: ' + (f.where || ''), move: f.move, reason: '↳ ' + (isDone ? `Bugün ${done[focus]}’de tamamlandı.` : this.reason(f)),
+      moveColor: isDone ? '#596963' : '#193d3d', deco: isDone ? 'line-through' : 'none', isDone, notDone: !isDone, fop: isDone ? .5 : 1, finish: fns.finish, undo: fns.undo
+    };
+    const RF = this._rf || (this._rf = {});
+    const rows = order.map((id, i) => {
+      const g = this.BY[id], cur = id === focus, dn = !!done[id], rk = vid + ':' + id;
+      return { num: dn ? '✓' : this.pad(i + 1), title: g.title + (dn ? ' · geçildi ' + done[id] : ''), text: g.move, weight: cur ? 600 : 400, color: dn ? '#596963' : '#193d3d', numColor: cur ? '#a24b2b' : '#596963', deco: dn ? 'line-through' : 'none', tap: RF[rk] || (RF[rk] = () => this.setState(s => ({ focus: { ...s.focus, [vid]: id } }))) };
+    });
+    const nDone = order.filter(id => done[id]).length;
+    let card = { show: false, type: '', color: '#94856b', title: '', meta: '', days: '', route: '', move: '', close: fns.close };
+    if (sel && this.BY[sel]) {
+      const g = this.BY[sel], ri = order.indexOf(sel), T = this.TYPES[g.type];
+      card = { show: true, type: T[0], color: T[1], title: g.title, meta: g.event ? `${g.event} · ${g.when}` : g.where ? 'Kaldığın yer: ' + g.where : 'Tarihli kalemi yok.', days: g.status === 'held' ? 'BEKLETİLİYOR' : g.days == null ? 'TARİHSİZ · OVADA' : `${g.days} GÜN KALDI`, route: ri >= 0 ? `ROTADA ${this.pad(ri + 1)}${done[sel] ? ' · GEÇİLDİ' : ''}` : 'BUGÜNÜN ROTASINDA DEĞİL', move: g.move, close: fns.close };
+    }
+    const open = this.FR.filter(x => x.status !== 'closed').length;
+    return {
+      id: vid, name, sub, P, ter: this.terrain(P, relief), home, atlas, sheet, rows, card, legendChip: !card.show && !legendOpen, legendOn: !card.show && legendOpen,
+      toggleLegend: fns.legend,
+      caption: `${order.length} CEPHE / ${order.length} HAMLE${nDone ? ` · ${nDone} GEÇİLDİ` : ''}`,
+      atlasSub: `${open} AÇIK CEPHE · BUGÜNÜN ROTASI ${order.length} KAMP`,
+      pendOn: !!this.state.pending[k], savePend: fns.save, cancelPend: fns.cancel, showHint: fns.hint, hintOn: !!this.state.hint[vid] && !this.state.drag,
+      toastOn: !!this.state.toast[vid], toast: this.state.toast[vid] || ''
+    };
+  }
+  renderVals() {
+    const relief = this.props.kabartma ?? true, labels = this.props.etiketler ?? true;
+    return {
+      grain: this.GRAIN,
+      stopProp: this._sp2 || (this._sp2 = e => e.stopPropagation()),
+      variants: [
+        this.variant('1a', 'Petrol', 'Atlas 02’nin gece haritası: koyu petrol zemin, zirveye çıktıkça açılır ve ısınır.', this.PAL.petrol, relief, labels),
+        this.variant('1b', 'Kum', 'Aynı arazi gündüz ışığında: açık kum zemin, petrol mürekkep.', this.PAL.kum, relief, labels)
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

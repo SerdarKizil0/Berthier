@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box}html,body{margin:0;background:#111213}a{color:#d6d3cb;text-decoration:underline;text-underline-offset:3px}a:hover{color:#d4b98a}button{letter-spacing:inherit}</style>
+</helmet>
+<section data-screen-label="P5" style="padding:56px 64px 88px;display:flex;flex-direction:column;gap:40px;min-height:100vh;font-family:'DM Sans','Segoe UI',sans-serif;color:#d6d3cb;background:#111213">
+<div style="display:flex;flex-direction:column;gap:12px;max-width:860px">
+<p style="margin:0;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#8f8d88">P5 · GRAFİT GECE · KODDA UYGULANMADI, REPOYA GÖNDERİLMEDİ</p>
+<h1 style="margin:0;font:400 2.8rem/1.08 'Instrument Serif',Georgia,serif;color:#d6d3cb">Ritim ve motivasyon</h1>
+<p style="margin:0;font-size:1rem;line-height:1.6;color:#b3b0a8;text-wrap:pretty">P5 şartnamesinin kapsamı: sabah raporu, bildirimler, motivasyon katmanı, çevrimdışı kullanım ve iki haftalık sefer. Gelen evrak bölümü 26 Eylül kararıyla yok. “Kilitlendim” düğmesi DURUM.md’de “Olmasın” yazdığı için yapılmadı.</p>
+<div style="display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 16px;font-size:.9375rem;line-height:1.55;color:#b3b0a8">
+<span style="font:500 .75rem/1.9 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#d4b98a">RAPOR</span><span style="text-wrap:pretty">Her sabah aynı dört bölüm, aynı sırada: emir, uyarılar, yerler, kararlar. Boş bölüm de görünür ve “yok” yazar. Rapor 08:00’de hazırlanır, bildirim 08:30’da gelir. Onay tek dokunuş.</span>
+<span style="font:500 .75rem/1.9 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#d4b98a">BİLDİRİM</span><span style="text-wrap:pretty">Dört tür: sabah raporu, teftiş, çakışma, akşam. Sessiz saatte yakalanan çakışma ayrı bildirim olmaz, sabah raporuna girer. Akşam bildirimi yalnız yarın olunacak bir yer varsa gelir; saatini sen seçersin (varsayılan 21:00).</span>
+<span style="font:500 .75rem/1.9 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#d4b98a">SEFER DEFTERİ</span><span style="text-wrap:pretty">Günleri Berthier kendisi yazar. Seri, puan, seviye yok; emirsiz gün “Karargâhta” diye geçer. Bütün kampları alınan gün “Sefer tamamlandı” olur, kapanan cephe mühür alır.</span>
+<span style="font:500 .75rem/1.9 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#d4b98a">ÖLÇÜM</span><span style="text-wrap:pretty">İki haftalık seferin üç ölçümü yalnız istenince açılır. Raporda süre sayılmaz. Hükmü 14. günde sen verirsin.</span>
+<span style="font:500 .75rem/1.9 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#d4b98a">ÇEVRİMDIŞI</span><span style="text-wrap:pretty">Son rapor ve harita cihazda kalır, dikte cihaz kuyruğunda bekler. Onay ve yanıt gibi işlemler bağlantı gelince yapılır.</span>
+</div>
+<p style="margin:0;font-size:.9375rem;line-height:1.6;color:#8f8d88;text-wrap:pretty">Tweaks: örnek sabah (Yoğun / Sakin) ve bağlantı (Çevrimiçi / Çevrimdışı). Raporda bölüm düğmeleri, soru yanıtı ve onay; bildirimlerde izin, deneme bildirimi ve akşam saati; sefer defterinde ölçümler çalışır. Harita: <a href="Berthier Harita v7.dc.html">Grafit Gece</a>.</p>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start">
+
+<div style="display:flex;flex-direction:column;gap:12px;width:390px">
+<p style="margin:0;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#8f8d88">1 · BİLDİRİM · KİLİT EKRANI</p>
+<div data-screen-label="Kilit ekranı" style="position:relative;width:390px;height:844px;overflow:hidden;background:linear-gradient(180deg,#26272a 0%,#18191b 50%,#0f1011 100%);color:#e6e3dc;font-family:'DM Sans','Segoe UI',sans-serif;line-height:1.55;box-shadow:0 0 0 1px #2a2b2e, 0 30px 80px -24px #000000b3">
+<div style="position:absolute;left:0;right:0;top:96px;display:flex;flex-direction:column;align-items:center;gap:4px">
+<span style="font-size:1.0625rem;font-weight:500;color:#c9c6be">Cumartesi 26 Eylül</span>
+<span style="font:400 6.5rem/1 'Instrument Serif',Georgia,serif;letter-spacing:-.02em;color:#ece9e2">08:30</span>
+</div>
+<div style="position:absolute;left:12px;right:12px;bottom:120px;display:grid;grid-template-columns:38px minmax(0,1fr);gap:0 12px;padding:12px 14px 14px;border-radius:20px;background:rgba(48,49,52,.82);border:1px solid rgba(255,255,255,.06)">
+<span style="grid-row:span 2;width:38px;height:38px;border-radius:9px;display:grid;place-items:center;background:#18191b;border:1px solid #343538;color:#ed845c;font-size:1.25rem">✳</span>
+<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><strong style="font-size:.9375rem;font-weight:600;color:#ece9e2">Sabah raporu hazır</strong><span style="font-size:.8125rem;color:#a9a6a0">şimdi</span></div>
+<p style="margin:2px 0 0;font-size:.9375rem;line-height:1.4;color:#d6d3cb">{{ lock.body }}</p>
+</div>
+</div>
+<p style="margin:0;font-size:.875rem;line-height:1.5;color:#8f8d88;text-wrap:pretty">{{ lock.cap }}</p>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px;width:390px">
+<p style="margin:0;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#8f8d88">2 · SABAH RAPORU</p>
+<div data-screen-label="Sabah raporu" style="position:relative;width:390px;height:844px;overflow:hidden;background:#18191b;color:#d6d3cb;font-family:'DM Sans','Segoe UI',sans-serif;font-size:16px;line-height:1.55;box-shadow:0 0 0 1px #2a2b2e, 0 30px 80px -24px #000000b3">
+<div ref="{{ rep.box }}" style="position:relative;height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none">
+<div style="padding:0 20px">
+<header style="height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #343538">
+<a href="#" style="display:flex;align-items:center;gap:6px;font-family:'Instrument Serif',Georgia,serif;font-size:2rem;color:#d6d3cb;text-decoration:none"><span>berthier</span><span style="font-family:'DM Sans','Segoe UI',sans-serif;font-size:1.6rem;color:#ed845c">✳</span></a>
+<div style="display:flex;align-items:center;gap:10px">
+<button aria-label="Kayıt defteri" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:#d6d3cb;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg></button>
+<button aria-label="Tercihler" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:#d6d3cb;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+</div>
+</header>
+<sc-if value="{{ rep.off }}" hint-placeholder-val="{{ false }}"><div style="margin-top:12px;padding:10px 12px;border-radius:12px;background:#202123;border:1px solid #343538;display:flex;gap:10px;align-items:flex-start;font-size:.875rem;line-height:1.45;color:#b3b0a8"><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;flex-shrink:0;margin-top:1px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M12 20h.01"></path><path d="M8.5 16.429a5 5 0 0 1 7 0"></path><path d="M5 12.859a10 10 0 0 1 5.17-2.69"></path><path d="M19 12.859a10 10 0 0 0-2.007-1.523"></path><path d="M2 8.82a15 15 0 0 1 4.177-2.643"></path><path d="M22 8.82a15 15 0 0 0-11.288-3.764"></path><path d="m2 2 20 20"></path></svg><span>Bağlantı yok. Rapor 08:00’deki haliyle gösteriliyor; dikte cihazda saklanır.</span></div></sc-if>
+<div style="padding:14px 0 16px">
+<a href="Berthier Harita v7.dc.html" style="display:inline-flex;gap:8px;align-items:center;min-height:44px;font-size:.875rem;font-weight:500;color:#8f8d88;text-decoration:none"><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>Karargâh</a>
+<h1 style="margin:0;font:400 2.7rem/1.05 'Instrument Serif',Georgia,serif;letter-spacing:-.025em;color:#d6d3cb">Sabah raporu</h1>
+<p style="margin:8px 0 0;font:400 .75rem/1.5 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#8f8d88">CMT 26 EYLÜL · 08:00’DE HAZIRLANDI</p>
+</div>
+</div>
+<div style="position:sticky;top:0;z-index:3;background:#18191b;padding:10px 20px 12px;border-bottom:1px solid #343538;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px">
+<sc-for list="{{ rep.index }}" as="ix" hint-placeholder-count="4">
+<button onClick="{{ ix.go }}" style="font:inherit;min-height:48px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;padding:6px 10px;border-radius:10px;background:#202123;border:1px solid #343538;color:#d6d3cb;cursor:pointer;text-align:left"><span style="font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#d4b98a">{{ ix.num }}</span><span style="font-size:.8125rem;font-weight:500;white-space:nowrap">{{ ix.label }}</span></button>
+</sc-for>
+</div>
+<div style="padding:0 20px 150px">
+
+<section ref="{{ rep.s0 }}" style="padding-top:22px">
+<h2 style="margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid #343538;display:flex;align-items:baseline;gap:10px;font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#b3b0a8"><span style="color:#d4b98a">I</span><span>GÜNÜN EMRİ</span><span style="margin-left:auto;letter-spacing:.04em;color:#8f8d88">{{ rep.h0 }}</span></h2>
+<sc-if value="{{ rep.hasOrder }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;align-items:center;padding:4px 0 8px">
+<span style="width:28px;height:28px;border-radius:8px;flex-shrink:0;display:grid;place-items:center;background:#202123;border:1px solid #77756f;color:#ed845c;font-size:.95rem">✳</span>
+<sc-for list="{{ rep.strip }}" as="n" hint-placeholder-count="6"><div style="display:contents"><span style="flex:1;min-width:6px;height:0;border-top:2px dotted #c9ad7a"></span><span style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font:400 .75rem 'IBM Plex Mono',monospace;background:{{ n.bg }};border:{{ n.bd }};color:{{ n.fg }};box-shadow:{{ n.sh }}">{{ n.num }}</span></div></sc-for>
+</div>
+<p style="margin:0 0 4px;font-size:.8125rem;line-height:1.45;color:#8f8d88;text-wrap:pretty">{{ rep.path }}</p>
+<sc-for list="{{ rep.order }}" as="o" hint-placeholder-count="6">
+<div style="display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:2px 10px;padding:14px 0;border-bottom:1px solid #343538;align-items:start">
+<span style="font:400 .75rem 'IBM Plex Mono',monospace;color:#8f8d88;padding-top:2px">{{ o.num }}</span>
+<div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+<span style="font-size:.75rem;color:#8f8d88">{{ o.head }}</span>
+<span style="font-size:1rem;font-weight:500;line-height:1.4;color:#d6d3cb">{{ o.move }}</span>
+<span style="font-size:.8125rem;line-height:1.45;color:#8f8d88;text-wrap:pretty">{{ o.why }}</span>
+</div>
+<span style="font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.04em;padding:3px 8px;border-radius:10px;white-space:nowrap;background:{{ o.cbg }};color:{{ o.cfg }}">{{ o.chip }}</span>
+</div>
+</sc-for>
+<div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:4px">
+<button onClick="{{ rep.reorder }}" style="font:inherit;background:none;border:0;padding:8px 0;min-height:44px;display:inline-flex;align-items:center;gap:7px;font-size:.875rem;font-weight:500;color:#d6d3cb;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m3 16 4 4 4-4"></path><path d="M7 20V4"></path><path d="m21 8-4-4-4 4"></path><path d="M17 4v16"></path></svg>Sırayı düzenle</button>
+<button onClick="{{ rep.fronts }}" style="font:inherit;background:none;border:0;padding:8px 0;min-height:44px;display:inline-flex;align-items:center;gap:7px;font-size:.875rem;font-weight:500;color:#d6d3cb;border-radius:10px;cursor:pointer">Cephe ekle / çıkar</button>
+</div>
+</sc-if>
+<sc-if value="{{ rep.noOrder }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:2px;padding:4px 0"><p style="margin:0;font-size:1rem;color:#d6d3cb">Bugün için önerilen cephe yok.</p><p style="margin:0;font-size:.875rem;color:#8f8d88">İstersen bir cephe ekleyebilirsin.</p><div><button onClick="{{ rep.fronts }}" style="font:inherit;background:none;border:0;padding:8px 0;min-height:44px;display:inline-flex;align-items:center;gap:7px;font-size:.875rem;font-weight:500;color:#d6d3cb;border-radius:10px;cursor:pointer">Cephe ekle</button></div></div></sc-if>
+</section>
+
+<section ref="{{ rep.s1 }}" style="padding-top:28px">
+<h2 style="margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid #343538;display:flex;align-items:baseline;gap:10px;font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#b3b0a8"><span style="color:#d4b98a">II</span><span>UYARILAR</span><span style="margin-left:auto;letter-spacing:.04em;color:#8f8d88">{{ rep.h1 }}</span></h2>
+<sc-for list="{{ rep.warnings }}" as="w" hint-placeholder-count="2">
+<div style="margin-bottom:10px;padding:14px 16px 6px;border-radius:14px;background:#202123;border:1px solid #343538;display:flex;flex-direction:column;gap:6px;opacity:{{ w.op }}">
+<div style="display:flex;justify-content:space-between;gap:10px;font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.08em"><span style="color:{{ w.lc }}">{{ w.label }}</span><span style="letter-spacing:.04em;color:#8f8d88">{{ w.meta }}</span></div>
+<p style="margin:0;font-size:.9375rem;line-height:1.5;color:#d6d3cb;text-wrap:pretty">{{ w.text }}</p>
+<div style="display:flex;gap:18px;flex-wrap:wrap">
+<button onClick="{{ w.go1 }}" disabled="{{ rep.off }}" style="font:inherit;background:none;border:0;padding:8px 0;min-height:44px;font-size:.875rem;font-weight:500;color:#d6d3cb;border-radius:10px;cursor:pointer;opacity:{{ rep.dis }}">{{ w.a1 }}</button>
+<button onClick="{{ w.go2 }}" disabled="{{ rep.off }}" style="font:inherit;background:none;border:0;padding:8px 0;min-height:44px;font-size:.875rem;font-weight:500;color:#8f8d88;border-radius:10px;cursor:pointer;opacity:{{ rep.dis }}">{{ w.a2 }}</button>
+</div>
+</div>
+</sc-for>
+<sc-if value="{{ rep.noWarn }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:4px 0;font-size:1rem;color:#8f8d88">Uyarı yok.</p></sc-if>
+</section>
+
+<section ref="{{ rep.s2 }}" style="padding-top:28px">
+<h2 style="margin:0 0 4px;padding-bottom:10px;border-bottom:1px solid #343538;display:flex;align-items:baseline;gap:10px;font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#b3b0a8"><span style="color:#d4b98a">III</span><span>BUGÜN VE YARIN</span><span style="margin-left:auto;letter-spacing:.04em;color:#8f8d88">{{ rep.h2 }}</span></h2>
+<sc-for list="{{ rep.places }}" as="p" hint-placeholder-count="2">
+<div style="padding:12px 0 14px;border-bottom:1px solid #343538;display:flex;flex-direction:column;gap:3px">
+<span style="font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#8f8d88">{{ p.when }}</span>
+<sc-if value="{{ p.has }}" hint-placeholder-val="{{ true }}">
+<h3 style="margin:2px 0 0;font:400 1.6rem/1.15 'Instrument Serif',Georgia,serif;color:#d6d3cb">{{ p.title }}</h3>
+<span style="font-size:.875rem;color:#8f8d88">{{ p.ctx }}</span>
+<p style="margin:6px 0 0;font-size:.9375rem;line-height:1.5;color:#d6d3cb"><span style="display:block;margin-bottom:2px;font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#d4b98a">YANINA AL</span>{{ p.bring }}</p>
+</sc-if>
+<sc-if value="{{ p.none }}" hint-placeholder-val="{{ false }}"><span style="font-size:1rem;color:#8f8d88">Olunacak yer yok.</span></sc-if>
+</div>
+</sc-for>
+</section>
+
+<section ref="{{ rep.s3 }}" style="padding-top:28px">
+<h2 style="margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid #343538;display:flex;align-items:baseline;gap:10px;font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#b3b0a8"><span style="color:#d4b98a">IV</span><span>KARARINI BEKLEYENLER</span><span style="margin-left:auto;letter-spacing:.04em;color:#8f8d88">{{ rep.h3 }}</span></h2>
+<sc-if value="{{ rep.hasQ }}" hint-placeholder-val="{{ true }}">
+<div style="margin-bottom:10px;padding:14px 16px;border-radius:14px;background:#202123;border:1px solid #343538;display:flex;flex-direction:column;gap:6px">
+<span style="font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#8f8d88">SORU · BİYOKİMYA</span>
+<p style="margin:0;font-size:1.0625rem;font-weight:500;color:#d6d3cb">Sunum kaç dakika olacak?</p>
+<p style="margin:0;font-size:.875rem;color:#8f8d88">Slayt sayısını buna göre öneririm.</p>
+<sc-if value="{{ rep.qOpen }}" hint-placeholder-val="{{ true }}"><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><sc-for list="{{ rep.opts }}" as="op" hint-placeholder-count="4"><button onClick="{{ op.go }}" disabled="{{ rep.off }}" style="font:inherit;min-height:44px;padding:8px 14px;border-radius:22px;background:#2a2b2d;border:1px solid #434448;color:#e2dfd7;font-size:.875rem;font-weight:500;cursor:pointer;opacity:{{ rep.dis }}">{{ op.label }}</button></sc-for></div></sc-if>
+<sc-if value="{{ rep.qDone }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px"><span style="display:flex;align-items:center;gap:8px;font-size:.9375rem;color:#d4b98a"><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M20 6 9 17l-5-5"></path></svg>Yanıtın kaydedildi: {{ rep.answer }}</span><button onClick="{{ rep.qUndo }}" style="font:inherit;background:none;border:0;padding:8px 0;min-height:44px;font-size:.875rem;font-weight:500;color:#d6d3cb;border-radius:10px;cursor:pointer">Geri al</button></div></sc-if>
+</div>
+</sc-if>
+<sc-if value="{{ rep.hasDraft }}" hint-placeholder-val="{{ true }}">
+<div style="margin-bottom:10px;padding:14px 16px 6px;border-radius:14px;background:#202123;border:1px solid #343538;display:flex;flex-direction:column;gap:6px">
+<span style="font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#8f8d88">MAİL TASLAĞI · ERASMUS+</span>
+<p style="margin:0;font-size:1.0625rem;font-weight:500;color:#d6d3cb">Ayşe Hoca’ya referans ricası taslağı hazır.</p>
+<p style="margin:0;font-size:.875rem;color:#8f8d88">Gönderen sensin; Berthier göndermez.</p>
+<div><button onClick="{{ rep.openDraft }}" style="font:inherit;background:none;border:0;padding:8px 0;min-height:44px;display:inline-flex;align-items:center;gap:7px;font-size:.875rem;font-weight:500;color:#d6d3cb;border-radius:10px;cursor:pointer">Taslağı aç<svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button></div>
+</div>
+</sc-if>
+<sc-if value="{{ rep.noDec }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:4px 0;font-size:1rem;color:#8f8d88">Kararını bekleyen bir şey yok.</p></sc-if>
+</section>
+<p style="margin:28px 0 0;text-align:center;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#8f8d88">RAPORUN SONU · SIRADAKİ RAPOR PAZ 27 EYL 08:30</p>
+</div>
+</div>
+<sc-if value="{{ rep.toastOn }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:16px;right:16px;bottom:108px;z-index:6;padding:10px 14px;border-radius:12px;background:#2a2b2d;border:1px solid #434448;color:#e2dfd7;font-size:.875rem;box-shadow:0 12px 30px -10px rgba(0,0,0,.6);pointer-events:none">{{ rep.toast }}</div></sc-if>
+<div style="position:absolute;left:0;right:0;bottom:0;z-index:5;padding:12px 16px 28px;background:#18191b;border-top:1px solid #343538">
+<sc-if value="{{ rep.pending }}" hint-placeholder-val="{{ true }}"><button onClick="{{ rep.approve }}" disabled="{{ rep.off }}" style="font:inherit;width:100%;min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;border-radius:12px;background:#333437;border:1px solid #434448;color:#e2dfd7;font-weight:600;cursor:pointer;opacity:{{ rep.dis }}"><span>Emri onayla</span><span style="font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#b3b0a8">{{ rep.barMeta }}</span></button></sc-if>
+<sc-if value="{{ rep.done }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:6px;min-height:52px"><span style="flex:1;display:flex;align-items:center;gap:8px;font-size:.9375rem;font-weight:500;color:#d4b98a"><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M20 6 9 17l-5-5"></path></svg>{{ rep.doneText }}</span><button onClick="{{ rep.undo }}" style="font:inherit;background:none;border:0;min-height:44px;padding:8px 10px;font-size:.875rem;font-weight:500;color:#d6d3cb;border-radius:10px;cursor:pointer">Geri al</button><a href="Berthier Harita v7.dc.html" style="display:inline-flex;align-items:center;min-height:44px;padding:8px 14px;border-radius:10px;background:#333437;border:1px solid #434448;color:#e2dfd7;font-size:.875rem;font-weight:500;text-decoration:none;white-space:nowrap">Karargâh’a git</a></div></sc-if>
+<sc-if value="{{ rep.empty }}" hint-placeholder-val="{{ false }}"><a href="Berthier Harita v7.dc.html" style="width:100%;min-height:52px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:#333437;border:1px solid #434448;color:#e2dfd7;font-weight:600;text-decoration:none">Karargâh’a dön</a></sc-if>
+<sc-if value="{{ rep.offNote }}" hint-placeholder-val="{{ false }}"><p style="margin:8px 0 0;font-size:.8125rem;line-height:1.4;color:#8f8d88;text-align:center">Onay için bağlantı gerekiyor. Diktelerin cihazda saklanır.</p></sc-if>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px;width:390px">
+<p style="margin:0;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#8f8d88">3 · MOTİVASYON · SEFER DEFTERİ</p>
+<div data-screen-label="Sefer defteri" style="position:relative;width:390px;height:844px;overflow:hidden;background:#18191b;color:#d6d3cb;font-family:'DM Sans','Segoe UI',sans-serif;font-size:16px;line-height:1.55;box-shadow:0 0 0 1px #2a2b2e, 0 30px 80px -24px #000000b3">
+<div style="height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none">
+<div style="padding:0 20px">
+<header style="height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #343538">
+<a href="#" style="display:flex;align-items:center;gap:6px;font-family:'Instrument Serif',Georgia,serif;font-size:2rem;color:#d6d3cb;text-decoration:none"><span>berthier</span><span style="font-family:'DM Sans','Segoe UI',sans-serif;font-size:1.6rem;color:#ed845c">✳</span></a>
+<div style="display:flex;align-items:center;gap:10px">
+<button aria-label="Kayıt defteri" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:#d6d3cb;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg></button>
+<button aria-label="Tercihler" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:#d6d3cb;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+</div>
+</header>
+<main style="padding:14px 0 205px">
+<a href="Berthier Harita v7.dc.html" style="display:inline-flex;gap:8px;align-items:center;min-height:44px;font-size:.875rem;font-weight:500;color:#8f8d88;text-decoration:none"><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>Karargâh</a>
+<h1 style="margin:0;font:400 2.7rem/1.05 'Instrument Serif',Georgia,serif;letter-spacing:-.025em;color:#d6d3cb">Sefer defteri</h1>
+<p style="margin:8px 0 0;font:400 .75rem/1.5 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#8f8d88">İKİ HAFTALIK SEFER · 6. GÜN / 14 · 21 EYL – 4 EKİ</p>
+<div style="display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:4px;margin-top:18px">
+<sc-for list="{{ log.cells }}" as="c" hint-placeholder-count="14"><div style="display:flex;flex-direction:column;align-items:center;gap:5px"><span style="height:22px;width:100%;border-radius:5px;background:{{ c.bg }};border:{{ c.bd }}"></span><span style="font:400 .75rem 'IBM Plex Mono',monospace;color:{{ c.fg }}">{{ c.n }}</span></div></sc-for>
+</div>
+<p style="margin:14px 0 0;padding-bottom:14px;border-bottom:1px solid #343538;font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#b3b0a8">ALINAN KAMP <span style="color:#d4b98a">18</span> · KAPANAN CEPHE <span style="color:#d4b98a">2</span></p>
+<sc-for list="{{ log.entries }}" as="e" hint-placeholder-count="6">
+<article style="padding:16px 0;border-bottom:1px solid #343538;display:flex;flex-direction:column;gap:9px">
+<div style="display:flex;align-items:baseline;gap:10px;font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.08em"><span style="color:#d6d3cb">{{ e.date }}</span><span style="margin-left:auto;color:{{ e.tagc }}">{{ e.tag }}</span></div>
+<sc-if value="{{ e.hasTrack }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:center;padding:2px 0"><span style="width:20px;height:20px;border-radius:6px;flex-shrink:0;display:grid;place-items:center;background:#202123;border:1px solid #77756f;color:#ed845c;font-size:.75rem">✳</span><sc-for list="{{ e.nodes }}" as="n" hint-placeholder-count="5"><div style="display:contents"><span style="flex:1;min-width:8px;height:{{ n.lh }};background:{{ n.lbg }};border-top:{{ n.lbd }};box-shadow:{{ n.lsh }}"></span><span style="width:14px;height:14px;border-radius:50%;flex-shrink:0;background:{{ n.bg }};border:{{ n.bd }};box-shadow:{{ n.sh }}"></span></div></sc-for></div></sc-if>
+<p style="margin:0;font-size:.9375rem;line-height:1.55;color:{{ e.tc }};text-wrap:pretty">{{ e.text }}</p>
+<sc-if value="{{ e.hasClose }}" hint-placeholder-val="{{ false }}"><div style="align-self:flex-start;display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;border:1px solid rgba(212,185,138,.55);color:#d4b98a;font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.08em"><svg viewBox="0 0 24 24" style="width:14px;height:14px;display:block;fill:currentColor;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"></path></svg>CEPHE KAPANDI · {{ e.closed }}</div></sc-if>
+</article>
+</sc-for>
+<button onClick="{{ log.toggle }}" style="font:inherit;width:100%;margin-top:22px;min-height:56px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-radius:14px;background:#202123;border:1px solid #343538;color:#d6d3cb;cursor:pointer;text-align:left"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:500">Seferin ölçümleri</span><span style="font-size:.8125rem;color:#8f8d88">{{ log.btnText }}</span></span><svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;flex-shrink:0;transform:{{ log.chev }};transition:transform .2s;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m9 18 6-6-6-6"></path></svg></button>
+<sc-if value="{{ log.open }}" hint-placeholder-val="{{ false }}">
+<div style="margin-top:6px">
+<sc-for list="{{ log.metrics }}" as="mt" hint-placeholder-count="3">
+<div style="padding:14px 4px;border-bottom:1px solid #343538;display:flex;flex-direction:column;gap:4px">
+<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><span style="font-size:.9375rem;font-weight:500;color:#d6d3cb">{{ mt.title }}</span><span style="font:500 .875rem 'IBM Plex Mono',monospace;color:#d4b98a;white-space:nowrap">{{ mt.value }}</span></div>
+<span style="font-size:.8125rem;line-height:1.45;color:#8f8d88;text-wrap:pretty">{{ mt.note }}</span>
+</div>
+</sc-for>
+<p style="margin:12px 4px 0;font-size:.875rem;line-height:1.5;color:#b3b0a8;text-wrap:pretty">14. günde tek soru sorulur: Kilitlenmeler seyreldi mi? Hükmü sen verirsin.</p>
+</div>
+</sc-if>
+</main>
+</div>
+</div>
+<div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:30;width:calc(100% - 20px);padding:10px 12px 34px;background:#18191b;border:1px solid #343538;border-bottom:0;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.3)">
+<button style="font:inherit;display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#2a2b2d;border:0;padding:10px 12px;border-radius:14px;font-size:1rem;font-weight:500;color:#d6d3cb;min-height:44px;cursor:pointer"><span style="width:42px;height:42px;background:#2a2b2d;color:#d4b98a;display:grid;place-items:center;border-radius:50%;flex-shrink:0"><svg viewBox="0 0 24 24" style="width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M2 10v3"></path><path d="M6 6v11"></path><path d="M10 3v18"></path><path d="M14 8v7"></path><path d="M18 5v13"></path><path d="M22 10v3"></path></svg></span><span style="flex:1">Aklındakini bırak.<small style="display:block;font-size:.75rem;color:#8f8d88;font-weight:400;margin-top:2px">Berthier yerine yerleştirir.</small></span><svg viewBox="0 0 24 24" style="width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+<nav style="display:flex;justify-content:space-around;width:100%;padding:9px 0 0">
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#d6d3cb;font-weight:700;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"></path></svg>Karargâh</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#8f8d88;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg>Harita</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#8f8d88;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M8 13h.01"></path><path d="M12 13h.01"></path><path d="M16 13h.01"></path><path d="M8 17h.01"></path><path d="M12 17h.01"></path><path d="M16 17h.01"></path></svg>Ufuk</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#8f8d88;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg>Teftiş</button>
+</nav>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px;width:390px">
+<p style="margin:0;font:400 .75rem 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#8f8d88">4 · TERCİHLER · BİLDİRİMLER</p>
+<div data-screen-label="Bildirimler" style="position:relative;width:390px;height:844px;overflow:hidden;background:#18191b;color:#d6d3cb;font-family:'DM Sans','Segoe UI',sans-serif;font-size:16px;line-height:1.55;box-shadow:0 0 0 1px #2a2b2e, 0 30px 80px -24px #000000b3">
+<div style="height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none">
+<div style="padding:0 20px">
+<header style="height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #343538">
+<a href="#" style="display:flex;align-items:center;gap:6px;font-family:'Instrument Serif',Georgia,serif;font-size:2rem;color:#d6d3cb;text-decoration:none"><span>berthier</span><span style="font-family:'DM Sans','Segoe UI',sans-serif;font-size:1.6rem;color:#ed845c">✳</span></a>
+<div style="display:flex;align-items:center;gap:10px">
+<button aria-label="Kayıt defteri" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:#d6d3cb;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg></button>
+<button aria-label="Tercihler" style="font:inherit;width:44px;min-height:44px;padding:10px;background:transparent;border:0;border-radius:10px;display:grid;place-items:center;color:#d4b98a;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+</div>
+</header>
+<main style="padding:14px 0 205px">
+<button style="font:inherit;border:0;padding:0;display:inline-flex;gap:8px;align-items:center;min-height:44px;font-size:.875rem;font-weight:500;background:none;color:#8f8d88;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>Tercihler</button>
+<h1 style="margin:0;font:400 2.7rem/1.05 'Instrument Serif',Georgia,serif;letter-spacing:-.025em;color:#d6d3cb">Bildirimler</h1>
+<h2 style="margin:26px 0 0;padding-bottom:10px;border-bottom:1px solid #343538;font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#b3b0a8">KURULUM · iPhone</h2>
+<sc-for list="{{ notif.steps }}" as="s" hint-placeholder-count="3">
+<div style="display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:2px 12px;padding:14px 0;border-bottom:1px solid #343538;align-items:start">
+<span style="width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:{{ s.nbg }};border:{{ s.nbd }};color:{{ s.nfg }};font:400 .75rem 'IBM Plex Mono',monospace"><sc-if value="{{ s.done }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" style="width:14px;height:14px;display:block;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if><sc-if value="{{ s.open }}" hint-placeholder-val="{{ true }}">{{ s.mark }}</sc-if></span>
+<div style="min-width:0"><div style="font-size:1rem;font-weight:500;color:#d6d3cb">{{ s.title }}</div><div style="margin-top:2px;font-size:.875rem;line-height:1.45;color:#8f8d88;text-wrap:pretty">{{ s.text }}</div></div>
+<sc-if value="{{ s.hasBtn }}" hint-placeholder-val="{{ false }}"><button onClick="{{ s.go }}" disabled="{{ s.bdis }}" style="font:inherit;min-height:44px;padding:8px 14px;border-radius:10px;background:#333437;border:1px solid #434448;color:#e2dfd7;font-size:.875rem;font-weight:500;white-space:nowrap;cursor:pointer;opacity:{{ s.bop }}">{{ s.btn }}</button></sc-if>
+<sc-if value="{{ s.done }}" hint-placeholder-val="{{ false }}"><span style="padding-top:5px;font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#d4b98a;white-space:nowrap">{{ s.status }}</span></sc-if>
+</div>
+</sc-for>
+<h2 style="margin:28px 0 0;padding-bottom:10px;border-bottom:1px solid #343538;font:500 .75rem 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#b3b0a8">NE ZAMAN GELİR</h2>
+<sc-for list="{{ notif.rules }}" as="r" hint-placeholder-count="5">
+<div style="padding:14px 0;border-bottom:1px solid #343538;display:flex;flex-direction:column;gap:4px">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><span style="font-size:1rem;font-weight:500;color:#d6d3cb">{{ r.title }}</span><sc-if value="{{ r.fixed }}" hint-placeholder-val="{{ true }}"><span style="font:500 .8125rem 'IBM Plex Mono',monospace;color:#d6d3cb;white-space:nowrap">{{ r.when }}</span></sc-if><sc-if value="{{ r.edit }}" hint-placeholder-val="{{ false }}"><input type="time" step="900" aria-label="Akşam bildirimi saati" value="{{ r.val }}" onChange="{{ r.set }}" style="font:500 .875rem 'IBM Plex Mono',monospace;color:#d6d3cb;background:#2a2b2d;border:1px solid #434448;border-radius:10px;padding:8px 10px;min-height:44px;color-scheme:dark;cursor:pointer"></sc-if></div>
+<span style="font-size:.875rem;line-height:1.45;color:#8f8d88;text-wrap:pretty">{{ r.rule }}</span>
+<sc-if value="{{ r.warn }}" hint-placeholder-val="{{ false }}"><span style="font-size:.8125rem;line-height:1.45;color:#ea9a7c">Bu saat sessiz saatlere denk geliyor; bildirim gelmez. 23:00’ten önce bir saat seç.</span></sc-if>
+<sc-if value="{{ r.hasEx }}" hint-placeholder-val="{{ true }}"><div style="margin-top:6px;padding:9px 12px;border-radius:12px;background:#202123;border:1px solid #343538;font-size:.8125rem;line-height:1.45;color:#b3b0a8"><strong style="display:block;font-weight:600;color:#d6d3cb">{{ r.exT }}</strong>{{ r.exB }}</div></sc-if>
+</div>
+</sc-for>
+</main>
+</div>
+</div>
+<div style="position:absolute;left:10px;right:10px;top:10px;z-index:40;transform:{{ notif.tf }};transition:transform .4s cubic-bezier(.2,.8,.2,1);pointer-events:none">
+<div style="display:grid;grid-template-columns:38px minmax(0,1fr);gap:0 12px;padding:12px 14px;border-radius:20px;background:rgba(48,49,52,.97);border:1px solid rgba(255,255,255,.06);box-shadow:0 14px 30px -10px rgba(0,0,0,.6)">
+<span style="grid-row:span 2;width:38px;height:38px;border-radius:9px;display:grid;place-items:center;background:#18191b;border:1px solid #343538;color:#ed845c;font-size:1.25rem">✳</span>
+<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><strong style="font-size:.9375rem;font-weight:600;color:#ece9e2">Deneme bildirimi</strong><span style="font-size:.8125rem;color:#a9a6a0">şimdi</span></div>
+<p style="margin:2px 0 0;font-size:.9375rem;line-height:1.4;color:#d6d3cb">Bildirimler bu iPhone’da çalışıyor.</p>
+</div>
+</div>
+<div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:30;width:calc(100% - 20px);padding:10px 12px 34px;background:#18191b;border:1px solid #343538;border-bottom:0;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.3)">
+<button style="font:inherit;display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#2a2b2d;border:0;padding:10px 12px;border-radius:14px;font-size:1rem;font-weight:500;color:#d6d3cb;min-height:44px;cursor:pointer"><span style="width:42px;height:42px;background:#2a2b2d;color:#d4b98a;display:grid;place-items:center;border-radius:50%;flex-shrink:0"><svg viewBox="0 0 24 24" style="width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M2 10v3"></path><path d="M6 6v11"></path><path d="M10 3v18"></path><path d="M14 8v7"></path><path d="M18 5v13"></path><path d="M22 10v3"></path></svg></span><span style="flex:1">Aklındakini bırak.<small style="display:block;font-size:.75rem;color:#8f8d88;font-weight:400;margin-top:2px">Berthier yerine yerleştirir.</small></span><svg viewBox="0 0 24 24" style="width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+<nav style="display:flex;justify-content:space-around;width:100%;padding:9px 0 0">
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#8f8d88;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"></path></svg>Karargâh</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#8f8d88;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg>Harita</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#8f8d88;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M8 13h.01"></path><path d="M12 13h.01"></path><path d="M16 13h.01"></path><path d="M8 17h.01"></path><path d="M12 17h.01"></path><path d="M16 17h.01"></path></svg>Ufuk</button>
+<button style="font:inherit;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 10px;border:0;font-size:.75rem;min-width:60px;min-height:44px;color:#8f8d88;font-weight:500;border-radius:10px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg>Teftiş</button>
+</nav>
+</div>
+</div>
+</div>
+
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;sabah&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Yoğun&quot;,&quot;Sakin&quot;],&quot;default&quot;:&quot;Yoğun&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Örnek sabah&quot;},&quot;baglanti&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Çevrimiçi&quot;,&quot;Çevrimdışı&quot;],&quot;default&quot;:&quot;Çevrimiçi&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Örnek sabah&quot;}}">
+class Component extends DCLogic {
+  state = { approved: {}, answer: {}, seen: {}, perm: false, tested: false, banner: false, metrics: false, toast: null, eve: '21:00' };
+  componentWillUnmount() { clearTimeout(this._bt); clearTimeout(this._tt); }
+  pad(n) { return String(n).padStart(2, '0'); }
+  fn(k, f) { const F = this._fns || (this._fns = {}); return F[k] || (F[k] = f); }
+  mode() { return this.props.sabah === 'Sakin' ? 'Sakin' : 'Yoğun'; }
+  off() { return this.props.baglanti === 'Çevrimdışı'; }
+  flash(t) { clearTimeout(this._tt); this.setState({ toast: t }); this._tt = setTimeout(() => this.setState({ toast: null }), 2600); }
+  go(i) { const box = this._box, el = this._sec && this._sec[i]; if (!box || !el) return; box.scrollTo({ top: Math.max(0, el.offsetTop - 76), behavior: 'smooth' }); }
+  data(m) {
+    if (m === 'Sakin') return { order: [], warnings: [], places: [{ when: 'BUGÜN · CMT 26 EYL' }, { when: 'YARIN · PAZ 27 EYL' }], q: false, draft: false };
+    return {
+      order: [
+        { title: 'Erasmus+ başvurusu', region: 'Başvuru Geçidi', move: 'Ayşe Hoca’ya referans ricası mailini gönder.', why: 'Son başvuru Çar 30 Eyl 23:59. Referansı yazması için hocaya zaman kalmalı.', days: 4 },
+        { title: 'Kargo iadesi', region: 'Genel Düzlük', move: 'İade paketini PTT şubesine götür.', why: 'Son iade günü yarın.', days: 1 },
+        { title: 'Biyokimya', region: 'Ders Ovası', move: 'Sunumun ilk beş slaytını hazırla.', why: 'Sunum Sal 29 Eyl 10:00. Hazırlık planında bugün ilk beş slayt var.', days: 3 },
+        { title: 'İstatistik', region: 'Ders Ovası', move: 'Hipotez testleri bölümünden 10 soru çöz.', why: 'Vize Pzt 5 Eki 13:30. Hazırlık planı bugün başlıyor.', days: 9 },
+        { title: 'Mikrobiyom derlemesi', region: 'Kulvar Dağları', move: '13. makaleyi oku ve tabloya ekle.', why: 'Bu hafta aktif seçtiğin kulvar. Kaldığın yer: 12. makale.', days: null },
+        { title: 'TÜBİTAK 2209-A', region: 'Başvuru Geçidi', move: 'Proje özetinin ilk taslağını yaz.', why: 'Son başvuru Çar 14 Eki. Özet, başvurunun ilk açık hamlesi.', days: 18 }
+      ],
+      warnings: [
+        { id: 'cak', label: 'SAAT ÇAKIŞMASI', meta: '02:14’TE YAKALANDI', text: 'Pzt 28 Eyl 14:00 dekanlık randevusu, 13:00–16:00 Organik Kimya Lab ile çakışıyor.', a1: 'Başka saat için mail taslağı', t1: 'Çakışma için mail taslağı açılır.' },
+        { id: 'haz', label: 'HAZIRLIK DARALIYOR', meta: 'ERASMUS+', text: 'Son başvuruya 4 gün kaldı. Gerekli 5 belgeden 2’si hazır.', a1: 'Belgeleri gör', t1: 'Başvuru belgeleri açılır.' }
+      ],
+      places: [
+        { when: 'BUGÜN · CMT 26 EYL', title: 'PTT şubesi', ctx: 'Kargo iadesi · son iade günü yarın', bring: 'İade paketi, kimlik kartı' },
+        { when: 'YARIN · PAZ 27 EYL · 11:00', title: 'Laboratuvar B-204', ctx: 'Reuteri fermantasyonu · ikinci partinin 48. saat ölçümü', bring: 'Laboratuvar defteri, pH kalibrasyon tamponları' }
+      ],
+      q: true, draft: true
+    };
+  }
+  chip(d) {
+    if (d == null) return { t: 'TARİHSİZ', bg: '#2a2b2d', fg: '#b3b0a8' };
+    if (d <= 2) return { t: d + ' GÜN', bg: '#e0805e', fg: '#1c1d1f' };
+    if (d <= 7) return { t: d + ' GÜN', bg: 'rgba(224,128,94,.18)', fg: '#ea9a7c' };
+    return { t: d + ' GÜN', bg: '#2a2b2d', fg: '#b3b0a8' };
+  }
+  nodeSt(d) {
+    if (d != null && d <= 2) return { bg: '#e0805e', bd: '1px solid #e0805e', fg: '#1c1d1f', sh: '0 0 0 4px rgba(224,128,94,.18)' };
+    if (d != null && d <= 7) return { bg: '#202123', bd: '1.5px solid #e0805e', fg: '#ea9a7c', sh: 'none' };
+    return { bg: '#202123', bd: '1px solid #77756f', fg: '#d6d3cb', sh: 'none' };
+  }
+  report() {
+    const m = this.mode(), off = this.off(), D = this.data(m), ap = this.state.approved[m], ans = this.state.answer[m];
+    const counts = [D.order.length, D.warnings.length, D.places.filter(p => p.title).length, (D.q ? 1 : 0) + (D.draft ? 1 : 0)];
+    const regions = []; for (const o of D.order) if (regions[regions.length - 1] !== o.region) regions.push(o.region);
+    const sec = i => this.fn('s' + i, el => { (this._sec || (this._sec = []))[i] = el; });
+    return {
+      box: this.fn('box', el => { this._box = el; }), s0: sec(0), s1: sec(1), s2: sec(2), s3: sec(3),
+      index: ['Emir', 'Uyarı', 'Yer', 'Karar'].map((n, i) => ({ num: ['I', 'II', 'III', 'IV'][i], label: n + ' ' + (counts[i] || 'yok'), go: this.fn('go' + i, () => this.go(i)) })),
+      h0: counts[0] ? counts[0] + ' CEPHE' : 'CEPHE YOK', h1: counts[1] ? String(counts[1]) : 'YOK', h2: counts[2] ? counts[2] + ' YER' : 'YOK', h3: counts[3] ? String(counts[3]) : 'YOK',
+      hasOrder: counts[0] > 0, noOrder: !counts[0],
+      strip: D.order.map((o, i) => ({ num: this.pad(i + 1), ...this.nodeSt(o.days) })),
+      path: 'Güzergâh: ' + ['Karargâh'].concat(regions).join(' → '),
+      order: D.order.map((o, i) => { const c = this.chip(o.days); return { num: this.pad(i + 1), head: o.title + ' · ' + o.region, move: o.move, why: '↳ ' + o.why, chip: c.t, cbg: c.bg, cfg: c.fg }; }),
+      reorder: this.fn('reorder', () => this.flash('“Sırayı düzenle” penceresi açılır.')),
+      fronts: this.fn('fronts', () => this.flash('Cephe seçimi açılır.')),
+      noWarn: !counts[1],
+      warnings: D.warnings.map(w => {
+        const k = m + w.id, seen = !!this.state.seen[k];
+        return { label: w.label, lc: seen ? '#8f8d88' : '#ea9a7c', meta: seen ? 'GÖRÜLDÜ' : w.meta, text: w.text, op: seen ? .65 : 1, a1: w.a1, go1: this.fn('a1' + k, () => this.flash(w.t1)), a2: seen ? 'Geri al' : 'Görüldü', go2: this.fn('a2' + k, () => this.setState(s => ({ seen: { ...s.seen, [k]: !s.seen[k] } }))) };
+      }),
+      places: D.places.map(p => ({ when: p.when, has: !!p.title, none: !p.title, title: p.title || '', ctx: p.ctx || '', bring: p.bring || '' })),
+      hasQ: !!D.q, qOpen: !!D.q && !ans, qDone: !!D.q && !!ans, answer: ans || '',
+      opts: D.q ? ['10 dk', '15 dk', '20 dk', 'Yazıyla yanıtla'].map(o => ({ label: o, go: this.fn('q' + m + o, () => { if (o === 'Yazıyla yanıtla') this.flash('Yanıt alanı açılır.'); else this.setState(s => ({ answer: { ...s.answer, [m]: o } })); }) })) : [],
+      qUndo: this.fn('qu' + m, () => this.setState(s => ({ answer: { ...s.answer, [m]: null } }))),
+      hasDraft: !!D.draft, openDraft: this.fn('draft', () => this.flash('Taslak açılır. Gönderen sensin.')),
+      noDec: !counts[3],
+      pending: counts[0] > 0 && !ap, done: counts[0] > 0 && !!ap, empty: !counts[0], offNote: off && counts[0] > 0 && !ap,
+      barMeta: counts[0] + ' CEPHE', doneText: 'Onaylandı · ' + (ap || ''),
+      approve: this.fn('ap' + m, () => this.setState(s => ({ approved: { ...s.approved, [m]: '08:34' } }))),
+      undo: this.fn('un' + m, () => this.setState(s => ({ approved: { ...s.approved, [m]: null } }))),
+      off, dis: off ? .5 : 1, toastOn: !!this.state.toast, toast: this.state.toast || ''
+    };
+  }
+  logbook() {
+    const nums = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 1, 2, 3, 4];
+    const CS = { past: ['rgba(212,185,138,.72)', '1px solid rgba(212,185,138,.72)', '#b3b0a8'], zero: ['transparent', '1px solid #434448', '#b3b0a8'], today: ['rgba(212,185,138,.22)', '1px solid #d4b98a', '#d4b98a'], future: ['transparent', '1px dashed #3a3b3e', '#8f8d88'] };
+    const cells = nums.map((n, i) => { const S = CS[i === 5 ? 'today' : i > 5 ? 'future' : i === 2 ? 'zero' : 'past']; return { n: String(n), bg: S[0], bd: S[1], fg: S[2] }; });
+    const E = [
+      { date: 'CMT 26 EYL · BUGÜN', tag: 'SÜRÜYOR', n: [1, 1, 1, 0, 0, 0], text: 'Erasmus+ için referans ricası gönderildi. Kargo PTT’ye teslim edildi. Biyokimya sunumunun ilk beş slaytı hazır.' },
+      { date: 'CUM 25 EYL', tag: 'SEFER TAMAMLANDI', gold: true, n: [1, 1, 1, 1, 1], text: 'İstatistikte 10 soru çözüldü. Reuteri ilk partisinin 24. saat ölçümü kaydedildi. Mikrobiyom tablosu 12. makaleye ulaştı. TÜBİTAK özeti için kaynaklar toplandı. Staj defterinin 2. haftası doldu.' },
+      { date: 'PER 24 EYL', tag: '', n: [1, 1, 0, 1, 1], text: 'Organik Kimya Lab deney 3 verileri tabloya girildi. Dekanlık randevusu alındı. Moleküler Genetik ödev 2 okundu. Öğrenci kimliği yenilendi.', closed: 'Öğrenci kimliği yenileme' },
+      { date: 'ÇAR 23 EYL', tag: 'KARARGÂHTA', n: [], text: 'Bu gün için emir yoktu.' },
+      { date: 'SAL 22 EYL', tag: 'SEFER TAMAMLANDI', gold: true, n: [1, 1, 1], text: 'Ders ekle-bırak formu danışmana onaylatıldı. İstatistik ders notları düzenlendi. Kargo iadesi talebi açıldı.', closed: 'Ders ekle-bırak' },
+      { date: 'PZT 21 EYL', tag: '1. GÜN', n: [1, 1, 1, 0], text: 'Sefer başladı. Ders programı Ufuk’a işlendi. Biyokimya sunum konusu seçildi. Reuteri için kültür ve süt alındı.' }
+    ];
+    const entries = E.map(e => ({
+      date: e.date, tag: e.tag, tagc: e.gold ? '#d4b98a' : '#8f8d88', hasTrack: e.n.length > 0, text: e.text, tc: e.n.length ? '#d6d3cb' : '#8f8d88', hasClose: !!e.closed, closed: e.closed || '',
+      nodes: e.n.map((v, i) => { const solid = (i === 0 ? 1 : e.n[i - 1]) && v; return { lh: solid ? '2px' : '0px', lbg: solid ? '#d4b98a' : 'transparent', lbd: solid ? 'none' : '2px dotted #5d5c58', lsh: solid ? '0 0 6px rgba(212,185,138,.55)' : 'none', bg: v ? '#d4b98a' : '#18191b', bd: v ? '1px solid #d4b98a' : '1.5px solid #77756f', sh: v ? '0 0 8px rgba(212,185,138,.5)' : 'none' }; })
+    }));
+    const open = this.state.metrics;
+    return {
+      cells, entries, open, chev: open ? 'rotate(90deg)' : 'rotate(0deg)', btnText: open ? 'Gizlemek için dokun.' : 'Yalnız istediğinde görünür.',
+      toggle: this.fn('mt', () => this.setState(s => ({ metrics: !s.metrics }))),
+      metrics: [
+        { title: 'Emirdeki hamlelerin tamamlanma oranı', value: '%78 · 18/23', note: '“Kilitlenmeler seyreldi mi?” sorusu için destek verisi.' },
+        { title: 'Rapor açılışından onaya', value: 'ort. 2 dk 40 sn', note: 'Hedef birkaç dakikadan kısa. Süre raporda sayılmaz, yalnız burada görünür.' },
+        { title: 'Elle düzenleme ve ayar değişikliği', value: '3 · 0', note: '3 sıra düzenlemesi, 0 ayar değişikliği. Hedef sıfıra yakın.' }
+      ]
+    };
+  }
+  notifs() {
+    const perm = this.state.perm, tested = this.state.tested;
+    const st = d => d ? { nbg: 'rgba(212,185,138,.14)', nbd: '1px solid #d4b98a', nfg: '#d4b98a' } : { nbg: '#202123', nbd: '1px solid #434448', nfg: '#d6d3cb' };
+    const noop = this.fn('noop', () => {});
+    const grant = this.fn('grant', () => this.setState({ perm: true }));
+    const test = this.fn('test', () => { clearTimeout(this._bt); this.setState({ tested: true, banner: true }); this._bt = setTimeout(() => this.setState({ banner: false }), 3800); });
+    const eve = this.state.eve || '', quiet = !!eve && (eve >= '23:00' || eve < '07:30');
+    const fx = { fixed: true, edit: false, val: '', set: noop, warn: false };
+    return {
+      tf: this.state.banner ? 'translateY(0)' : 'translateY(-150%)',
+      steps: [
+        { mark: '1', done: true, open: false, title: 'Ana ekrana ekle', text: 'iPhone’da bildirimler yalnız ana ekrandan açılan Berthier’de çalışır. Safari’de Paylaş, sonra Ana Ekrana Ekle.', hasBtn: false, btn: '', go: noop, bdis: false, bop: 1, status: 'TAMAM', ...st(true) },
+        { mark: '2', done: perm, open: !perm, title: 'Bildirim izni', text: 'İzin penceresi yalnız bu düğmeye dokununca açılır.', hasBtn: !perm, btn: 'İzin ver', go: grant, bdis: false, bop: 1, status: 'VERİLDİ', ...st(perm) },
+        { mark: '3', done: tested, open: !tested, title: 'Deneme bildirimi', text: 'Kurulumun bu telefonda çalıştığını görmek için.', hasBtn: !tested, btn: 'Gönder', go: test, bdis: !perm, bop: perm ? 1 : .45, status: '08:31’DE GELDİ', ...st(tested) }
+      ],
+      rules: [
+        { ...fx, title: 'Sabah raporu', when: 'Her gün 08:30', rule: 'Rapor 08:00’de hazırlanır; bildirim seçtiğin saatte gelir.', hasEx: true, exT: 'Sabah raporu hazır', exB: 'Önerilen emir: 6 cephe. 2 uyarı, 2 yer, kararını bekleyen 2 konu.' },
+        { ...fx, title: 'Haftalık teftiş', when: 'Pazar 20:00', rule: 'Teftiş beş adımdır; kaldığın adım korunur.', hasEx: true, exT: 'Haftalık teftiş zamanı', exB: 'Bir haftadır dokunulmamış 2 cephe var.' },
+        { ...fx, title: 'Çakışma', when: 'Yakalandığı anda', rule: 'Sessiz saatlerde yakalanırsa ayrı bildirim olmaz; sabah raporuna girer.', hasEx: true, exT: 'Yeni çakışma', exB: 'Pzt 28 Eyl 14:00 dekanlık randevusu, Organik Kimya Lab ile çakışıyor.' },
+        { title: 'Akşam', when: eve, fixed: false, edit: true, val: eve, set: this.fn('eve', e => this.setState({ eve: e.target.value })), warn: quiet, rule: 'Yalnız yarın olunacak bir yer varsa gelir. Saatini sen seçersin.', hasEx: true, exT: 'Yarın 11:00 · Laboratuvar B-204', exB: 'Yanına al: laboratuvar defteri, pH kalibrasyon tamponları.' },
+        { ...fx, title: 'Sessiz saatler', when: '23:00–07:30', rule: 'Bu aralıkta hiçbir bildirim gelmez.', hasEx: false, exT: '', exB: '' }
+      ]
+    };
+  }
+  renderVals() {
+    const sakin = this.mode() === 'Sakin';
+    return {
+      lock: sakin
+        ? { body: 'Bugün için önerilen cephe yok. Uyarı, yer ve bekleyen karar da yok.', cap: 'Sakin günde de rapor aynı saatte, aynı yapıyla gelir.' }
+        : { body: 'Önerilen emir: 6 cephe. 2 uyarı, 2 yer, kararını bekleyen 2 konu.', cap: 'Gece 02:14’te yakalanan çakışma ayrı bildirim olmadı: sessiz saatlere denk geldi, sabah raporuna girdi.' },
+      rep: this.report(), log: this.logbook(), notif: this.notifs()
+    };
+  }
+}
+</script>
+</body>
+</html>
