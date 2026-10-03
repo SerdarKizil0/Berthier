@@ -21,7 +21,7 @@ export async function POST(req:Request){
  let processing=false;
  try{
  let {state,revision}=await read(user.userId);
- if(state.receipts.includes(input.id))return respond({state,revision,dictations:await list(user.userId)});
+ if(state.receipts.includes(input.id))return respond({state,revision,dictations:await list(user.userId),replayed:true});
  let replySource:Dictation|null=null;
  if(input.replyTo){replySource=await db().prepare('SELECT id,raw,context,created_at,status,result FROM dictations WHERE id = ? AND owner = ?').bind(input.replyTo,user.userId).first<Dictation>();if(!replySource||!['question','answered'].includes(replySource.status))throw Error('Yanıtlanacak soru bulunamadı.');}
  if(input.kind==='enqueue'){
@@ -51,7 +51,7 @@ export async function POST(req:Request){
  const modelText=replySource?JSON.stringify({previousDictation:replySource.raw,question:JSON.parse(replySource.result??'{}').question,answer:raw}):raw;
  const parsed=await parseDictation(modelText,state,input.frontId??replySource?.context??null,config,input.kind==='complete'?f:undefined,undefined,false,input.source==='document'||JSON.parse(replySource?.result??'{}').source==='document');
  // The user may edit their map while the model is working. Apply only to a fresh revision.
- const latest=await read(user.userId);if(latest.state.receipts.includes(input.id))return respond({state:latest.state,revision:latest.revision,dictations:await list(user.userId)});
+ const latest=await read(user.userId);if(latest.state.receipts.includes(input.id))return respond({state:latest.state,revision:latest.revision,dictations:await list(user.userId),replayed:true});
  if(input.kind==='complete'&&JSON.stringify(latest.state.fronts[f!.id])!==JSON.stringify(f))throw Error('Cephe bu sırada değişti. Notun saklandı; yeniden dene.');
  state=latest.state;revision=latest.revision;
  for(const item of parsed.items){if(item.id&&!state.fronts[item.id])throw Error('Cephe değişti; girdin saklandı. Yeniden dene.');if(item.completedMoveId&&!state.fronts[item.id!]?.moves.some(m=>m.id===item.completedMoveId&&!m.doneAt))throw Error('Hamle bu sırada değişti. Girdin saklandı; yeniden dene.');}

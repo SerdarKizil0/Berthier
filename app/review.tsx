@@ -49,7 +49,10 @@ function ReviewTop({close, later}: {close: () => void; later?: () => void}) {
 function Steps({state, now, busy, online, why, action, close, horizon, step}: Props & {step: number}) {
   const lanes = Object.values(state.fronts).filter(f => f.type === 'lane' && f.status !== 'closed');
   const active = lanes.filter(f => f.status === 'active').map(f => f.id).sort().join();
-  const [selected, setSelected] = useState(() => lanes.filter(f => f.status === 'active').map(f => f.id));
+  // The lane step follows the lanes active now (step 1 decisions, a dictation processed meanwhile); only the
+  // boxes ticked or cleared on the step itself are held here, and they are dropped once the step is left.
+  const [picked, setPicked] = useState<Record<string, boolean>>({});
+  const selected = lanes.filter(f => picked[f.id] ?? f.status === 'active').map(f => f.id), changed = [...selected].sort().join() !== active;
   const off = busy || !online, date = new Date(now);
   const fronts = reviewFronts(state, date), brief = horizonBrief(state, date), decisions = state.review?.decisions ?? [];
   const ideas = Object.values(state.ideas ?? {}).filter(i => i.status === 'stored' && !i.reviewedAt).length;
@@ -57,11 +60,12 @@ function Steps({state, now, busy, online, why, action, close, horizon, step}: Pr
   // Leaving the lane step saves a changed selection first; the step itself is stored on the server.
   async function go(to: number) {
     if (to === step || off) return;
-    if (step === 2 && [...selected].sort().join() !== active && !(await action({kind: 'setup', ids: selected}, {silent: true}))) return;
+    if (step === 2 && changed && !(await action({kind: 'setup', ids: selected}, {silent: true}))) return;
+    setPicked({});
     await action({kind: 'reviewStep', step: to}, {silent: true});
   }
   async function leave() {
-    if (step === 2 && [...selected].sort().join() !== active && online) await action({kind: 'setup', ids: selected}, {silent: true});
+    if (step === 2 && changed && online) await action({kind: 'setup', ids: selected}, {silent: true});
     close();
   }
   function decide(f: Front, d: Decision, current?: Decision) {
@@ -104,7 +108,7 @@ function Steps({state, now, busy, online, why, action, close, horizon, step}: Pr
       {step === 1 && <Research state={state} busy={off} action={action} pending/>}
 
       {step === 2 && <>
-        {lanes.map(f => <label className="choice" key={f.id}><Checkbox checked={selected.includes(f.id)} onCheckedChange={checked => setSelected(ids => checked ? [...ids, f.id] : ids.filter(id => id !== f.id))}/><span><strong>{f.title}</strong>{laneSuggestion(state, f) && <small>Öneri · {laneSuggestion(state, f)}</small>}</span></label>)}
+        {lanes.map(f => <label className="choice" key={f.id}><Checkbox checked={selected.includes(f.id)} onCheckedChange={checked => setPicked(p => ({...p, [f.id]: checked === true}))}/><span><strong>{f.title}</strong>{laneSuggestion(state, f) && <small>Öneri · {laneSuggestion(state, f)}</small>}</span></label>)}
         {!lanes.length && <p className="quiet">Henüz kulvar yok.</p>}
         <p className="quiet review-lanes">{selected.length} kulvar seçili · Sonraki adıma geçince kaydedilir.</p>
       </>}
