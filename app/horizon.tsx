@@ -1,12 +1,11 @@
 'use client';
 import {useState} from 'react';
-import {CalendarDays,MapPin,AlertTriangle,Check,ArrowRight} from 'lucide-react';
+import {CalendarDays,MapPin,AlertTriangle,Check} from 'lucide-react';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
 import {Select,SelectContent,SelectItem,SelectTrigger,SelectValue} from '@/components/ui/select';
 import {type State} from '@/lib/domain';
 import {addDays,calendarDay,conflicts,denseDays,eventMail,kindNames,occurrences,daysBetween,type CalendarEvent,type Conflict,type Profile} from '@/lib/calendar';
 type Props={state:State;busy:boolean;action:(body:{kind:string;[key:string]:unknown})=>Promise<boolean|undefined>;dictate:(prefill:string)=>void;frontId?:string};
-export function HorizonSummary({state,open}:{state:State;open:()=>void}){const today=calendarDay(),events=Object.values(state.events??{}),upcoming=occurrences(events,today,addDays(today,13)).filter(e=>e.kind!=='class'),unseen=conflicts(events,today).filter(c=>!state.seenConflicts?.includes(c.id));return <button className="map-link horizon-link" onClick={open}><CalendarDays/><div><h2>Ufuk <span className="quiet">14 gün</span></h2><p>{unseen.length?`${unseen.length} yeni çakışma · `:''}{upcoming.length?`${upcoming.length} tarihli kalem · ${upcoming[0].title}`:'Tarihli işlerini ve hazırlıklarını burada takip et.'}</p></div><ArrowRight/></button>;}
 export default function Horizon({state,busy,action,dictate,frontId}:Props){
  const [editing,setEditing]=useState<CalendarEvent|null>(null),[mailId,setMailId]=useState<string|null>(null);
  const today=calendarDay(),all=Object.values(state.events??{}).filter(e=>!e.cancelled),events=frontId?all.filter(e=>e.frontId===frontId):all,rows=occurrences(events,today,addDays(today,13)).filter(e=>e.kind!=='class'),clashes=conflicts(all,today).filter(c=>!frontId||c.a.frontId===frontId||c.b.frontId===frontId),dense=denseDays(all),selected=clashes.find(c=>c.id===mailId);

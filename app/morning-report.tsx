@@ -131,13 +131,13 @@ export default function MorningReport({state, dictations, outbox, now, online, b
     </div>
 
     <div className="mr-bar">
-      {orders > 0 && !approved && <button className="mr-approve" disabled={off} onClick={() => action({kind: 'approve'}, {silent: true})}><span>Emri onayla</span><span>{orders} CEPHE</span></button>}
+      {orders > 0 && !approved && <button className="mr-approve btn-main" disabled={off} onClick={() => action({kind: 'approve'}, {silent: true})}><span>Emri onayla</span><span>{orders} CEPHE</span></button>}
       {orders > 0 && approved && <div className="mr-approved">
         <span><Check size={18}/>Onaylandı · {clockText(approved)}</span>
         <button className="text-button" disabled={off || !approval} onClick={() => approval && action({kind: 'undo', changeId: approval.id}, {silent: true})}>Geri al</button>
         <button className="mr-home" onClick={back}>Karargâh’a git</button>
       </div>}
-      {!orders && <button className="mr-approve is-center" onClick={back}>Karargâh’a dön</button>}
+      {!orders && <button className="mr-approve is-center btn-quiet" onClick={back}>Karargâh’a dön</button>}
       {!online && orders > 0 && !approved && <p className="mr-offline-note">Onay için bağlantı gerekiyor. Diktelerin cihazda saklanır.</p>}
     </div>
 

@@ -204,17 +204,7 @@ textarea::placeholder {
   color: var(--primary-foreground);
   border-color: var(--primary-border);
 }
-.map-link {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 28px 0;
-  border-bottom: 1px solid var(--border);
-}
-.map-link p {
-  color: var(--muted-foreground);
-  font-size: 0.9rem;
-}
+
 .paper-note {
   display: flex;
   gap: 16px;
@@ -326,34 +316,7 @@ textarea::placeholder {
 .row-actions .light {
   margin: 0;
 }
-.map-link {
-  width: 100%;
-  border: 0;
-  border-bottom: 1px solid var(--border);
-  border-radius: 0;
-  background: none;
-  text-align: left;
-  font-weight: 400;
-}
-.map-link > div {
-  flex: 1;
-}
-.completion-line {
-  display: flex;
-  gap: 9px;
-  color: var(--gold);
-  margin-top: 18px;
-  font-size: 0.9rem;
-}
-.question-block {
-  border: 1px solid var(--border);
-  margin-top: 24px;
-  padding: 16px 20px;
-  background: var(--card);
-}
-.question-block p {
-  margin: 12px 0;
-}
+
 .front-group {
   margin-bottom: 34px;
 }
@@ -639,9 +602,7 @@ summary:focus-visible {
 .choice strong {
   font-size: 1rem;
 }
-.empty-order p {
-  margin-bottom: 18px;
-}
+
 @keyframes ink {
   from {
     opacity: 0.2;
@@ -679,11 +640,6 @@ summary:focus-visible {
   }
 }
 
-.horizon-link h2 {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-}
 .horizon-day {
   margin: 28px 0;
 }

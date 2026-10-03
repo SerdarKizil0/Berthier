@@ -1,37 +1,53 @@
 'use client';
-import {useEffect,useRef,useState} from 'react';
-import {ArrowDownUp,ArrowUpRight,Check,ChevronRight,GripVertical} from 'lucide-react';
+import {Fragment,useEffect,useRef,useState} from 'react';
+import {ArrowDownUp,ArrowUpRight,Check,ChevronRight,Ellipsis,GripVertical} from 'lucide-react';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
 import {type State,type Front,type Order,directGoal,nextMove,keepPassed} from '@/lib/domain';
-import {clockText} from '@/lib/expedition/camps';
+import {clockText,daysTag,nextDated,urgency} from '@/lib/expedition/camps';
+import {calendarDay} from '@/lib/calendar';
 import {atTime} from '@/lib/turkish';
-import ExpeditionMap from './expedition-map';
 
 type Action=(body:{kind:string;[key:string]:unknown},options?:{quiet?:boolean})=>Promise<boolean|undefined>;
-type Props={state:State;order:Order;busy:boolean;online:boolean;open:(id:string)=>void;complete:(front:Front)=>void;edit:(front:Front,text:string)=>void;select:()=>void;action:Action;why:string;notify:(text:string)=>void};
+type Props={state:State;order:Order;busy:boolean;online:boolean;open:(id:string)=>void;complete:(front:Front)=>void;edit:(front:Front,text:string)=>void;select:()=>void;action:Action;why:string;say:(frontId:string)=>void};
 const pad=(n:number)=>String(n).padStart(2,'0');
 // The change that marked this camp as passed today; “Geri al” undoes exactly that change.
 export function passedBy(state:State,order:Order,frontId:string){return [...state.changes].reverse().find(c=>c.ops.some(o=>!o.undone&&o.key==='order:'+order.date&&!!(o.after as Order|null)?.slots.some(x=>x.frontId===frontId&&x.doneAt)&&!(o.before as Order|null)?.slots.some(x=>x.frontId===frontId&&x.doneAt)));}
-export default function AtlasOrder({state,order,busy,online,open,complete,edit,select,action,why,notify}:Props){
- const [picked,setPicked]=useState<{id:string;done:boolean}|null>(null);
+// Karargâh, design 1a (“önce hamle”): the next move first, with one main action (Bitti); then the route as
+// the morning report's strip and rows. The map stays in the Harita tab (“Haritada aç”).
+export default function AtlasOrder({state,order,busy,online,why,open,complete,edit,select,action,say}:Props){
+ const [picked,setPicked]=useState<{id:string;done:boolean}|null>(null),[more,setMore]=useState(false);
  // A camp chosen while open gives way to the next open camp once it is passed; a passed camp chosen on purpose stays.
  const slots=order.slots,firstOpen=slots.find(s=>!s.doneAt),chosen=picked?slots.find(s=>s.frontId===picked.id):undefined,slot=chosen&&(picked!.done||!chosen.doneAt)?chosen:firstOpen??chosen??slots[0];
  const front=slot?state.fronts[slot.frontId]:undefined,current=front?.moves.find(m=>m.id===slot?.moveId),rank=slot?slots.indexOf(slot):0,passed=slot?.doneAt?clockText(slot.doneAt):'',passedChange=slot&&passed?passedBy(state,order,slot.frontId):undefined;
- const nDone=slots.filter(s=>s.doneAt).length,allDone=slots.length>0&&nDone===slots.length;
- function pick(id:string){setPicked({id,done:!!slots.find(s=>s.frontId===id)?.doneAt});}
+ const nDone=slots.filter(s=>s.doneAt).length,allDone=slots.length>0&&nDone===slots.length,today=calendarDay();
+ // Urgency as on the map: the front's nearest dated item (critical ≤2 days, near ≤7).
+ const tag=(frontId:string,done?:string)=>{const f=state.fronts[frontId];if(!f)return {tone:'calm',chip:''};if(done)return {tone:'done',chip:'GEÇİLDİ '+clockText(done)};const days=nextDated(state,frontId,today)?.days??null;return {tone:urgency(f,days,false),chip:daysTag(f,days)};};
+ function pick(id:string){setMore(false);setPicked({id,done:!!slots.find(s=>s.frontId===id)?.doneAt});}
  const reorder=useReorder({state,order,busy,online,action,saved:ids=>{const first=ids.find(id=>!order.slots.find(s=>s.frontId===id)?.doneAt);if(first)pick(first);}});
- return <section className="atlas-order">
-  <div className="atlas-terrain"><div className="terrain-heading"><h2>Bugünün arazisi.</h2><span>{order.approvedAt?'ROTA ONAYLANDI':'ÖNERİLEN ROTA'}</span></div>
-   {slots.length>0?<><ExpeditionMap variant="home" state={state} order={order} focus={slot?.frontId} onFocus={pick} editable={!busy&&online} notify={notify} reorder={next=>action({kind:'reorder',ids:next,orderDate:order.date,orderSnapshot:JSON.stringify(order)},{quiet:true})}/><div className="terrain-caption"><span>{allDone?`SEFER TAMAMLANDI · ${nDone}/${slots.length}`:`${slots.length} CEPHE / ${slots.length} HAMLE${nDone?` · ${nDone} GEÇİLDİ`:''}`}</span><span>MERCAN = ACİL</span></div></>:<p className="terrain-empty">Bugün açık emir yok.<br/>Yeni rotanı birlikte hazırlayalım.</p>}
-  </div>
-  <div className="atlas-order-sheet"><div className="sheet-grip" aria-hidden="true"/><div className="atlas-order-top"><span>{slot?`${pad(rank+1)} / ${passed?'GEÇİLDİ · '+passed:slot===firstOpen?'SIRADAKİ HAMLE':'ROTADAKİ HAMLE'}`:'GÜNÜN EMRİ'}</span>{slots.length>1&&<button className="text-button" onClick={reorder.begin} disabled={busy}><ArrowDownUp size={16}/>Sırayı düzenle</button>}</div>
-  {slot&&front?<><button className="atlas-front-label" onClick={()=>open(front.id)}>{front.title}<ChevronRight size={14}/></button>{front.type==='lane'&&front.where&&<p className="atlas-where">Kaldığın yer: {front.where}</p>}<h3 className={passed?'atlas-move is-passed':'atlas-move'} key={slot.moveId}>{slot.text}</h3><p className="atlas-reason">↳ {passed?`Bugün ${atTime(passed)} tamamlandı.`:current?.prerequisiteReason??slot.reason}</p><div className="atlas-move-actions"><button className={order.approvedAt?'primary':'secondary-action'} disabled={busy||!online||!!passed||current?.doneAt!==undefined||nextMove(front)?.id!==slot.moveId} onClick={()=>complete(front)}><Check size={17}/>Hamleyi bitir</button>{passed?<button className="text-button" onClick={()=>passedChange&&action({kind:'undo',changeId:passedChange.id},{quiet:true})} disabled={busy||!online||!passedChange}>Geri al</button>:<button className="text-button" onClick={()=>edit(front,slot.text)} disabled={busy}>Düzenle</button>}</div>{!passed&&why&&<p className="why">{why}</p>}{!passed&&directGoal(front)&&<button className="text-button prerequisite" disabled={busy||!online} onClick={()=>action({kind:'skipPrerequisite',frontId:front.id})}>Ön adıma gerek yok</button>}{!passed&&nextMove(front)?.id!==slot.moveId&&<p className="quiet">Cephe güncellendi. Yeni hamleyi görmek için cephe seçimini güncelle.</p>}</>:<div className="empty-order"><h3 className="serif">Günün emri sende.</h3><p>Haritandan cephe seçebilir ya da bugünü boş bırakabilirsin.</p></div>}
-  {!order.approvedAt&&<button className="primary approve-route" disabled={busy||!online||!state.setup} onClick={()=>action({kind:'approve'})}><span>Emri onayla</span><ArrowUpRight size={20}/></button>}{!order.approvedAt&&!why&&!state.setup&&<p className="why">Önce bu haftanın aktif kulvarlarını seç.</p>}
-  <div className="atlas-order-bottom"><span className="quiet">{order.approvedAt?'Günün emri onaylandı.':'Günün emri onayını bekliyor.'}</span><button className="text-button" disabled={busy} onClick={select}>Cephe ekle / çıkar</button></div>
-  {slots.length>1&&<div className="route-itinerary">{slots.map((s,i)=><button key={s.frontId} className={[slot?.frontId===s.frontId?'is-current':'',s.doneAt?'is-passed':''].join(' ').trim()||undefined} onClick={()=>pick(s.frontId)}><span>{s.doneAt?'✓':pad(i+1)}</span><span><small>{state.fronts[s.frontId]?.title}{s.doneAt?` · geçildi ${clockText(s.doneAt)}`:''}</small><span className="itinerary-move">{s.text}</span></span><ChevronRight size={16}/></button>)}</div>}
-  </div>
+ const head=slot?tag(slot.frontId,slot.doneAt):null,stale=!!front&&!passed&&nextMove(front)?.id!==slot?.moveId;
+ return <>
+  <section className="hq-move" aria-label="Sıradaki hamle">
+  {allDone?<><div className="hq-move-top"><span>SEFER TAMAMLANDI · {nDone} / {slots.length}</span></div><h2 className="hq-move-text">Günün emri tamamlandı.</h2><p className="hq-why">↳ Bütün kamplar alındı. Yarının rotası sabah önerilir.</p><div className="hq-actions"><button className="btn-quiet" onClick={()=>open('logbook')}>Sefer defterini aç</button></div></>
+  :slot&&front?<><div className="hq-move-top"><span>{passed?'GEÇİLDİ':slot===firstOpen?'SIRADAKİ HAMLE':'ROTADAKİ HAMLE'} · {pad(rank+1)} / {pad(slots.length)}</span>{head?.chip&&<span className={`hq-chip is-${head.tone}`}>{head.chip}</span>}</div>
+   <button className="hq-front" onClick={()=>open(front.id)}><span className={`hq-type ${front.type}`}/>{front.title}<ChevronRight size={14}/></button>
+   {front.type==='lane'&&front.where&&<p className="hq-where">Kaldığın yer: {front.where}</p>}
+   <h2 className={passed?'hq-move-text is-passed':'hq-move-text'} key={slot.moveId}>{slot.text}</h2>
+   <p className="hq-why">↳ {passed?`Bugün ${atTime(passed)} tamamlandı.`:current?.prerequisiteReason??slot.reason}</p>
+   <div className="hq-actions">{passed?<button className="btn-quiet" onClick={()=>passedChange&&action({kind:'undo',changeId:passedChange.id})} disabled={busy||!online||!passedChange}>Geri al</button>:<><button className="btn-main" disabled={busy||!online||current?.doneAt!==undefined||stale} onClick={()=>complete(front)}><Check size={18}/>Bitti</button><button className="btn-quiet" onClick={()=>edit(front,slot.text)} disabled={busy}>Düzenle</button><button className="btn-quiet hq-more" aria-label="Diğer" aria-expanded={more} onClick={()=>setMore(!more)}><Ellipsis size={20}/></button></>}</div>
+   {more&&!passed&&<div className="hq-more-list"><button className="text-button" onClick={()=>open(front.id)}>Cepheyi aç</button><button className="text-button" onClick={()=>say(front.id)}>Bu cepheye söyle</button>{directGoal(front)&&<button className="text-button" disabled={busy||!online} onClick={()=>action({kind:'skipPrerequisite',frontId:front.id})}>Ön adıma gerek yok</button>}</div>}
+   {!passed&&why&&<p className="why">{why}</p>}{stale&&<p className="why">Cephe güncellendi. Yeni hamleyi görmek için cephe seçimini güncelle.</p>}</>
+  :<><div className="hq-move-top"><span>GÜNÜN EMRİ</span></div><h2 className="hq-move-text">Bugün açık emir yok.</h2><p className="hq-why">Haritandan cephe seçebilir ya da bugünü boş bırakabilirsin.</p><div className="hq-actions"><button className="btn-quiet" disabled={busy} onClick={select}>Cephe ekle</button></div></>}
+  </section>
+  {slots.length>0&&<section className="hq-route" aria-label="Rota">
+   <div className="hq-route-head"><h2>ROTA · {slots.length} CEPHE{order.approvedAt?' · ONAYLI':''}</h2><button onClick={()=>open('map')}>HARİTADA AÇ<ArrowUpRight size={14}/></button></div>
+   <div className="hq-strip" aria-hidden="true"><span className="mr-hq">✳</span>{slots.map((s,i)=><Fragment key={s.frontId}><span className={s.doneAt&&(i===0||slots[i-1].doneAt)?'hq-line is-sealed':'mr-dots'}/><span className={`mr-node is-${tag(s.frontId,s.doneAt).tone}${slot?.frontId===s.frontId?' is-current':''}`}>{s.doneAt?<Check size={14}/>:pad(i+1)}</span></Fragment>)}</div>
+   {slots.map((s,i)=>{const t=tag(s.frontId,s.doneAt);return <button key={s.frontId} className={['hq-row',s.doneAt?'is-done':'',s===firstOpen?'is-next':'',slot?.frontId===s.frontId?'is-current':''].join(' ').trim()} aria-current={slot?.frontId===s.frontId?'true':undefined} onClick={()=>pick(s.frontId)}><span className="hq-num">{s.doneAt?'✓':pad(i+1)}</span><span className="hq-row-body"><small>{state.fronts[s.frontId]?.title}</small><span>{s.text}</span></span>{t.chip&&<span className={`hq-chip is-${t.tone}`}>{t.chip}</span>}</button>;})}
+   {!order.approvedAt&&<button className="hq-approve" disabled={busy||!online||!state.setup} onClick={()=>action({kind:'approve'})}><span>Emri onayla</span><span>{slots.length} CEPHE</span></button>}
+   {!order.approvedAt&&(why?<p className="why">{why}</p>:!state.setup&&<p className="why">Önce bu haftanın aktif kulvarlarını seç.</p>)}
+   <div className="hq-links">{slots.length>1&&<button className="text-button" onClick={reorder.begin} disabled={busy}><ArrowDownUp size={16}/>Sırayı düzenle</button>}<button className="text-button" disabled={busy} onClick={select}>Cephe ekle / çıkar</button></div>
+  </section>}
   {reorder.dialog}
- </section>;
+ </>;
 }
 
 // The “Sırayı düzenle” dialog. Karargâh and the morning report open the same one.
