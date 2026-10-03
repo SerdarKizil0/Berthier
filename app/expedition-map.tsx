@@ -34,6 +34,8 @@ export type ExpeditionMapProps = {
   /** Saves a new order of today's fronts with the existing reorder command. */
   reorder: (ids: string[]) => Promise<boolean | undefined>;
   editable: boolean;
+  /** Where the map's notices go (the app's single status card); without it they show inside the map. */
+  notify?: (text: string) => void;
 };
 
 const HQ = '__hq';
@@ -115,7 +117,7 @@ const Terrain = memo(function Terrain({terrain, ripple, shown}: {terrain: MapTer
   </>;
 });
 
-export default function ExpeditionMap({variant, state, order, focus, onFocus, onOpen, onBack, onList, reorder, editable}: ExpeditionMapProps) {
+export default function ExpeditionMap({variant, state, order, focus, onFocus, onOpen, onBack, onList, reorder, editable, notify}: ExpeditionMapProps) {
   const atlas = variant === 'atlas', fronts = state.fronts, box = useRef<HTMLDivElement>(null);
   const arcId = 'xm-arc-' + useId().replace(/[^a-zA-Z0-9_-]/g, '');
   const mounted = useSyncExternalStore(onClient, () => true, () => false);
@@ -177,6 +179,7 @@ export default function ExpeditionMap({variant, state, order, focus, onFocus, on
     animate({k, x: cx - wx * k, y: cy - wy * k});
   };
   const flash = (text: string) => {
+    if (notify) { notify(text); return; }
     clearTimeout(toastTimer.current);
     setToast(text);
     toastTimer.current = setTimeout(() => setToast(''), 2800);

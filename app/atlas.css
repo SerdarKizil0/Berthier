@@ -1159,6 +1159,10 @@ body .choice [data-slot="checkbox"][data-state="checked"] {
   body .shell {
     padding: 0 20px;
   }
+  .offline-strip {
+    margin: 0 -20px;
+    padding: 0 20px;
+  }
   body main {
     padding-top: 22px;
     padding-bottom: calc(var(--tabbar-h) + 72px);
@@ -1320,6 +1324,200 @@ body .tabbar > .say-button {
   border: 1px solid var(--gold-line);
   box-shadow: 0 0 0 5px var(--background);
   color: var(--gold);
+}
+
+/* Söyle shows what waits on the device (badge) and, while Berthier works, a turning gold ring. */
+.say-badge {
+  position: absolute;
+  top: -3px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: var(--badge);
+  color: var(--badge-ink);
+  font: 600 0.6875rem var(--atlas-mono);
+  box-shadow: 0 0 0 2px var(--background);
+}
+.say-disc.is-working::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: conic-gradient(var(--gold) 0 62%, var(--gold-faint) 62% 100%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  animation: say-turn 1.4s linear infinite;
+}
+@keyframes say-turn {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* 1g · The single status card, floating just above Söyle; it never pushes the page. */
+.status-card {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(var(--tabbar-h) + 12px);
+  z-index: 32;
+  max-width: 696px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 10px 12px 10px 14px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.7);
+  animation: status-in 0.18s ease-out;
+}
+.is-report .status-card {
+  bottom: 108px;
+}
+@keyframes status-in {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+}
+.status-card > p,
+.status-line > p {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--tertiary-foreground);
+}
+.status-card strong {
+  font-weight: 600;
+  color: var(--foreground);
+}
+.status-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  color: var(--foreground);
+}
+.status-spin {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-faint);
+  border-top-color: var(--gold);
+  animation: say-turn 0.9s linear infinite;
+}
+body .status-action {
+  min-height: 36px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gold);
+  white-space: nowrap;
+}
+body .status-action.is-plain {
+  font-weight: 500;
+  color: var(--foreground);
+}
+body .status-close {
+  width: 36px;
+  min-height: 36px;
+  padding: 0;
+  margin-right: -4px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  color: var(--muted-foreground);
+}
+.status-card.is-done {
+  border-color: var(--gold-line);
+}
+.status-card.is-done .status-icon,
+.status-card.is-done strong {
+  color: var(--gold);
+}
+.status-card.is-error {
+  border-color: var(--hot-border);
+}
+.status-card.is-error .status-icon,
+.status-card.is-error strong {
+  color: var(--hot-ink);
+}
+.status-card.is-question {
+  flex-direction: column;
+  align-items: stretch;
+}
+.status-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.status-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-left: 32px;
+}
+body .status-choices button {
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 20px;
+  background: var(--secondary);
+  border: 1px solid var(--primary-border);
+  color: var(--primary-foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Being offline lasts, so it is a thin strip at the top of the page rather than a card. */
+.offline-strip {
+  position: sticky;
+  top: 0;
+  z-index: 25;
+  margin: 0 -40px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 40px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8125rem;
+  color: var(--tertiary-foreground);
+}
+.offline-strip > span:nth-child(2) {
+  flex: 1;
+}
+.offline-count {
+  font: 500 0.6875rem var(--atlas-mono);
+  letter-spacing: 0.06em;
+  color: var(--muted-foreground);
+}
+
+/* B14: a disabled button says why, right under it. A short wait does not flash the note. */
+.why {
+  margin: 8px 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--muted-foreground);
+  animation: why-in 0.2s ease-out 0.4s both;
+}
+@keyframes why-in {
+  from {
+    opacity: 0;
+  }
 }
 
 /* 1f · Text sheets (Berthier’e söyle, answers, “Nerede kaldın?”, move edits). The sheet's bottom follows

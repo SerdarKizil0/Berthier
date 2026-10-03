@@ -306,24 +306,6 @@ textarea::placeholder {
   font-size: 0.875rem;
   margin-left: auto;
 }
-.summary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
-  font-size: 0.875rem;
-}
-.summary span {
-  flex: 1;
-  min-width: 180px;
-}
-.summary button {
-  background: none;
-  padding: 6px 10px;
-  border: 0;
-  color: var(--gold);
-}
 .orders .caption {
   font-size: 0.8rem;
   margin: 16px 0 0;
@@ -692,9 +674,6 @@ summary:focus-visible {
   .orders {
     padding: 22px 18px;
   }
-  .summary button {
-    font-size: 0.85rem;
-  }
   .status-controls button {
     flex: 1;
   }
@@ -925,16 +904,4 @@ summary:focus-visible {
   .idea-actions button {
     flex: 1 1 40%;
   }
-}
-
-.queue-status {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin: 12px 0;
-}
-.queue-status button {
-  font-size: 0.875rem;
-  background: transparent;
 }
