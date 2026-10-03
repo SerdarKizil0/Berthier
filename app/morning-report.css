@@ -5,10 +5,6 @@ body .is-report main {
   padding-top: 0;
   padding-bottom: 150px;
 }
-body .is-report .heading,
-body .is-logbook .heading {
-  display: none;
-}
 
 .mr-head {
   padding: 14px 0 16px;

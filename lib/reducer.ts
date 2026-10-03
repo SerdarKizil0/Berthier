@@ -1,6 +1,6 @@
 import {addIdeas,researchAct,type ResearchCommand} from './research';
 import {calendarDay,resolveDate,syncPlans,type CalendarEvent,type Profile,type EventKind,validDate,validTime} from './calendar';
-import {type State,type Front,type Order,type Move,uid,nextMove,normalize,canonicalTitle,similarity,fallbackMove,commitChanges,undo,dayKey,propose,replaceSlot,materializeOrder,validMove,directGoal} from './domain';
+import {type State,type Front,type Order,type Move,type Rhythm,uid,nextMove,normalize,canonicalTitle,similarity,fallbackMove,commitChanges,undo,dayKey,propose,replaceSlot,materializeOrder,validMove,directGoal} from './domain';
 import type {Parsed} from './llm';
 export function applyParsed(s:State,p:Parsed,raw:string,today=calendarDay(),sourceId:string|null=null):State{
  // The change remembers its dictation, so the answer to a question can be taken back from the morning report.
@@ -23,10 +23,10 @@ export function applyParsed(s:State,p:Parsed,raw:string,today=calendarDay(),sour
  });
  if(sourceId&&result.changes.length>s.changes.length)result.changes.at(-1)!.sourceId=sourceId;return result;
 }
-export type Command=ResearchCommand & {id:string;kind:string;frontId?:string;text?:string;status?:Front['status'];ids?:string[];orderDate?:string;orderSnapshot?:string;changeId?:string;index?:number;targetId?:string;where?:string;question?:string;event?:CalendarEvent;eventId?:string;profile?:Profile;conflictId?:string;warningId?:string;seen?:boolean};
+export type Command=ResearchCommand & {id:string;kind:string;frontId?:string;text?:string;status?:Front['status'];ids?:string[];orderDate?:string;orderSnapshot?:string;changeId?:string;index?:number;targetId?:string;where?:string;question?:string;event?:CalendarEvent;eventId?:string;profile?:Profile;conflictId?:string;warningId?:string;seen?:boolean;rhythm?:Rhythm};
 export function act(s:State,c:Command):State{
  if(c.kind==='undo')return undo(s,c.changeId!,c.index);
- return commitChanges(s,c.kind==='seenConflict'&&c.seen===false?'Çakışma yeniden açıldı':({approve:'Günün emri onaylandı',select:'Günün emri değiştirildi',reorder:'Rotanın sırası değiştirildi',setup:'Aktif kulvarlar seçildi',status:'Cephe durumu değiştirildi',skipPrerequisite:'Ön adım kaldırıldı',edit:'Hamle düzenlendi',complete:'Hamle tamamlandı',merge:'Cepheler birleştirildi',event:'Tarihli kalem düzenlendi',cancelEvent:'Tarihli kalem kaldırıldı',profile:'Mail imzası kaydedildi',seenConflict:'Çakışma görüldü',reviewStart:'Teftiş başladı',reviewStep:'Teftiş adımı',reviewFinish:'Teftiş tamamlandı',reviewContinue:'Cephe sürdürülüyor',ideaAssign:'Depo kalemi kulvara atandı',ideaDecide:c.decision==='discard'?'Depo kalemi atıldı':c.decision==='keep'?'Depo kalemi depoda kaldı':'Depo kalemi hamleye çevrildi'} as Record<string,string>)[c.kind]??'Değişiklik',n=>{
+ return commitChanges(s,c.kind==='seenConflict'&&c.seen===false?'Çakışma yeniden açıldı':({approve:'Günün emri onaylandı',select:'Günün emri değiştirildi',reorder:'Rotanın sırası değiştirildi',setup:'Aktif kulvarlar seçildi',status:'Cephe durumu değiştirildi',skipPrerequisite:'Ön adım kaldırıldı',edit:'Hamle düzenlendi',complete:'Hamle tamamlandı',merge:'Cepheler birleştirildi',event:'Tarihli kalem düzenlendi',cancelEvent:'Tarihli kalem kaldırıldı',profile:'Mail imzası kaydedildi',rhythm:'Ritim ayarı değiştirildi',seenConflict:'Çakışma görüldü',reviewStart:'Teftiş başladı',reviewStep:'Teftiş adımı',reviewFinish:'Teftiş tamamlandı',reviewContinue:'Cephe sürdürülüyor',ideaAssign:'Depo kalemi kulvara atandı',ideaDecide:c.decision==='discard'?'Depo kalemi atıldı':c.decision==='keep'?'Depo kalemi depoda kaldı':'Depo kalemi hamleye çevrildi'} as Record<string,string>)[c.kind]??'Değişiklik',n=>{
  const f=c.frontId?n.fronts[c.frontId]:undefined;
  if(['status','edit','skipPrerequisite','complete','merge'].includes(c.kind)&&!f)throw Error('Cephe bulunamadı.');
  if(['reviewStart','reviewStep','reviewFinish','reviewContinue','ideaAssign','ideaDecide'].includes(c.kind)){researchAct(n,c);return;}
@@ -34,6 +34,7 @@ export function act(s:State,c:Command):State{
  case 'event':{const e=c.event!;if(!e||!n.events?.[e.id])throw Error('Tarihli kalem bulunamadı.');if(e.date&&!validDate(e.date)||e.time&&!validTime(e.time)||e.endTime&&(!validTime(e.endTime)||!e.time||e.endTime<=e.time))throw Error('Tarih veya saat geçersiz.');if(e.frontId&&!n.fronts[e.frontId])throw Error('Cephe bulunamadı.');n.events[e.id]=e;syncPlans(n,calendarDay());break;}
  case 'cancelEvent':if(!n.events?.[c.eventId!])throw Error('Kalem bulunamadı.');n.events[c.eventId!].cancelled=true;syncPlans(n,calendarDay());break;
  case 'profile':n.profile=c.profile;break;
+ case 'rhythm':{const r=c.rhythm;if(!r||![r.report,r.reviewTime,r.quietFrom,r.quietTo].every(validTime)||!Number.isInteger(r.reviewDay)||r.reviewDay<0||r.reviewDay>6)throw Error('Saat veya gün geçersiz.');n.rhythm={report:r.report,reviewDay:r.reviewDay,reviewTime:r.reviewTime,quietFrom:r.quietFrom,quietTo:r.quietTo};break;}
  case 'seenConflict':if(c.seen===false){n.seenConflicts=(n.seenConflicts??[]).filter(id=>id!==c.conflictId);if(n.seenWarnings)delete n.seenWarnings[c.conflictId!];}else{n.seenConflicts=[...new Set([...(n.seenConflicts??[]),c.conflictId!])];(n.seenWarnings??={})[c.conflictId!]=new Date().toISOString();}break;
  // Morning report records: the first opening of the day (also the expedition's first day) and seen preparation warnings.
  case 'reportOpen':{const d=dayKey();((n.metrics??={}).reportOpenedAt??={})[d]??=new Date().toISOString();n.expedition??={startedAt:d};break;}

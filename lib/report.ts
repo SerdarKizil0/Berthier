@@ -181,6 +181,6 @@ export function buildReport(s: State, dictations: Dictation[], outbox: QueuedRep
     day, order, rows, path, warnings, days, questions, drafts,
     header: `${longDay(day)} · ${upper(atTime(clockText(opened)))} HAZIRLANDI`,
     counts: [rows.length, warnings.length, days.reduce((n, d) => n + d.places.length, 0), questions.length + drafts.length],
-    next: `RAPORUN SONU · SIRADAKİ RAPOR ${upper(shortDay(addDays(day, 1)))} ${REPORT_TIME}`,
+    next: `RAPORUN SONU · SIRADAKİ RAPOR ${upper(shortDay(addDays(day, 1)))} ${s.rhythm?.report ?? REPORT_TIME}`,
   };
 }

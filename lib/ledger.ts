@@ -2,10 +2,11 @@
 // or an action (“3 değişiklik. 1 yeni cephe, 1 hamle, 1 tarih.”) and by the change log rows.
 // Read-only: nothing here changes the state.
 
-import { type Change, type Front, type Op, type Order, type State } from './domain';
-import { type CalendarEvent } from './calendar';
+import { type Change, type Dictation, type Front, type Op, type Order, type State, undo } from './domain';
+import { addDays, calendarDay, type CalendarEvent } from './calendar';
+import { clockText } from './expedition/camps';
 import { type Idea } from './research';
-import { shortDay } from './turkish';
+import { atTime, shortDay, upper } from './turkish';
 
 export type OpLine = { tag: string; text: string; count: string };
 
@@ -94,4 +95,46 @@ export function changeNotice(change: Change, fronts: State['fronts']) {
   const live = change.ops.filter(o => !o.undone).length;
   if (change.sourceId) return { title: `${live} değişiklik.`, text: breakdown(change, fronts) };
   return { title: change.label.replace(/[.]?$/, '.'), text: live > 1 ? breakdown(change, fronts) : '' };
+}
+
+// ── Kayıt defteri (design 1l): one stream by day; a dictation and the changes it made sit together. ──
+
+export type LedgerItem =
+  | { kind: 'dictation'; at: string; dictation: Dictation; change?: Change }
+  | { kind: 'change'; at: string; change: Change };
+export type LedgerDay = { day: string; label: string; items: LedgerItem[] };
+
+/** Entries newest first, grouped by calendar day (“BUGÜN · CMT 26 EYL”, “DÜN · CUM 25 EYL”). A change
+ *  made by a dictation (Change.sourceId) is shown under that dictation, not on its own. */
+export function ledgerDays(s: State, dictations: Dictation[], now = new Date()): LedgerDay[] {
+  const today = calendarDay(now), byId = new Map(dictations.map(d => [d.id, d]));
+  const items: LedgerItem[] = [];
+  for (const d of dictations) if (d.created_at && !['failed', 'queued'].includes(d.status)) items.push({ kind: 'dictation', at: d.created_at, dictation: d, change: s.changes.find(c => c.sourceId === d.id) });
+  for (const c of s.changes) if (!c.sourceId || !byId.has(c.sourceId)) items.push({ kind: 'change', at: c.at, change: c });
+  items.sort((a, b) => b.at.localeCompare(a.at));
+  const days: LedgerDay[] = [];
+  for (const item of items) {
+    const day = calendarDay(new Date(item.at));
+    if (days.at(-1)?.day !== day) {
+      const name = upper(shortDay(day));
+      days.push({ day, label: day === today ? `BUGÜN · ${name}` : day === addDays(today, -1) ? `DÜN · ${name}` : name, items: [] });
+    }
+    days.at(-1)!.items.push(item);
+  }
+  return days;
+}
+
+/** Why an undo would be refused, from the same rules as `undo` (nothing is applied). A newer change on
+ *  the same record names its time: “Önce 10:12’deki değişikliği geri al.” */
+export function undoBlock(s: State, change: Change, index?: number): string | null {
+  if (change.ops.every(o => o.undone) || (index !== undefined && change.ops[index]?.undone)) return null;
+  try { undo(s, change.id, index); return null; } catch (e) {
+    const message = e instanceof Error ? e.message : 'Geri alınamıyor.';
+    if (!message.startsWith('Bu kayıtta daha yeni bir değişiklik var')) return message;
+    const keys = new Set((index === undefined ? change.ops : [change.ops[index]]).filter(o => !o.undone).map(o => o.key));
+    const later = s.changes.filter(c => c.at >= change.at && c.id !== change.id && c.ops.some(o => !o.undone && keys.has(o.key))).at(-1);
+    if (!later) return message;
+    const day = calendarDay(new Date(later.at)), when = day === calendarDay(new Date(change.at)) ? atTime(clockText(later.at)) : `${shortDay(day)} ${atTime(clockText(later.at))}`;
+    return `Önce ${when}ki değişikliği geri al.`;
+  }
 }

@@ -40,6 +40,12 @@ export function timeWord(hhmm: string) {
 /** “08:14’te”, “08:30’da”. */
 export const atTime = (hhmm: string) => hhmm + '’' + locative(timeWord(hhmm));
 
+/** Dative after a clock time, as read aloud: “17:00’ye”, “16:00’ya”, “14:00’e”, “10:30’a” (as in “17:00’ye kadar”). */
+export function untilTime(hhmm: string) {
+  const word = timeWord(hhmm), end = word.at(-1) ?? '';
+  return hhmm + '’' + (FRONT.includes(end) || BACK.includes(end) ? 'y' : '') + (FRONT.includes(lastVowel(word)) ? 'e' : 'a');
+}
+
 /** Third-person possessive after a number: 1 → "i", 2 → "si", 3 → "ü", 6 → "sı" (as in “2’si hazır”). */
 export function possessive(n: number) {
   const word = lastWord(n), v = lastVowel(word), end = word.at(-1) ?? '';

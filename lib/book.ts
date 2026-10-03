@@ -2,15 +2,16 @@
 // which fronts the first step shows and which decision each got. Read-only; the review itself is driven by
 // the existing commands (reviewStart, reviewStep, reviewContinue, status, setup, reviewFinish).
 
-import { type Dictation, type Front, type State } from './domain';
+import { RHYTHM, type Dictation, type Front, type State } from './domain';
 import { addDays, calendarDay, conflicts, occurrences, type CalendarEvent } from './calendar';
 import { clockText } from './expedition/camps';
 import { pendingIdeas, staleFronts } from './research';
 import { dayMonth, shortDay, upper } from './turkish';
 
-/** The saved review time (Tercihler): Sunday, 20:00 Istanbul. */
+/** The saved review time (Tercihler › Ritim; Sunday 20:00 Istanbul unless changed). */
 export type ReviewTime = { day: number; time: string };
-export const REVIEW_TIME: ReviewTime = { day: 0, time: '20:00' };
+export const REVIEW_TIME: ReviewTime = { day: RHYTHM.reviewDay, time: RHYTHM.reviewTime };
+export const reviewTimeOf = (s: State): ReviewTime => s.rhythm ? { day: s.rhythm.reviewDay, time: s.rhythm.reviewTime } : REVIEW_TIME;
 const DAYS = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
 export const reviewTimeText = (r: ReviewTime) => `${DAYS[r.day]} ${r.time}`;
 
@@ -26,7 +27,7 @@ export function reviewSchedule(now: Date, r: ReviewTime = REVIEW_TIME) {
 
 /** The review card also shows on Karargâh while a review is unfinished, and for a day and a half after the
  *  scheduled time unless a review was completed shortly before it (doing it early counts). */
-export function reviewDue(s: State, now: Date, r: ReviewTime = REVIEW_TIME) {
+export function reviewDue(s: State, now: Date, r: ReviewTime = reviewTimeOf(s)) {
   if (s.review && !s.review.completedAt) return true;
   const { last } = reviewSchedule(now, r);
   if (now.getTime() - last.getTime() > 36 * 3600000) return false;
@@ -45,7 +46,7 @@ export const STEPS = [
 export type ReviewCard = { open: boolean; label: string; when: string; title: string; meta: string; action: string };
 
 /** “HAFTALIK TEFTİŞ · YARIN 20:00 · Haritaya birlikte bakalım. · 5 adım · 2 bayat cephe · 3 yeni fikir”. */
-export function reviewCard(s: State, now: Date, r: ReviewTime = REVIEW_TIME): ReviewCard {
+export function reviewCard(s: State, now: Date, r: ReviewTime = reviewTimeOf(s)): ReviewCard {
   const stale = staleFronts(s, now.getTime()).length, ideas = pendingIdeas(s).length;
   const counts = [stale ? `${stale} bayat cephe` : 'bayat cephe yok', ideas ? `${ideas} yeni fikir` : 'yeni fikir yok'];
   if (s.review && !s.review.completedAt) {

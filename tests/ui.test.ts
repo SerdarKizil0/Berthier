@@ -1,10 +1,11 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {fresh,commitChanges,type Front} from '../lib/domain';
+import {fresh,commitChanges,undo,type Front} from '../lib/domain';
 import {act} from '../lib/reducer';
-import {describeOp,breakdown,changeNotice} from '../lib/ledger';
+import {describeOp,breakdown,changeNotice,ledgerDays,undoBlock} from '../lib/ledger';
 import {type CalendarEvent} from '../lib/calendar';
 import {reviewDue,reviewCard,reviewFronts,decisionOf} from '../lib/book';
+import {untilTime} from '../lib/turkish';
 
 // Design review (2 Oct): the status card and the change log say what a change did in the user's words.
 const front=(id:string,title:string,type:Front['type'],moves=[{id:id+'-m1',text:`${title} için sıradaki adımı yaz.`}]):Front=>({id,title,type,status:'active',moves,where:'',question:'',notes:[],touched:'2026-09-25T10:00:00.000Z'});
@@ -57,4 +58,33 @@ test('review decisions show on their card and finishing keeps untouched items as
  s=act(s,{id:'d',kind:'reviewFinish'});
  assert.ok(s.ideas!.i1.reviewedAt);assert.equal(s.ideas!.i1.status,'stored');
  assert.equal(s.changes.at(-1)!.label,'Teftiş tamamlandı');
+});
+
+test('a clock time takes the dative as it is read aloud', ()=>{
+ assert.deepEqual(['17:00','16:00','14:00','10:30','20:00','19:00','13:00'].map(untilTime),['17:00’ye','16:00’ya','14:00’e','10:30’a','20:00’ye','19:00’a','13:00’e']);
+});
+
+test('the change log groups by day, keeps a dictation with its changes and says why an undo waits', ()=>{
+ let s=fresh();s.setup=true;s.fronts.a=front('a','Kargo iadesi','general');
+ s=commitChanges(s,'Dikte işlendi',n=>{n.fronts.a.moves.push({id:'a2',text:'İade paketini PTT şubesine götür.'});});
+ const said=s.changes.at(-1)!;said.sourceId='d1';said.at='2026-09-25T19:17:00.000Z';
+ s=act(s,{id:'x1',kind:'edit',frontId:'a',text:'İade paketini Kadıköy PTT şubesine götür.'});s.changes.at(-1)!.at='2026-09-26T05:41:00.000Z';
+ s=act(s,{id:'x2',kind:'status',frontId:'a',status:'closed'});s.changes.at(-1)!.at='2026-09-26T07:12:00.000Z';
+ const dictations=[{id:'d1',raw:'Yarın kargo iadesini unutma',context:null,created_at:'2026-09-25T19:17:00.000Z',status:'done',result:'{}'}];
+ const days=ledgerDays(s,dictations,new Date('2026-09-26T09:00:00Z'));
+ assert.deepEqual(days.map(d=>d.label),['BUGÜN · CMT 26 EYL','DÜN · CUM 25 EYL']);
+ assert.equal(days[1].items[0].kind,'dictation');assert.equal(days[1].items[0].change?.id,said.id);
+ assert.equal(days[0].items.length,2);
+ const edit=s.changes.find(c=>c.label==='Hamle düzenlendi')!;
+ assert.equal(undoBlock(s,edit),'Önce 10:12’deki değişikliği geri al.');
+ assert.equal(undoBlock(s,s.changes.at(-1)!),null);
+});
+
+test('rhythm settings are saved, validated and undone like any change', ()=>{
+ let s=fresh();
+ s=act(s,{id:'r1',kind:'rhythm',rhythm:{report:'09:00',reviewDay:6,reviewTime:'18:30',quietFrom:'23:30',quietTo:'07:00'}});
+ assert.equal(s.rhythm?.reviewDay,6);assert.equal(s.changes.at(-1)!.label,'Ritim ayarı değiştirildi');
+ assert.equal(reviewCard(s,new Date('2026-09-26T07:00:00Z')).when,'BUGÜN 18:30');
+ assert.throws(()=>act(s,{id:'r2',kind:'rhythm',rhythm:{report:'25:00',reviewDay:0,reviewTime:'20:00',quietFrom:'23:00',quietTo:'07:30'}}));
+ s=undo(s,s.changes.at(-1)!.id);assert.equal(s.rhythm,undefined);
 });
