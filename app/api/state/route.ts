@@ -3,15 +3,17 @@ import {addIdeas} from '@/lib/research';
 import {EventInput} from '@/lib/event-input';
 import {env} from 'cloudflare:workers';
 import {getChatGPTUser} from '../../chatgpt-auth';
-import {type State,type Dictation,fresh,uid,commitChanges,nextMove,replaceSlot} from '@/lib/domain';
+import {type State,type Dictation,fresh,uid,commitChanges,nextMove,replaceSlot,captureOrder} from '@/lib/domain';
 import {act,applyParsed,type Command} from '@/lib/reducer';
 import {parseDictation,type LlmConfig} from '@/lib/llm';
 import {z} from 'zod';
+import {ensureRhythm,attachReportAnswer,attachReportQuestions} from '@/lib/rhythm';
+import {notifyNewConflicts} from '@/lib/notification-scheduler';
 export const dynamic='force-dynamic';
-const Input=z.object({id:z.string().uuid(),kind:z.enum(['enqueue','dictate','complete','approve','reorder','select','setup','status','edit','skipPrerequisite','undo','merge','event','cancelEvent','profile','seenConflict','reviewStart','reviewStep','reviewFinish','reviewContinue','ideaAssign','ideaDecide','importIdeas']),source:z.enum(['document','dictation']).optional(),replyTo:z.string().uuid().optional(),frontId:z.string().optional(),ideaId:z.string().optional(),sourceId:z.string().optional(),decision:z.enum(['keep','discard','move','front']).optional(),title:z.string().max(90).optional(),step:z.number().int().min(0).max(4).optional(),text:z.string().max(20000).optional(),status:z.enum(['active','held','closed']).optional(),ids:z.array(z.string()).optional(),orderDate:z.string().optional(),orderSnapshot:z.string().optional(),changeId:z.string().optional(),index:z.number().int().nonnegative().optional(),targetId:z.string().optional(),where:z.string().max(120).optional(),question:z.string().max(120).optional(),skip:z.boolean().optional(),event:EventInput.omit({dateText:true,frontTitle:true}).extend({id:z.string(),date:z.string().nullable(),frontId:z.string().nullable(),cancelled:z.boolean().optional()}).optional(),eventId:z.string().optional(),conflictId:z.string().max(500).optional(),profile:z.object({name:z.string().max(100),number:z.string().max(50),department:z.string().max(100),university:z.string().max(100)}).optional()});
+const Input=z.object({id:z.string().uuid(),kind:z.enum(['enqueue','dictate','complete','approve','reorder','select','setup','status','edit','skipPrerequisite','undo','merge','event','cancelEvent','profile','seenConflict','reviewStart','reviewStep','reviewFinish','reviewContinue','ideaAssign','ideaDecide','importIdeas','reportOpened','reportUnapprove','reportAlertSeen','notificationPreferences','expeditionReflection']),reportDate:z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),alertId:z.string().max(1000).optional(),seen:z.boolean().optional(),answer:z.string().max(500).optional(),preferences:z.object({morningTime:z.string(),eveningTime:z.string(),weeklyDay:z.number().int().min(0).max(6),weeklyTime:z.string(),quietStart:z.string(),quietEnd:z.string()}).partial().optional(),source:z.enum(['document','dictation']).optional(),replyTo:z.string().uuid().optional(),frontId:z.string().optional(),moveId:z.string().optional(),ideaId:z.string().optional(),sourceId:z.string().optional(),decision:z.enum(['keep','discard','move','front']).optional(),title:z.string().max(90).optional(),step:z.number().int().min(0).max(4).optional(),text:z.string().max(20000).optional(),status:z.enum(['active','held','closed']).optional(),ids:z.array(z.string()).optional(),orderDate:z.string().optional(),orderSnapshot:z.string().optional(),changeId:z.string().optional(),index:z.number().int().nonnegative().optional(),targetId:z.string().optional(),where:z.string().max(120).optional(),question:z.string().max(120).optional(),skip:z.boolean().optional(),event:EventInput.omit({dateText:true,frontTitle:true}).extend({id:z.string(),date:z.string().nullable(),frontId:z.string().nullable(),cancelled:z.boolean().optional()}).optional(),eventId:z.string().optional(),conflictId:z.string().max(500).optional(),profile:z.object({name:z.string().max(100),number:z.string().max(50),department:z.string().max(100),university:z.string().max(100)}).optional()});
 const headers={'Cache-Control':'no-store'};
 const respond=(data:unknown,status=200)=>Response.json(data,{status,headers});
-export async function GET(){const user=await getChatGPTUser();if(!user)return respond({error:'Giriş yapman gerekiyor.'},401);try{const {state,revision}=await read(user.userId);return respond({state,revision,dictations:await list(user.userId)});}catch{return respond({error:'Veri defterine ulaşılamıyor. Tekrar dene.'},503);}}
+export async function GET(){const user=await getChatGPTUser();if(!user)return respond({error:'Giriş yapman gerekiyor.'},401);try{for(let attempt=0;attempt<3;attempt++){const [{state,revision},dictations]=await Promise.all([read(user.userId),list(user.userId)]);const updated=ensureRhythm(state,dictations);if(updated===state)return respond({state,revision,dictations});try{await save(user.userId,updated,revision);return respond({state:updated,revision:revision+1,dictations});}catch(error){if(attempt===2)throw error;}}}catch{return respond({error:'Veri defterine ulaşılamıyor. Tekrar dene.'},503);}return respond({error:'Son durum alınamadı. Tekrar dene.'},503);}
 export async function POST(req:Request){
  const user=await getChatGPTUser();if(!user)return respond({error:'Giriş yapman gerekiyor.'},401);
  if(req.headers.get('origin')!==new URL(req.url).origin)return respond({error:'İstek kaynağı doğrulanamadı.'},403);
@@ -19,6 +21,7 @@ export async function POST(req:Request){
  let processing=false;
  try{
  let {state,revision}=await read(user.userId);
+ state=ensureRhythm(state,await list(user.userId));
  if(state.receipts.includes(input.id))return respond({state,revision,dictations:await list(user.userId)});
  let replySource:Dictation|null=null;
  if(input.replyTo){replySource=await db().prepare('SELECT id,raw,context,created_at,status,result FROM dictations WHERE id = ? AND owner = ?').bind(input.replyTo,user.userId).first<Dictation>();if(!replySource||!['question','answered'].includes(replySource.status))throw Error('Yanıtlanacak soru bulunamadı.');}
@@ -37,6 +40,7 @@ export async function POST(req:Request){
  if(input.kind==='dictate'||(input.kind==='complete'&&!input.skip)){
  const f=input.frontId?state.fronts[input.frontId]:undefined;
  if(input.kind==='complete'&&!f)throw Error('Cephe bulunamadı.');
+ if(input.kind==='complete'&&input.moveId&&nextMove(f!)?.id!==input.moveId)throw Error('Hamle bu sırada değişti. Güncel hamleyi açıp yeniden dene.');
  const raw=input.text?.trim()||(input.kind==='complete'?'Hamleyi tamamladım.':'');if(!raw)throw Error('Önce söylemek istediğini yaz.');
  await db().prepare('INSERT OR IGNORE INTO dictations(id,owner,raw,context,created_at,status,result) VALUES (?,?,?,?,?,?,?)').bind(input.id,user.userId,raw,input.frontId??null,new Date().toISOString(),'queued',JSON.stringify({kind:input.kind,replyTo:input.replyTo??null,source:input.source??'dictation'})).run();
  const original=await db().prepare('SELECT owner,raw,context,result FROM dictations WHERE id = ?').bind(input.id).first<{owner:string;raw:string;context:string|null;result:string|null}>();
@@ -49,18 +53,20 @@ export async function POST(req:Request){
  // The user may edit their map while the model is working. Apply only to a fresh revision.
  const latest=await read(user.userId);if(latest.state.receipts.includes(input.id))return respond({state:latest.state,revision:latest.revision,dictations:await list(user.userId)});
  if(input.kind==='complete'&&JSON.stringify(latest.state.fronts[f!.id])!==JSON.stringify(f))throw Error('Cephe bu sırada değişti. Notun saklandı; yeniden dene.');
- state=latest.state;revision=latest.revision;
+ state=ensureRhythm(latest.state,await list(user.userId));revision=latest.revision;
  for(const item of parsed.items){if(item.id&&!state.fronts[item.id])throw Error('Cephe değişti; girdin saklandı. Yeniden dene.');if(item.completedMoveId&&!state.fronts[item.id!]?.moves.some(m=>m.id===item.completedMoveId&&!m.doneAt))throw Error('Hamle bu sırada değişti. Girdin saklandı; yeniden dene.');}
 
  if(input.kind==='complete'&&f){
  const item=parsed.items.find(x=>x.id===f.id);if(!item||parsed.question)throw Error('Sıradaki hamle netleşmedi. Notun kaydedildi; tekrar dene veya Atla ile tamamla.');
  // A completion only changes the chosen front; model cannot complete unrelated fronts.
- n=commitChanges(state,'Hamle tamamlandı; kaldığın yer kaydedildi',draft=>{const front=draft.fronts[f.id];const m=nextMove(front);if(m)m.doneAt=new Date().toISOString();if(item.where!==null)front.where=item.where;if(item.question!==null)front.question=item.question;
+ n=commitChanges(state,'Hamle tamamlandı; kaldığın yer kaydedildi',draft=>{const front=draft.fronts[f.id];captureOrder(draft);const m=nextMove(front);if(m)m.doneAt=new Date().toISOString();if(item.where!==null)front.where=item.where;if(item.question!==null)front.question=item.question;
  if(item.moves.length&&!m?.eventId){front.moves=front.moves.filter(m=>!!m.doneAt);front.moves.push(...item.moves.map(text=>({id:uid(),text})));}front.notes.push(raw);front.touched=new Date().toISOString();replaceSlot(draft,front);});
  }else n=applyParsed(state,parsed,raw,undefined,input.id);
+ n=attachReportQuestions(state,n,[...(await list(user.userId)).filter(d=>d.id!==input.id),{id:input.id,raw,context:input.frontId??null,created_at:new Date().toISOString(),status:parsed.question?'question':'done',result:JSON.stringify({question:parsed.question})}]);
+ if(input.replyTo)n=attachReportAnswer(state,n,input.replyTo,raw);
  summary=parsed.question||parsed.summary;
- n.receipts.push(input.id);await save(user.userId,n,revision,{id:input.id,status:parsed.question?'question':'done',result:JSON.stringify({summary,question:parsed.question,kind:input.kind,replyTo:input.replyTo??null,source:input.source??'dictation'}),replyTo:input.replyTo});
- }else{n=act(state,input as Command);n.receipts.push(input.id);await save(user.userId,n,revision);summary=n.changes.at(-1)?.label??'Kaydedildi.';}
+ n.receipts.push(input.id);await save(user.userId,n,revision,{id:input.id,status:parsed.question?'question':'done',result:JSON.stringify({summary,question:parsed.question,kind:input.kind,replyTo:input.replyTo??null,source:input.source??'dictation'}),replyTo:input.replyTo});await notifyNewConflicts(user.userId,state,n).catch(()=>{});
+ }else{n=act(state,input as Command);n.receipts.push(input.id);const reopened=Object.values(n.reports??{}).flatMap(r=>r.decisions.questions.filter(q=>!q.answeredAt&&state.reports?.[r.date]?.decisions.questions.some(old=>old.id===q.id&&old.answeredAt)).map(q=>q.id));await save(user.userId,n,revision,undefined,[...new Set(reopened)]);await notifyNewConflicts(user.userId,state,n).catch(()=>{});summary=input.kind==='reportOpened'?'Sabah raporu açıldı.':n.changes.at(-1)?.label??'Kaydedildi.';}
  return respond({state:n,revision:revision+1,dictations:await list(user.userId),summary});
  }catch(e){const message=e instanceof Error?e.message:'İşlem kaydedilemedi; tekrar dene.';try{if(processing)await db().prepare("UPDATE dictations SET status = 'failed', result = ? WHERE id = ? AND owner = ? AND status IN ('queued','failed')").bind(JSON.stringify({summary:message,kind:input.kind==='enqueue'?'dictate':input.kind,replyTo:input.replyTo??null,source:input.source??'dictation'}),input.id,user.userId).run();}catch{}return respond({error:message},503);}
 }

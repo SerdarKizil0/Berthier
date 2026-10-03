@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+const base='http://127.0.0.1:5174',owner='p5-integration-20261002',headers={'oai-authenticated-user-id':owner,'oai-authenticated-user-email':'p5-qa@berthier.invalid','Content-Type':'application/json',origin:base};
+const call=async(path,body,h=headers)=>{const r=await fetch(base+path,{method:body?'POST':'GET',headers:h,body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(15000)});return {status:r.status,data:await r.json()};};
+assert.equal((await call('/api/state',undefined,{})).status,401);assert.equal((await call('/api/state',{id:crypto.randomUUID(),kind:'approve'},{...headers,origin:'https://invalid.example'})).status,403);
+let r=await call('/api/state');assert.equal(r.status,200);let date=Object.keys(r.data.state.reports)[0];assert.ok(date);const prepared=r.data.state.reports[date].generatedAt;assert.equal((await call('/api/state')).data.state.reports[date].generatedAt,prepared);
+const command=async(body)=>{const r=await call('/api/state',{id:crypto.randomUUID(),...body});assert.equal(r.status,200,JSON.stringify(r.data));return r.data;};
+await command({kind:'reportOpened',reportDate:date});await command({kind:'approve'});let d=await command({kind:'complete',frontId:'p5-integration-front',moveId:'p5-first',skip:true});assert.ok(d.state.orders[date].slots[0].doneAt);assert.equal(d.state.orders[date].slots[0].moveId,'p5-first');assert.equal(d.state.fronts['p5-integration-front'].moves[1].doneAt,undefined);
+assert.equal((await call('/api/state',{id:crypto.randomUUID(),kind:'complete',frontId:'p5-integration-front',moveId:'p5-first',skip:true})).status,503);
+const change=d.state.changes.at(-1).id;d=await command({kind:'undo',changeId:change});assert.equal(d.state.orders[date].slots[0].doneAt,undefined);
+d=await command({kind:'notificationPreferences',preferences:{eveningTime:'22:15'}});assert.equal(d.state.notificationPreferences.eveningTime,'22:15');assert.equal((await call('/api/state')).data.state.notificationPreferences.eveningTime,'22:15');
+assert.equal((await call('/api/notifications',undefined,{})).status,401);const status=await call('/api/notifications');assert.equal(status.status,200);assert.equal(status.data.schedulerActive,false);
+const pair=await crypto.subtle.generateKey({name:'ECDH',namedCurve:'P-256'},true,['deriveBits']),subscription={endpoint:'https://web.push.apple.com/berthier-local-qa-only',keys:{p256dh:Buffer.from(await crypto.subtle.exportKey('raw',pair.publicKey)).toString('base64url'),auth:Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('base64url')}};
+assert.equal((await call('/api/notifications',{action:'subscribe',subscription})).status,200);
+const stranger={...headers,'oai-authenticated-user-id':'p5-other-qa'};assert.notEqual((await call('/api/notifications',{action:'subscribe',subscription},stranger)).status,200);
+assert.equal((await call('/api/notifications',{action:'device',endpoint:subscription.endpoint},stranger)).data.subscribed,false);
+assert.equal((await call('/api/notifications',{action:'unsubscribe',endpoint:subscription.endpoint})).status,200);
+assert.notEqual((await call('/api/notifications',{action:'subscribe',subscription:{...subscription,endpoint:'https://localhost/private'}})).status,200);
+console.log('PASS compiled API: access, same-origin, persistent report, completion snapshot, stale completion, undo, persisted preferences, subscription ownership, endpoint allowlist, inactive scheduler');
