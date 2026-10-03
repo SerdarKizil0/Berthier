@@ -60,6 +60,17 @@ test('review decisions show on their card and finishing keeps untouched items as
  assert.equal(s.changes.at(-1)!.label,'Teftiş tamamlandı');
 });
 
+test('saving the lane selection keeps a lane closed in the review closed', ()=>{
+ let s=fresh();s.fronts.tez=front('tez','Tez önerisi','lane');s.fronts.lab={...front('lab','Laboratuvar','lane'),status:'held'};s.fronts.dil=front('dil','Almanca','lane');
+ s=act(s,{id:'a',kind:'reviewStart'});
+ s=act(s,{id:'b',kind:'status',frontId:'tez',status:'closed'});
+ s=act(s,{id:'c',kind:'setup',ids:['lab']});
+ assert.deepEqual(['tez','lab','dil'].map(id=>s.fronts[id].status),['closed','active','held']);
+ // Choosing a closed lane on purpose still opens it.
+ s=act(s,{id:'d',kind:'setup',ids:['tez']});
+ assert.deepEqual(['tez','lab','dil'].map(id=>s.fronts[id].status),['active','held','held']);
+});
+
 test('a clock time takes the dative as it is read aloud', ()=>{
  assert.deepEqual(['17:00','16:00','14:00','10:30','20:00','19:00','13:00'].map(untilTime),['17:00’ye','16:00’ya','14:00’e','10:30’a','20:00’ye','19:00’a','13:00’e']);
 });
