@@ -27,6 +27,7 @@ Kullanıcı başlamadan doldurur. Boş bırakılan maddede Astra varsayılanı k
 | Sabah raporunda gelen evrak | Şimdilik olmayacak (26 Eylül kararı) | Ertelendi |
 | Akşam bildirimi | Saat Tercihler › Bildirimler'de elle ayarlanır (1 Ekim kararı) | 21:00 |
 | Sessiz saatte yakalanan çakışma | Ayrı bildirim olmaz, sabah raporuna girer (1 Ekim kararı) | Sabah raporuna girer |
+| Arayüz incelemesi (Claude Design, 2 Ekim) | Karargâh 1a, alt panel 1d; diğer öneriler (1f, 1g, 1h, 1i–1m, K2) Design'ın önerdiği gibi | — |
 
 ## İlerleme
 
@@ -36,6 +37,7 @@ Kullanıcı başlamadan doldurur. Boş bırakılan maddede Astra varsayılanı k
 | P2 Tarihler | tamamlandı ve özel yayında | Ufuk, tarih çıkarma/düzenleme, çakışmalar, mail taslağı, hazırlıklar ve başvuru belgeleri. |
 | P3 Kulvarlar ve teftiş | tamamlandı ve özel yayında | Fikir deposu, sınırsız aktif kulvar, kalıcı beş adımlı teftiş. |
 | P4 Ses ve belge girişi | tamamlandı ve özel yayında | Ses, ekran görüntüsü ve PDF hazır. Gmail/Takvim kullanıcı kararıyla ertelendi. |
+| Tasarım incelemesi (2 Ekim) | kodda, `claude/design-review` dalında (3 Ekim, yayınlanmadı) | Aşama 0–5 uygulandı; kararlar aşağıda "2 Ekim arayüz incelemesi"nde. PR açık, `main`'e alınmadı. |
 | P5 Ritim ve motivasyon | bildirimler dışında kodda (2 Ekim, yayınlanmadı) | Sabah raporu, sefer defteri, ölçümler ve çevrimdışı görünüm hazır. Bildirimler ayrı dalda bekliyor. Tasarım: `design-reference/project/Berthier P5.dc.html`. Notlar aşağıda. |
 
 ## Tasarım dili
@@ -46,7 +48,7 @@ Kullanıcı 25 Eylül'de Atlas 02'yi onayladı. Petrol tonlu topografik harita, 
 
 1 Ekim renk kararı (tasarlandı; uygulama kabuğu 2 Ekim'de kodda uygulandı, harita henüz uygulanmadı; tasarım: Claude projesindeki “Berthier Harita v7”, depoda `design-reference/project/Berthier Harita v7.dc.html`): açık kum zemin gece ve uzun odakta gözü yorduğu için uygulama koyu “Grafit Gece” paletine geçer. Harita ve uygulama kabuğu (başlık, alt panel, liste, kartlar) aynı paletle koyu.
 
-- Uygulama: zemin `#18191b`, yüzey `#202123`, ikincil yüzey `#2a2b2d`, çizgi `#343538`, metin `#d6d3cb`, ikincil metin `#8f8d88`, vurgu `#d4b98a`. Ana düğme parlak değil: `#333437` zemin, `#e2dfd7` yazı.
+- Uygulama: zemin `#18191b`, yüzey `#202123`, ikincil yüzey `#2a2b2d`, çizgi `#343538`, metin `#d6d3cb`, ikincil metin `#8f8d88`, vurgu `#d4b98a`. Ana düğme parlak değil: `#333437` zemin, `#e2dfd7` yazı. (2 Ekim K2: ekranın tek ana eylemi altın çerçeve, altın yazı, hafif altın zemin; aşağıda.)
 - Harita: zemin `#1c1d1f`, patika soluk altın `#c9ad7a`, mühür ve bayrak `#d4b98a`. Mercan `#e0805e` yalnız aciliyeti anlatır.
 
 27 Eylül harita kararı (tasarlandı, kodda henüz uygulanmadı):
@@ -55,7 +57,7 @@ Kullanıcı 25 Eylül'de Atlas 02'yi onayladı. Petrol tonlu topografik harita, 
 - Aciliyet kampın kendi durumudur: tarihi 7 gün ve altındaki kamp mercan, 2 gün ve altındaki kamp mercan dolgu ve yavaş sonar. Uzak ve tarihsiz kamplar sade.
 - Günün sırası karargâhtan çıkan tek patikadır; eğime göre hesaplanır, dik yamaçlardan kaçar, vadi ve geçitleri izler. Seçili kamp kalın, sıradaki kamp ince halkayla gösterilir.
 - Geçilen kamp silinmez: altın bayrak ve her zaman görünen “GEÇİLDİ · saat” mührü. İki alınmış kamp arası parıltılı mühür hattına dönüşür; hamle bitince konturlar kamptan bir an dalgalanır; son hamlede “Sefer tamamlandı”.
-- Karargâh'ta sabit yükseklikte küçük rota haritası, Harita sekmesinde tam ekran atlas. İkisinde de iki parmakla yakınlaştırma/kaydırma ve sığdır düğmesi var. Atlasta kampa dokununca cephe kartı açılır.
+- Karargâh'ta sabit yükseklikte küçük rota haritası, Harita sekmesinde tam ekran atlas. (2 Ekim incelemesiyle Karargâh'taki harita güzergâh şeridine indi; atlas Harita sekmesinde aynen duruyor.) İkisinde de iki parmakla yakınlaştırma/kaydırma ve sığdır düğmesi var. Atlasta kampa dokununca cephe kartı açılır.
 - Haritada kampa dokunmak hamleyi gösterir. Sıra, haritada kampı basılı tutup başka bir kampın üstüne bırakarak ya da “Sırayı düzenle” penceresinde tutamaçla değiştirilir; görünür yukarı/aşağı veya “Başa al” düğmeleri yok. Değişiklik açıkça kaydedilir ve kayıt defterinden geri alınabilir. Mevcut emir onayı korunur; onaylanmamış emir kendiliğinden onaylanmaz.
 
 ## P5 tasarım notları
@@ -71,7 +73,27 @@ Kullanıcı 25 Eylül'de Atlas 02'yi onayladı. Petrol tonlu topografik harita, 
 - “Kilitlendim” düğmesi kullanıcı kararıyla yok.
 - 2 Ekim kararı: bildirimlerle ilgili her şey (Web Push, Tercihler › Bildirimler, zamanlanmış gönderim, `vite.config.ts` ve Worker değişiklikleri) Sites tarafı doğrulanana kadar yapılmaz; sonra ayrı bir dalda ele alınır.
 
+## 2 Ekim arayüz incelemesi
+
+Claude Design'ın 2 Ekim incelemesi (bulgular B1–B20, sorgulanan kararlar K1–K5, öneriler 1a–1m). Kullanıcı Karargâh için 1a'yı, alt panel için 1d'yi seçti; 1f, 1g, 1h, 1i–1m ve K2'yi önerildiği gibi kabul etti. 3 Ekim'de `claude/design-review` dalında koda geçti; yayınlanmadı.
+
+- **Bilgi mimarisi:** her yerin tek kapısı. Karargâh: sıradaki hamle, rota, bugün ve yarın; sabah raporu buradan ("Sabah raporunun tamamı") ve bildirimden. Harita: atlas ve cephe listesi; cephe ayrıntısı buradan. Ufuk: 14 gün, çakışmalar, hazırlıklar. Defter: Haftalık teftiş, Sefer defteri, Fikir deposu, Kayıt defteri; Tercihler sağ üstte. Marka başlığı ve pusula mührü kalktı.
+- **1d · Alt çubuk:** tek kat, ≈89 px (güvenli alan dahil): Karargâh · Harita · Söyle · Ufuk · Defter. Söyle ortada, altın çerçeveli; sekme değil, dikte sayfasını açar. **Teftiş sekmesi kalktı, yerine Defter geldi** (K5).
+- **1f · Dikte sayfası:** ekran ortasındaki pencere yerine alttan açılan, `visualViewport` ile klavyenin üstüne yapışan sayfa; gönder düğmesi hep görünür. Bağlamdaki cephe tek dokunuşla kaldırılan bir etiket. Ses kaydı aynı sayfada (süre, seviye çubukları, "Bitir ve yazıya dök", "Vazgeç"). Sınır ve sağlayıcı metni yalnız dosya seçilince ya da kayıt sınıra yaklaşınca. Yanıt, "Nerede kaldın?" ve hamle düzenleme de aynı sayfayı kullanır.
+- **1g · Tek durum yeri:** geçici her durum Söyle'nin üstünde yüzen tek kartta (çevrimdışı, işleniyor, tamamlandı 8 sn, soru, hata). Toast, sayfa başı özet satırı ve durum kutuları kalktı. Çevrimdışılık sayfanın üstünde ince şerit. Devre dışı düğme nedenini altında söyler.
+- **1h · Defter** ve **1j · Teftiş:** teftiş kartı Defter'de hep üstte; zamanı gelince (Tercihler'deki gün ve saat, bir buçuk gün) ya da yarım kalmışsa Karargâh'ta da çıkar. Teftiş tam ekran akış: adım adları, cephe başına kart ve tek dokunuşla kaydolan üç karar, tek ana eylem "Sonraki: …".
+- **1a · Karargâh, önce hamle:** ince tarih satırı ve "KAYITLI · saat", serif başlık, sıradaki hamle kartı (tek ana eylem "Bitti"), **Karargâh haritası yerine raporun güzergâh şeridi** ve rota satırları (K1), onaydan önce "Emri onayla", "Bugün ve yarın" (raporun II–IV. bölümleri birer satır), "Sabah raporunun tamamı". Sabah raporu ayrı sayfa olarak kaldı (K4 korunur).
+- **1i–1m:** Ufuk 2 × 7 ızgara (eşikler haritayla aynı); Fikir deposu kulvara göre gruplu, türe göre süzülür, satıra dokununca eylemler; Kayıt defteri günlere göre tek akış, dikte ve yaptığı değişiklikler bir arada, geri alınamayan satır nedenini söyler; Tercihler gerçek, gruplu ayarlar.
+- **K2 · Ana eylem:** ekran başına tek ana eylem `.btn-main` (altın çerçeve, altın yazı, `rgba(212,185,138,.14)` zemin; parlak dolgu yok). Karargâh ve cephe sayfasında "Bitti", teftişte "Sonraki: …", dikte sayfasında gönder ve "Bitir ve yazıya dök", raporda "Emri onayla". Karargâh'taki "Emri onayla" tasarımdaki gibi koyu dolgu (ikinci güçlü eylem) kaldı.
+- **Veri eklemeleri (JSON, migrasyon yok, geriye uyumlu):** `State.rhythm` ve `rhythm` komutu (rapor saati, teftiş günü/saati, sessiz saatler; kayıt defterinde kendi anahtarıyla geri alınır). Teftiş bitince teftişin gösterdiği ve dokunulmayan depo kalemleri "görüldü" sayılır (kaldırılan "Depoda kalsın"ın yaptığı). Teftiş ve depo komutlarına okunur kayıt etiketleri.
+- **Bilinçli olarak yapılmayanlar:** çevrimdışıyken "Bitti" kuyruğa alınmıyor (komut cephenin o anki sıradaki hamlesine uygulanır; geç işlenirse başka bir hamleyi bitirebilir ve başarısız komut kuyruğu tıkar). Kayıt defterinde ses dikte "YAZI" olarak görünür (kaynak bilgisi yalnız yazı/belge ayırıyor). Bildirim kurulumu "Yakında" (ayrı dalda yapılacak).
+
 ## Kaldığın yer
+- 3 Ekim, tasarım incelemesi (dal `claude/design-review`, yayınlanmadı; PR açık):
+  - Aşama 0 (B13, B10, B16, B17), Aşama 1 (1d, 1f), Aşama 2 (1g), Aşama 3 (1h, 1j), Aşama 4 (1a, K2), Aşama 5 (1i, 1k, 1l, 1m) ayrı commit'ler olarak. Ayrıntı yukarıda ve PR açıklamasında.
+  - Yeni dosyalar: `app/say-sheet.tsx`, `app/status.tsx`, `app/today.tsx`, `app/book.tsx`, `app/review.tsx`, `app/ledger.tsx`, `app/settings.tsx`, `app/page-head.tsx`, `lib/book.ts`, `lib/ledger.ts`, `tests/ui.test.ts` (`--ui`). 390 × 844 ekran görüntüleri `docs/design-review/` altında.
+  - Doğrulama: tip denetimi, 58 deterministik test (yeni `--ui` dahil), derleme ve anahtar taraması geçti. Lint: 5 hata (hepsi önceden vardı; 8'den düştü), yeni hata yok. Playwright ile 390 × 844'te bütün ekranlar ve durumlar çekildi; klavye `visualViewport` yüksekliği düşürülerek benzetildi. Fiziksel iPhone'da (klavye, mikrofon, ana ekran uygulaması) denenmedi; canlı model çağrısı yapılmadı.
+  - Sırada: kullanıcının incelemesi ve `main`'e alma kararı, ardından fiziksel iPhone'da dikte sayfası ve klavye denemesi; bildirimler (ayrı dalda) ve yayın kararı.
 
 - 2 Ekim, Adım C (aynı dal, yayınlanmadı):
   - Sabah raporu (`app/morning-report.tsx`, `lib/report.ts`): dört bölüm her gün aynı sırada; boş bölüm "yok" der. Rapor canlıdır, zamanlayıcı yok; başlıktaki saat raporun o gün ilk açıldığı saattir. "Emri onayla" gösterilen emri onaylar; onaydan sonra "Geri al" ve "Karargâh’a git" var. Rapor sayfasında alt panel yerine onay çubuğu durur.
