@@ -17,7 +17,7 @@ export default function Logbook({state, now, online, back, summarize}: Props) {
 
   return <div className="logbook">
     <header className="mr-head lb-head">
-      <button className="mr-back" onClick={back}><ArrowLeft size={16}/>Karargâh</button>
+      <button className="mr-back" onClick={back}><ArrowLeft size={16}/>Defter</button>
       <h1>Sefer defteri</h1>
       <p>{book.sub}</p>
     </header>

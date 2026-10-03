@@ -3,12 +3,11 @@
 // bar at the bottom. Every action reuses an existing flow: the reorder and front-selection dialogs, the
 // conflict mail and item dialogs, the answer queue and the change log's undo.
 import {Fragment, useEffect, useEffectEvent, useRef, useState} from 'react';
-import {ArrowDownUp, ArrowLeft, Check, ChevronRight, WifiOff} from 'lucide-react';
-import {calendarDay, type CalendarEvent} from '@/lib/calendar';
+import {ArrowDownUp, ArrowLeft, Check, ChevronRight} from 'lucide-react';
+import {type CalendarEvent} from '@/lib/calendar';
 import {type Dictation, type Order, type State} from '@/lib/domain';
 import {clockText} from '@/lib/expedition/camps';
 import {buildReport, type QueuedReply} from '@/lib/report';
-import {atTime, dayMonth} from '@/lib/turkish';
 import {useReorder} from './atlas-order';
 import {ConflictMailDialog, EventDialog} from './horizon';
 
@@ -16,15 +15,13 @@ type Options = {quiet?: boolean; silent?: boolean};
 type Action = (body: {kind: string; [key: string]: unknown}, options?: Options) => Promise<boolean | undefined>;
 type Props = {
   state: State; dictations: Dictation[]; outbox: QueuedReply[]; now: number; online: boolean; busy: boolean;
-  /** When the shown data was last received from the server (for the offline note). */
-  savedAt: string | null;
   action: Action; select: () => void; answer: (d: Dictation) => void; reply: (d: Dictation, text: string) => void;
   back: () => void; opened: () => void;
 };
 
 const SECTIONS = [['I', 'Emir'], ['II', 'Uyarı'], ['III', 'Yer'], ['IV', 'Karar']] as const;
 
-export default function MorningReport({state, dictations, outbox, now, online, busy, savedAt, action, select, answer, reply, back, opened}: Props) {
+export default function MorningReport({state, dictations, outbox, now, online, busy, action, select, answer, reply, back, opened}: Props) {
   const report = buildReport(state, dictations, outbox, new Date(now));
   const [editing, setEditing] = useState<CalendarEvent | null>(null), [mailId, setMailId] = useState<string | null>(null);
   const index = useRef<HTMLElement>(null);
@@ -48,11 +45,9 @@ export default function MorningReport({state, dictations, outbox, now, online, b
   // “Geri al” after approval undoes exactly the change that approved today's order.
   const approval = approved ? [...state.changes].reverse().find(c => c.ops.some(o => !o.undone && o.key === 'order:' + report.day && !!(o.after as Order | null)?.approvedAt && !(o.before as Order | null)?.approvedAt)) : undefined;
   const mailConflict = report.warnings.find(w => w.id === mailId)?.conflict ?? report.drafts.find(d => d.conflict.id === mailId)?.conflict;
-  const today = calendarDay(new Date(now));
-  const saved = savedAt ? (calendarDay(new Date(savedAt)) === today ? '' : dayMonth(calendarDay(new Date(savedAt))) + ' ') + atTime(clockText(savedAt)) + 'ki' : 'son kaydedilen';
 
   return <div className="morning-report">
-    {!online && <div className="mr-offline" role="status"><WifiOff size={18}/><span>Bağlantı yok. Rapor {saved} haliyle gösteriliyor; dikte cihazda saklanır.</span></div>}
+    {/* Offline, the app's strip above says which record is shown; the approval bar says why it waits. */}
     <header className="mr-head">
       <button className="mr-back" onClick={back}><ArrowLeft size={16}/>Karargâh</button>
       <h1>Sabah raporu</h1>
@@ -136,13 +131,13 @@ export default function MorningReport({state, dictations, outbox, now, online, b
     </div>
 
     <div className="mr-bar">
-      {orders > 0 && !approved && <button className="mr-approve" disabled={off} onClick={() => action({kind: 'approve'}, {silent: true})}><span>Emri onayla</span><span>{orders} CEPHE</span></button>}
+      {orders > 0 && !approved && <button className="mr-approve btn-main" disabled={off} onClick={() => action({kind: 'approve'}, {silent: true})}><span>Emri onayla</span><span>{orders} CEPHE</span></button>}
       {orders > 0 && approved && <div className="mr-approved">
         <span><Check size={18}/>Onaylandı · {clockText(approved)}</span>
         <button className="text-button" disabled={off || !approval} onClick={() => approval && action({kind: 'undo', changeId: approval.id}, {silent: true})}>Geri al</button>
         <button className="mr-home" onClick={back}>Karargâh’a git</button>
       </div>}
-      {!orders && <button className="mr-approve is-center" onClick={back}>Karargâh’a dön</button>}
+      {!orders && <button className="mr-approve is-center btn-quiet" onClick={back}>Karargâh’a dön</button>}
       {!online && orders > 0 && !approved && <p className="mr-offline-note">Onay için bağlantı gerekiyor. Diktelerin cihazda saklanır.</p>}
     </div>
 

@@ -26,6 +26,8 @@ Klasör **yalnız referanstır**:
 
 Tasarımdaki renk, metin ve ölçüler nihaidir. Koddaki renk tokenları `app/atlas.css` `:root` içindedir; yeni sabit renk yazmak yerine token kullan.
 
+Claude Design'ın 2 Ekim arayüz incelemesi (1a, 1d, 1f, 1g, 1h, 1i–1m, K2) bu pakettekinden sonra gelir ve kodda uygulandı; kararlar ve sapmalar `docs/DURUM.md` › "2 Ekim arayüz incelemesi" bölümünde. Ekran başına tek ana eylem `.btn-main` sınıfıdır (K2).
+
 ## Teknoloji
 
 - React 19 + TypeScript. Next.js API'sini Vite üzerinde çalıştıran **vinext**; Cloudflare Worker + D1 (drizzle).
@@ -36,29 +38,34 @@ Tasarımdaki renk, metin ve ölçüler nihaidir. Koddaki renk tokenları `app/at
 
 ## Yapı
 
-- `app/page.tsx` → `app/berthier.tsx`: bütün görünümler (Karargâh, Harita, cephe, Ufuk, Teftiş, Fikir deposu, Kayıt defteri, Tercihler), pencereler, dikte paneli ve alt gezinme.
-- `app/atlas-order.tsx`: Karargâh'taki "Bugünün arazisi" rotası ve "Sırayı düzenle" penceresi (`SortableRoute`).
-- `app/expedition-map.tsx` ve `app/expedition-map.css`: sefer haritası; Karargâh'ta `variant="home"`, Harita sekmesinde `variant="atlas"`.
+- `app/page.tsx` → `app/berthier.tsx`: görünümler ve kabuk. Tek katlı alt çubuk (Karargâh · Harita · Söyle · Ufuk · Defter; Söyle sekme değil, dikte sayfasını açar), tek durum kartı, pencereler ve sayfalar.
+  - Karargâh (1a): `app/atlas-order.tsx` (sıradaki hamle kartı, güzergâh şeridi, rota satırları, "Emri onayla" ve `SortableRoute` ile "Sırayı düzenle" penceresi) ve `app/today.tsx` (raporun II–IV. bölümleri "Bugün ve yarın" olarak).
+  - Harita sekmesi: `app/expedition-map.tsx` ve `app/expedition-map.css`, `variant="atlas"`. `variant="home"` kodda duruyor, kullanılmıyor.
+  - Ufuk (1i): `app/horizon.tsx`; 14 günlük ızgara, çakışma kartı, gün listesi, kalem ve çakışma maili pencereleri.
+  - Defter (1h): `app/book.tsx` (teftiş kartı, sefer defteri özeti, depo ve kayıt defteri satırları). Altındaki sayfalar: `app/review.tsx` (tam ekran Teftiş, 1j), `app/research.tsx` (Fikir deposu, 1k), `app/ledger.tsx` (Kayıt defteri, 1l), `app/settings.tsx` (Tercihler, 1m), `app/logbook.tsx` (Sefer defteri).
+  - `app/page-head.tsx`: iç sayfaların ortak başlığı (geri bağlantısı, serif başlık, mono özet satırı). Marka başlığı yok.
+  - `app/say-sheet.tsx`: alttan açılan, `visualViewport` ile klavyenin üstüne yapışan yazı sayfası (dikte, yanıt, "Nerede kaldın?", hamle düzenleme).
+  - `app/status.tsx`: Söyle'nin üstünde yüzen tek durum kartı (çevrimdışı, işleniyor, tamamlandı, soru, hata) ve çevrimdışı şeridi.
+  - `app/media-input.tsx`: ses ve dosya girişi, dikte sayfasındaki kayıt paneli.
 - `lib/expedition/`: tasarımdaki `class Component`'in taşınmış hâli.
   - `terrain.ts`: arazi, konturlar, A* patika, dalga efekti.
   - `terrain.worker.ts` ve `load.ts`: araziyi Web Worker'da bir kez üretir.
-  - `camps.ts`: kalıcı kamp yerleri ve aciliyet.
+  - `camps.ts`: kalıcı kamp yerleri ve aciliyet (Karargâh çipleri ve Ufuk noktaları da bu eşikleri kullanır).
   - `labels.ts`: etiket yerleşimi.
 - `app/morning-report.tsx` ve `lib/report.ts`: Sabah raporu; dört bölüm, uyarı kuralları ve bekleyen sorular.
 - `app/logbook.tsx` ve `lib/logbook.ts`: Sefer defteri; iki haftalık pencere, gün kayıtları ve ölçümler.
-- `lib/turkish.ts`: saat ve sayılardan sonraki Türkçe ekler ("08:14’te", "2’si") ve kısa tarih biçimleri.
-- `app/horizon.tsx`: Ufuk, çakışma maili, kalem düzenleme.
-- `app/research.tsx`: Fikir deposu ve Teftiş.
-- `app/media-input.tsx`: ses ve dosya girişi.
+- `lib/book.ts`: teftiş zamanı ve kartı, teftişte cephe kararları, Ufuk özeti, Defter satırları.
+- `lib/ledger.ts`: değişikliklerin insan dilinde anlatımı, Kayıt defterinin gün grupları ve geri alınamama nedeni (`undo` kuralları aynen kullanılır).
+- `lib/turkish.ts`: saat ve sayılardan sonraki Türkçe ekler ("08:14’te", "17:00’ye", "2’si") ve kısa tarih biçimleri.
 - `app/api/state/route.ts`: tek komut ucu (zod `Input`, kimlik ve aynı kaynak denetimi, idempotent istek kimliği).
 - `app/api/media/route.ts`: döküm.
-- `lib/domain.ts`: tipler, `propose`/`ensureOrder`, `commitChanges`/`undo`.
+- `lib/domain.ts`: tipler, `propose`/`ensureOrder`, `commitChanges`/`undo`. `State.rhythm` (Tercihler › Ritim) kendi anahtarıyla geri alınabilir.
 - `lib/reducer.ts`: `act`, `applyParsed`.
 - `lib/calendar.ts`, `lib/research.ts`.
 - `lib/notebook.ts`: D1 erişimi.
 - `lib/offline.ts`: IndexedDB kuyruğu.
 - Bütün kullanıcı durumu `notebooks.data` içinde tek bir JSON olarak tutulur ve revizyonla korunur. Değişiklikler `commitChanges` ile kayıt defterine düşer ve geri alınabilir.
-- Stiller: `app/globals.css` (temel) ve `app/atlas.css` (tasarım katmanı, tokenlar).
+- Stiller: `app/globals.css` (temel) ve `app/atlas.css` (tasarım katmanı, tokenlar, `.btn-main`).
 - `public/sw.js` ve `public/manifest.webmanifest`: PWA ve çevrimdışı kabuk.
 
 ## Komutlar
@@ -69,8 +76,8 @@ Tasarımdaki renk, metin ve ölçüler nihaidir. Koddaki renk tokenları `app/at
   - `npm run start -- --port 5174`: derlenmiş Worker; API testleri bu portu kullanır.
   - `npm run dev`: 5173 portu.
 - Tip denetimi: `node node_modules/typescript/bin/tsc --noEmit`.
-- `npm run lint`: uygulama kodunda eskiden kalan 8 hata (React hook kuralları) var. Yeni hata ekleme.
-- Testler: `node scripts/check.mjs`, ayrıca `--calendar`, `--research`, `--flow`, `--media`, `--map`, `--p5` bayraklarıyla.
+- `npm run lint`: uygulama kodunda eskiden kalan 5 hata (React hook kuralları) var. Yeni hata ekleme.
+- Testler: `node scripts/check.mjs`, ayrıca `--calendar`, `--research`, `--flow`, `--media`, `--map`, `--p5`, `--ui` bayraklarıyla.
   - `--llm`, `--p2-llm`, `--p3-llm`, `--flow-llm` ve `--media-live` gerçek sağlayıcıyı çağırır ve kota tüketir; istenmeden çalıştırma.
   - `tests/*-api.mjs`, derlenmiş Worker'a karşı ayrı QA kimlikleriyle çalışır.
 

@@ -17,7 +17,7 @@
   touch-action: pan-y;
 }
 .expedition-map.is-atlas {
-  height: calc(100dvh - 88px);
+  height: calc(100dvh - 16px);
   min-height: 520px;
   border-radius: 24px;
   touch-action: none;
@@ -426,7 +426,7 @@
   cursor: auto;
 }
 .is-atlas .xm-pending {
-  bottom: 186px;
+  bottom: calc(var(--tabbar-h) + 38px);
   z-index: 6;
 }
 .xm-pending > span {
@@ -449,7 +449,7 @@
   color: var(--primary-foreground);
 }
 
-/* Atlas: title over a dark scrim, legend, card and the chips above the dock. */
+/* Atlas: title over a dark scrim, legend, card and the chips above the bottom bar (Söyle rises 26 px in the middle). */
 .xm-head {
   position: absolute;
   left: 0;
@@ -489,7 +489,7 @@
 
 .xm-chip {
   position: absolute;
-  bottom: 186px;
+  bottom: calc(var(--tabbar-h) + 14px);
   z-index: 3;
   min-height: 44px;
   padding: 0 14px;
@@ -511,7 +511,7 @@
 .xm-legend {
   position: absolute;
   right: 12px;
-  bottom: 186px;
+  bottom: calc(var(--tabbar-h) + 14px);
   z-index: 3;
   width: 262px;
   display: flex;
@@ -605,7 +605,7 @@
   position: absolute;
   left: 10px;
   right: 10px;
-  bottom: 184px;
+  bottom: calc(var(--tabbar-h) + 38px);
   z-index: 5;
   padding: 12px 16px 16px 18px;
   border-radius: 20px;
@@ -736,7 +736,7 @@
 
 @media (max-width: 600px) {
   .expedition-map.is-atlas {
-    height: calc(100dvh - 76px);
+    height: 100dvh;
     margin: 0 -20px;
     border-radius: 0;
   }

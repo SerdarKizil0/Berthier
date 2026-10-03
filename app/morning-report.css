@@ -5,28 +5,6 @@ body .is-report main {
   padding-top: 0;
   padding-bottom: 150px;
 }
-body .is-report .heading,
-body .is-logbook .heading {
-  display: none;
-}
-
-.mr-offline {
-  margin-top: 12px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  font-size: 0.875rem;
-  line-height: 1.45;
-  color: var(--tertiary-foreground);
-}
-.mr-offline svg {
-  flex-shrink: 0;
-  margin-top: 1px;
-}
 
 .mr-head {
   padding: 14px 0 16px;
@@ -437,6 +415,7 @@ body .mr-place h3 {
   background: var(--background);
   border-top: 1px solid var(--border);
 }
+/* The approval is the report's one main action (K2: .btn-main gives the gold outline). */
 .mr-approve {
   width: 100%;
   min-height: 52px;
@@ -446,15 +425,11 @@ body .mr-place h3 {
   gap: 12px;
   padding: 10px 16px;
   border-radius: 12px;
-  background: var(--primary);
-  border: 1px solid var(--primary-border);
-  color: var(--primary-foreground);
-  font-weight: 600;
 }
 .mr-approve > span:last-child {
   font: 400 0.75rem var(--atlas-mono);
   letter-spacing: 0.06em;
-  color: var(--tertiary-foreground);
+  opacity: 0.8;
 }
 .mr-approve.is-center {
   justify-content: center;
