@@ -495,6 +495,23 @@ body .change-entry summary > span:last-child {
 body .change-entry .op-row {
   flex-wrap: wrap;
 }
+/* A failed dictation says so in coral and offers “Tekrar dene” on the row itself. */
+.dictation-entry {
+  position: relative;
+}
+.dictation-entry.is-failed .change-entry summary > span:last-child {
+  background: var(--hot-soft);
+  color: var(--hot-ink);
+}
+.dictation-entry.is-failed .change-entry {
+  padding-bottom: 56px;
+}
+.entry-retry {
+  position: absolute;
+  left: 0;
+  bottom: 8px;
+  color: var(--gold);
+}
 /* Berthier's question reads like the P5 "Kararını bekleyenler" card. */
 body .question-block {
   border: 1px solid var(--border);
