@@ -633,6 +633,9 @@ body .tabbar > .say-button {
 .is-report .status-card {
   bottom: 108px;
 }
+.is-review .status-card {
+  bottom: calc(max(14px, env(safe-area-inset-bottom)) + 80px);
+}
 @keyframes status-in {
   from {
     transform: translateY(8px);
