@@ -38,6 +38,15 @@
   --destructive: #ea9a7c;
   --brand: #ed845c;
   --shadow: rgba(0, 0, 0, 0.3);
+  --scrim: rgba(0, 0, 0, 0.6);
+  /* Söyle (design 1d): a warm disc with a gold rim; the rim colour also outlines the main action (K2). */
+  --say-surface: #2c2a26;
+  --gold-line: rgba(212, 185, 138, 0.55);
+  --badge: #e2dfd7;
+  --badge-ink: #18191b;
+
+  /* Shell: one bottom bar, 89 px with the iPhone's 34 px home indicator area */
+  --tabbar-h: calc(55px + max(env(safe-area-inset-bottom), 10px));
 
   /* Map */
   --map-ground: #1c1d1f;
@@ -599,7 +608,7 @@ body .shell {
 }
 body main {
   max-width: 760px;
-  padding-bottom: 210px;
+  padding-bottom: calc(var(--tabbar-h) + 72px);
 }
 body h1,
 body .serif,
@@ -1020,83 +1029,6 @@ body .is-map .heading {
 .route-itinerary .is-passed .itinerary-move {
   text-decoration: line-through;
 }
-body .atlas-bottom {
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 30;
-  width: min(720px, calc(100% - 28px));
-  padding: 10px 12px max(10px, env(safe-area-inset-bottom));
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-bottom: 0;
-  border-radius: 22px 22px 0 0;
-  box-shadow: 0 -8px 30px var(--shadow);
-}
-.dictation-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  text-align: left;
-  background: var(--secondary);
-  border: 0;
-  padding: 10px 12px;
-  border-radius: 14px;
-  font-size: 1rem;
-}
-.dictation-bar > span:nth-child(2) {
-  flex: 1;
-}
-.dictation-bar small {
-  display: block;
-  font-size: 0.75rem;
-  color: var(--muted-foreground);
-  font-weight: 400;
-  margin-top: 2px;
-}
-.dictation-icon {
-  width: 42px;
-  height: 42px;
-  background: var(--secondary);
-  color: var(--gold);
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-body .dock {
-  position: static;
-  transform: none;
-  box-shadow: none;
-  border: 0;
-  width: 100%;
-  background: transparent;
-  padding: 9px 0 0;
-  display: flex;
-  justify-content: space-around;
-  gap: 0;
-  border-radius: 0;
-}
-body .dock button {
-  background: transparent;
-  flex-direction: column;
-  gap: 5px;
-  padding: 6px 10px;
-  border: 0;
-  font-size: 0.75rem;
-  min-width: 60px;
-  color: var(--muted-foreground);
-}
-body .dock .nav-active {
-  color: var(--foreground);
-  font-weight: 700;
-  background: transparent;
-}
-body .dock .nav-active svg {
-  color: var(--foreground);
-}
 .sortable-route {
   padding: 0 4px;
   margin: 0;
@@ -1197,7 +1129,7 @@ body .berthier-dialog .row-actions button {
 }
 /* shadcn renders the overlay with a Tailwind utility; deepen it for the dark shell. */
 [data-slot="dialog-overlay"] {
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--scrim);
 }
 /* Every dialog close control looks like the dictation dialog's icon button. */
 body .berthier-dialog [data-slot="dialog-close"] {
@@ -1229,7 +1161,7 @@ body .choice [data-slot="checkbox"][data-state="checked"] {
   }
   body main {
     padding-top: 22px;
-    padding-bottom: 205px;
+    padding-bottom: calc(var(--tabbar-h) + 72px);
   }
   body .is-map main {
     padding-top: 0;
@@ -1284,9 +1216,6 @@ body .choice [data-slot="checkbox"][data-state="checked"] {
     padding-left: 23px;
     padding-right: 23px;
   }
-  .atlas-bottom {
-    width: calc(100% - 20px) !important;
-  }
   .atlas-move {
     font-size: 2.2rem;
   }
@@ -1313,34 +1242,385 @@ body .choice [data-slot="checkbox"][data-state="checked"] {
   }
 }
 
-/* Reviewed audio and document drafts share the Atlas dictation surface. */
-.media-input {
-  border-top: 1px solid var(--border);
-  padding-top: 16px;
-  margin-top: 4px;
+/* K2 (design review, 2 Oct): one main action per screen. Gold outline, gold text and a faint gold
+   ground; never a bright fill. Every other button is secondary (.btn-quiet) or a text link. */
+.btn-main {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-line);
+  color: var(--gold);
+  font-weight: 600;
 }
-.media-input .row-actions button {
+.btn-quiet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: var(--secondary);
+  border: 1px solid transparent;
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+/* 1d · One bottom bar: four places and Söyle in the middle. Söyle is not a tab; it opens the sheet. */
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: end;
+  padding: 6px max(6px, calc((100% - 720px) / 2)) max(env(safe-area-inset-bottom), 10px);
+  background: var(--background);
+  border-top: 1px solid var(--border);
+}
+body .tabbar > button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: 48px;
+  padding: 6px 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+body .tabbar > button[aria-current="page"] {
+  color: var(--foreground);
+  font-weight: 700;
+}
+body .tabbar > .say-button {
+  padding: 0;
+  margin-top: -26px;
+  font-weight: 600;
+  color: var(--gold);
+}
+.say-disc {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--say-surface);
+  border: 1px solid var(--gold-line);
+  box-shadow: 0 0 0 5px var(--background);
+  color: var(--gold);
+}
+
+/* 1f · Text sheets (Berthier’e söyle, answers, “Nerede kaldın?”, move edits). The sheet's bottom follows
+   the keyboard (say-sheet.tsx); the field scrolls inside so the send button always stays visible. */
+.say-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--scrim);
+}
+.say-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 51;
+  max-width: 760px;
+  max-height: calc(100dvh - 12px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px max(14px, env(safe-area-inset-bottom));
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -8px 30px var(--shadow);
+  outline: none;
+  animation: say-up 0.18s ease-out;
+}
+.say-sheet.is-raised {
+  padding-bottom: 12px;
+}
+@keyframes say-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0.6;
+  }
+}
+.say-grip {
+  flex-shrink: 0;
+  height: 3px;
+  width: 32px;
+  margin: 0 auto 8px;
+  background: var(--input);
+  border-radius: 4px;
+}
+.say-head {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.say-head h2 {
+  margin: 0;
+  font: 400 1.55rem/1.2 var(--atlas-display);
+}
+body .say-close {
+  width: 44px;
+  min-height: 44px;
+  margin-right: -8px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 0;
+}
+.say-description {
+  flex-shrink: 0;
+  margin: 0 0 10px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+body .say-context {
+  flex-shrink: 0;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  margin: 2px 0 10px;
+  padding: 0 6px 0 10px;
+  border-radius: 15px;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--foreground);
+}
+.say-context-bar {
+  width: 3px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--type-lane);
+}
+.say-context-bar.course {
+  background: var(--type-course);
+}
+.say-context-bar.application {
+  background: var(--type-application);
+}
+.say-context-bar.general {
+  background: var(--type-general);
+}
+body .say-text {
+  flex: 0 1 auto;
+  min-height: 92px;
+  max-height: none;
+  resize: none;
+  overflow-y: auto;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--secondary);
+  border: 1px solid var(--input);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+body .say-text:focus-visible,
+body .say-field:focus-visible {
+  outline: none;
+  border-color: var(--gold-line);
+  caret-color: var(--gold);
+}
+body .say-field {
+  flex-shrink: 0;
+  border-radius: 14px;
+}
+.say-choices {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+body .say-choices button {
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: 22px;
+  background: var(--secondary);
+  border: 1px solid var(--primary-border);
+  color: var(--primary-foreground);
+  font-size: 0.875rem;
+}
+body .say-choices button[aria-pressed="true"] {
+  background: var(--gold-soft);
+  border-color: var(--gold-line);
+  color: var(--gold);
+}
+.say-row {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.say-row .btn-main,
+.say-row .btn-quiet {
+  min-height: 44px;
+}
+.say-spacer {
+  flex: 1;
+}
+body .say-pill {
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  min-height: 44px;
+  padding: 0 14px 0 12px;
+  border-radius: 22px;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
 }
-.media-input .quiet {
-  line-height: 1.5;
-  margin-top: 12px;
+body .say-round {
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+}
+body .say-send {
+  width: 48px;
+  min-height: 48px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-line);
+  color: var(--gold);
+}
+
+/* Audio and documents: the pending file, its limits and the recording panel live inside the sheet. */
+.media-input {
+  flex-shrink: 0;
 }
 .media-pending {
-  padding: 12px 0;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--secondary);
   overflow-wrap: anywhere;
 }
 .media-pending p {
   font-weight: 600;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
+}
+.media-pending .row-actions button {
+  min-height: 40px;
+  font-size: 0.875rem;
+}
+.media-limits {
+  margin: 10px 0 0;
+  line-height: 1.5;
+}
+.media-input [role="alert"],
+.media-input .notice {
+  margin: 10px 0 0;
+  font-size: 0.875rem;
+}
+.rec-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  margin: 0;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  color: var(--hot-ink);
+}
+.rec-live > span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--hot);
+  animation: rec-pulse 1.6s ease-in-out infinite;
+}
+@keyframes rec-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+.rec-time {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 4px 0 0;
+}
+.rec-time > span:first-child {
+  font: 400 3rem/1 var(--atlas-mono);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.rec-time > span:last-child {
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.06em;
+  color: var(--muted-foreground);
+}
+.rec-bars {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 56px;
+  margin: 16px 0 10px;
+}
+.rec-bars > span {
+  flex: 1;
+  border-radius: 2px;
+  background: var(--input);
+}
+.rec-bars > span.is-heard {
+  background: var(--gold);
+}
+.rec-note {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+.rec-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+.rec-actions .btn-main {
+  flex: 1;
+}
+.rec-foot {
+  margin: 12px 0 0;
+  font: 500 0.6875rem var(--atlas-mono);
+  letter-spacing: 0.06em;
+  color: var(--muted-foreground);
 }
 .berthier-dialog {
   max-height: calc(100dvh - 32px);
   overflow-y: auto;
   overscroll-behavior: contain;
-}
-.media-input [role="alert"] {
-  font-size: 14px;
 }
