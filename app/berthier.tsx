@@ -40,6 +40,8 @@ export default function Berthier({userId}:{userId:string}) {
  const [view,setView]=useState('home'),[modal,setModal]=useState<Modal>(null),[context,setContext]=useState<string|undefined>(),[text,setText]=useState(''),[selected,setSelected]=useState<string[]>([]),[outbox,setOutbox]=useState<Payload[]>([]),[clock,setClock]=useState(Date.now());
  const revisionRef=useRef(-2),queueWrites=useRef(Promise.resolve()),processingRef=useRef(false),submitting=useRef(false),stateRef=useRef(state),locked=useRef(false),queueRef=useRef<Payload[]>([]),key=`${userId}:`,mounted=useRef(false),recording=useRef<Set<string>>(new Set()),noticeTimer=useRef<ReturnType<typeof setTimeout>|undefined>(undefined),failed=useRef<{body:Omit<Payload,'id'>;options?:{quiet?:boolean;silent?:boolean};id:string;error:string}|null>(null);
  stateRef.current=state;
+ // A failed command waits for “Tekrar dene” only while its own error is on screen.
+ useEffect(()=>{if(failed.current&&failed.current.error!==error)failed.current=null;},[error]);
  useEffect(()=>{window.scrollTo({top:0,behavior:'instant'});},[view]);
  // The single status card (design 1g): a result stays 8 seconds, then lives on in the change log.
  const show=useCallback((n:NoticeBody|null)=>{clearTimeout(noticeTimer.current);setNotice(n?{...n,id:Date.now()}:null);if(n?.kind==='done')noticeTimer.current=setTimeout(()=>setNotice(x=>x?.kind==='done'?null:x),8000);},[]);
