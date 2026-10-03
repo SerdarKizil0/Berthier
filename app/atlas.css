@@ -117,12 +117,6 @@ body .is-home .heading .date {
 body .is-home .heading {
   margin-bottom: 16px;
 }
-body .home-links {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin: 30px 0 12px;
-}
 body .home-links .map-link {
   display: block;
   background: var(--secondary);
@@ -416,53 +410,6 @@ body .idea-actions button:first-child {
   color: var(--primary-foreground);
   border-color: var(--primary-border);
 }
-body .review-start {
-  padding: 28px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-}
-body .review-start h2 {
-  font: 400 2.2rem/1.16 var(--atlas-display);
-}
-body .review-start p {
-  font-size: 1rem;
-}
-body .review-steps {
-  gap: 8px;
-}
-body .review-steps button {
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  font: 400 0.875rem var(--atlas-mono);
-  background: var(--secondary);
-  border: 0;
-}
-body .review-steps .chosen {
-  background: var(--gold-soft);
-  color: var(--gold);
-  box-shadow: inset 0 0 0 1px var(--gold);
-}
-body .review-steps span {
-  display: none !important;
-}
-body .review-steps li {
-  position: relative;
-}
-body .review-steps li:not(:last-child):after {
-  content: "";
-  position: absolute;
-  top: 24px;
-  left: 54px;
-  right: 6px;
-  height: 1px;
-  background: var(--border);
-}
-body .review-footer button {
-  font-size: 0.875rem;
-}
 body .subheading {
   font-family: var(--atlas-display);
   font-size: 1.8rem;
@@ -550,9 +497,6 @@ body .question-block button {
   font-size: 0.875rem;
 }
 @media (max-width: 600px) {
-  body .home-links {
-    gap: 10px;
-  }
   body .home-links .map-link {
     padding: 17px 14px;
   }
@@ -577,17 +521,6 @@ body .question-block button {
   }
   body .idea-text {
     font-size: 1.5rem;
-  }
-  body .review-start {
-    padding: 24px;
-  }
-  body .review-steps button {
-    width: 42px;
-    height: 42px;
-  }
-  body .review-steps li:not(:last-child):after {
-    top: 21px;
-    left: 48px;
   }
   body .settings-list {
     padding: 3px 16px;
@@ -1518,6 +1451,418 @@ body .status-choices button {
   from {
     opacity: 0;
   }
+}
+
+/* 1h · Defter: records and review in one place. */
+.book-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+}
+.book-head .icon-button {
+  margin-right: -10px;
+}
+body .book h1 {
+  margin: 0 0 18px;
+  font: 400 2.6rem/1.05 var(--atlas-display);
+  letter-spacing: -0.02em;
+}
+.review-card {
+  margin-bottom: 4px;
+  padding: 16px 18px 18px;
+  border-radius: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+.is-home .review-card {
+  margin-bottom: 18px;
+}
+.review-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  color: var(--gold);
+}
+.review-card-top > span:last-child {
+  letter-spacing: 0.06em;
+  color: var(--muted-foreground);
+}
+body .review-card h2 {
+  margin: 8px 0 4px;
+  font: 400 1.75rem/1.12 var(--atlas-display);
+}
+.review-card > p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+.review-card .btn-quiet {
+  margin-top: 14px;
+  min-height: 48px;
+  padding: 0 18px;
+  border-color: var(--primary-border);
+  color: var(--primary-foreground);
+  font-weight: 600;
+}
+.book-logbook {
+  margin-top: 24px;
+}
+body .book-logbook > h2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.1em;
+  color: var(--tertiary-foreground);
+}
+.book-logbook > h2 > span:last-child {
+  letter-spacing: 0.06em;
+  color: var(--muted-foreground);
+}
+.book-logbook .lb-cells {
+  margin-top: 14px;
+}
+.book-logbook .lb-totals {
+  margin-top: 12px;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+.book-entry {
+  margin-top: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+.book-entry .lb-text {
+  margin-top: 6px;
+}
+body .book-link {
+  min-height: 44px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gold);
+}
+body .book-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  text-align: left;
+  font-weight: 400;
+}
+.book-logbook + .book-row {
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.book-row > span {
+  flex: 1;
+  min-width: 0;
+}
+.book-row strong {
+  display: block;
+  font-weight: 500;
+}
+.book-row small {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+.book-row > svg {
+  flex-shrink: 0;
+}
+
+/* 1j · Haftalık teftiş, full screen: named steps, one card per front, one main action at the bottom. */
+body .is-review main {
+  padding-top: 4px;
+  padding-bottom: 150px;
+}
+.review-top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  min-height: 52px;
+}
+.review-top > span {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+body .review-close {
+  justify-self: start;
+  width: 44px;
+  min-height: 44px;
+  margin-left: -10px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 0;
+}
+body .review-later {
+  justify-self: end;
+  min-height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+.review-steps-bar {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 4px;
+}
+body .review-steps-bar button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-height: 36px;
+  padding: 4px 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  font: 500 0.6875rem var(--atlas-mono);
+  letter-spacing: 0.04em;
+  color: var(--muted-foreground);
+}
+.review-steps-bar button > span {
+  align-self: stretch;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border);
+}
+body .review-steps-bar button[aria-current="step"] {
+  color: var(--foreground);
+}
+.review-steps-bar button[aria-current="step"] > span {
+  background: var(--gold);
+}
+.review-count {
+  margin: 22px 0 6px;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  color: var(--gold);
+}
+body .review-title {
+  margin: 0;
+  font: 400 2.4rem/1.05 var(--atlas-display);
+  letter-spacing: -0.02em;
+}
+.review-lead {
+  margin: 8px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+  text-wrap: pretty;
+}
+.review-body .research,
+.review-body .choice:first-of-type {
+  margin-top: 10px;
+}
+.stale-card {
+  margin-top: 18px;
+  padding: 16px 18px 18px;
+  border-radius: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+.stale-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+}
+.stale-top > span:nth-child(2) {
+  flex: 1;
+}
+.stale-bar {
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--type-lane);
+}
+.stale-bar.course {
+  background: var(--type-course);
+}
+.stale-bar.application {
+  background: var(--type-application);
+}
+.stale-bar.general {
+  background: var(--type-general);
+}
+.stale-days {
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: var(--secondary);
+  letter-spacing: 0.04em;
+  color: var(--tertiary-foreground);
+}
+body .stale-card h3 {
+  margin: 8px 0 10px;
+  font: 400 1.9rem/1.1 var(--atlas-display);
+}
+.stale-label {
+  margin: 0;
+  font: 500 0.6875rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+}
+.stale-move {
+  margin: 2px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+.stale-note {
+  margin: 10px 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--muted-foreground);
+}
+.stale-choices {
+  display: flex;
+  gap: 6px;
+  margin-top: 14px;
+}
+body .stale-choices button {
+  flex: 1;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 12px;
+  background: var(--secondary);
+  border: 1px solid var(--primary-border);
+  color: var(--primary-foreground);
+  font-weight: 600;
+}
+body .stale-choices button.is-chosen {
+  background: var(--gold-soft);
+  border-color: var(--gold-line);
+  color: var(--gold);
+}
+.review-lanes {
+  margin-top: 12px;
+}
+.review-brief-counts {
+  margin: 16px 0 6px;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  color: var(--tertiary-foreground);
+}
+.brief-conflict {
+  margin: 8px 0;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--hot-border);
+  font-size: 0.9375rem;
+}
+.brief-conflict > span {
+  display: block;
+  font: 500 0.75rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  color: var(--hot-ink);
+}
+.brief-row {
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr);
+  gap: 2px 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9375rem;
+}
+.brief-row > span:first-child {
+  white-space: nowrap;
+  font: 500 0.6875rem/2 var(--atlas-mono);
+  letter-spacing: 0.04em;
+  color: var(--muted-foreground);
+}
+.brief-row > span:nth-child(3) {
+  grid-column: 2;
+  font: 500 0.6875rem var(--atlas-mono);
+  letter-spacing: 0.08em;
+  color: var(--gold);
+}
+.brief-row > span.is-open {
+  color: var(--hot-ink);
+}
+.brief-open {
+  color: var(--gold);
+}
+.review-body .review-summary {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.review-body .review-summary li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9375rem;
+}
+.review-note {
+  margin: 16px 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+.review-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px max(16px, calc((100% - 760px) / 2)) max(14px, env(safe-area-inset-bottom));
+  background: var(--background);
+  border-top: 1px solid var(--border);
+}
+.review-bar .btn-main {
+  flex: 1;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+body .review-prev {
+  min-height: 52px;
+  padding: 0 6px;
+  background: none;
+  border: 0;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+.review-why {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(max(14px, env(safe-area-inset-bottom)) + 70px);
+  z-index: 31;
+  text-align: center;
 }
 
 /* 1f · Text sheets (Berthier’e söyle, answers, “Nerede kaldın?”, move edits). The sheet's bottom follows

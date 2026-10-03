@@ -849,45 +849,6 @@ summary:focus-visible {
 .idea-actions button {
   font-size: 0.875rem;
 }
-.review-start {
-  padding: 24px 0;
-}
-.review-start p {
-  margin: 16px 0 24px;
-  color: var(--muted-foreground);
-}
-.review-start svg {
-  color: var(--gold);
-  margin-bottom: 14px;
-}
-.review-steps {
-  list-style: none;
-  display: flex;
-  padding: 0;
-  gap: 6px;
-  margin: 0 0 24px;
-}
-.review-steps li {
-  flex: 1;
-  min-width: 0;
-}
-.review-steps button {
-  width: 100%;
-  padding: 8px 4px;
-}
-.review-steps span {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 400;
-}
-.review-footer {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 24px 0;
-  margin-top: 20px;
-  border-top: 1px solid var(--border);
-}
 .review-summary {
   padding-left: 22px;
 }
@@ -895,12 +856,6 @@ summary:focus-visible {
   padding: 8px 0;
 }
 @media (max-width: 600px) {
-  .review-steps span {
-    display: none;
-  }
-  .review-steps [aria-current] span {
-    display: block;
-  }
   .idea-actions button {
     flex: 1 1 40%;
   }
