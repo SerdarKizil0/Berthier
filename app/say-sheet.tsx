@@ -39,10 +39,12 @@ type Props = {
   quietDescription?: boolean;
   /** The recording panel draws its own heading; the title stays for screen readers. */
   bare?: boolean;
+  /** The description is one mono line (a routine's record sheet: “SIRADA · 22:30 · ≈32 DK”). */
+  metaDescription?: boolean;
   children: ReactNode;
 };
 
-export default function SaySheet({open, onClose, locked, title, description, quietDescription, bare, children}: Props) {
+export default function SaySheet({open, onClose, locked, title, description, quietDescription, bare, metaDescription, children}: Props) {
   const {bottom, height} = useVisualViewport(open);
   return <Primitive.Root open={open} onOpenChange={value => { if (!value && !locked) onClose(); }}>
     <Primitive.Portal>
@@ -53,7 +55,7 @@ export default function SaySheet({open, onClose, locked, title, description, qui
           <Primitive.Title>{title}</Primitive.Title>
           <Primitive.Close asChild><button className="say-close" disabled={locked} aria-label="Kapat"><X size={20}/></button></Primitive.Close>
         </div>
-        <Primitive.Description className={quietDescription || bare ? 'sr-only' : 'say-description'}>{description}</Primitive.Description>
+        <Primitive.Description className={quietDescription || bare ? 'sr-only' : metaDescription ? 'say-description is-meta' : 'say-description'}>{description}</Primitive.Description>
         {children}
       </Primitive.Content>
     </Primitive.Portal>

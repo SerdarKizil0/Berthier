@@ -28,6 +28,8 @@ Tasarımdaki renk, metin ve ölçüler nihaidir. Koddaki renk tokenları `app/at
 
 Claude Design'ın 2 Ekim arayüz incelemesi (1a, 1d, 1f, 1g, 1h, 1i–1m, K2) bu pakettekinden sonra gelir ve kodda uygulandı; kararlar ve sapmalar `docs/DURUM.md` › "2 Ekim arayüz incelemesi" bölümünde. Ekran başına tek ana eylem `.btn-main` sınıfıdır (K2).
 
+4 Ekim "Rutinler ve dikte türleri" turu `design-reference/rutinler/` altındadır: `Berthier Rutinler.dc.html` (A1–A7, B1–B4, C1–C4, D1–D3, R1–R4, kararlar K6–K10) ve `devir/rutinler-devir.md` (veri, komutlar, model, kurallar, ölçüler). Önerilen seçenekler (R1a–R4a) uygulandı; ayrıntı ve sapmalar `docs/DURUM.md` › "4 Ekim: Rutinler ve dikte türleri".
+
 ## Teknoloji
 
 - React 19 + TypeScript. Next.js API'sini Vite üzerinde çalıştıran **vinext**; Cloudflare Worker + D1 (drizzle).
@@ -38,15 +40,18 @@ Claude Design'ın 2 Ekim arayüz incelemesi (1a, 1d, 1f, 1g, 1h, 1i–1m, K2) bu
 
 ## Yapı
 
-- `app/page.tsx` → `app/berthier.tsx`: görünümler ve kabuk. Tek katlı alt çubuk (Karargâh · Harita · Söyle · Ufuk · Defter; Söyle sekme değil, dikte sayfasını açar), tek durum kartı, pencereler ve sayfalar.
+- `app/page.tsx` → `app/berthier.tsx`: görünümler ve kabuk. Tek katlı alt çubuk (Karargâh · Rutinler · Söyle · Ufuk · Defter; K6). Söyle sekme değil, dikte sayfasını açar. Harita, cephe sayfaları ve sabah raporu Karargâh'ın altında açılır. Tek durum kartı, pencereler ve sayfalar; cephe sayfasında “Bu cephe ne?” (tür, C3).
   - Karargâh (1a): `app/atlas-order.tsx` (sıradaki hamle kartı, güzergâh şeridi, rota satırları, "Emri onayla" ve `SortableRoute` ile "Sırayı düzenle" penceresi) ve `app/today.tsx` (raporun II–IV. bölümleri "Bugün ve yarın" olarak).
-  - Harita sekmesi: `app/expedition-map.tsx` ve `app/expedition-map.css`, `variant="atlas"`. `variant="home"` kodda duruyor, kullanılmıyor.
+  - Harita sayfası (Karargâh › “Haritada aç”): `app/expedition-map.tsx` ve `app/expedition-map.css`, `variant="atlas"`. `variant="home"` kodda duruyor, kullanılmıyor.
+  - Rutinler (A1–A7, B3, B4): `app/routines.tsx`. Sekme (gözlem kartı, haftalık düzen hazır kartı, iskele, Bugün, Bu hafta), haftalık düzen sayfası (`routine-pattern`), rutin ayrıntısı (`routine:<id>`, adımlı rutin dahil), kayıt sayfası (A4), düzeltme ve teftişteki “+ Seans” sayfaları.
   - Ufuk (1i): `app/horizon.tsx`; 14 günlük ızgara, çakışma kartı, gün listesi, kalem ve çakışma maili pencereleri.
   - Defter (1h): `app/book.tsx` (teftiş kartı, sefer defteri özeti, depo ve kayıt defteri satırları). Altındaki sayfalar: `app/review.tsx` (tam ekran Teftiş, 1j), `app/research.tsx` (Fikir deposu, 1k), `app/ledger.tsx` (Kayıt defteri, 1l), `app/settings.tsx` (Tercihler, 1m), `app/logbook.tsx` (Sefer defteri).
   - `app/page-head.tsx`: iç sayfaların ortak başlığı (geri bağlantısı, serif başlık, mono özet satırı). Marka başlığı yok.
   - `app/say-sheet.tsx`: alttan açılan, `visualViewport` ile klavyenin üstüne yapışan yazı sayfası (dikte, yanıt, "Nerede kaldın?", hamle düzenleme).
-  - `app/status.tsx`: Söyle'nin üstünde yüzen tek durum kartı (çevrimdışı, işleniyor, tamamlandı, soru, hata) ve çevrimdışı şeridi.
+  - `app/status.tsx`: Söyle'nin üstünde yüzen tek durum kartı ve çevrimdışı şeridi. Öncelik (K10): hata › soru › sonuç (dikte makbuzu, K8) › sayaç › rutin hatırlatması › işleniyor › çevrimdışı kuyruk.
   - `app/media-input.tsx`: ses ve dosya girişi, dikte sayfasındaki kayıt paneli.
+- `lib/routines.ts`: rutin tipleri, hafta (Pzt 04:00), süre ortancası, kayma, gözlem → öneri (`mirror`), Bugün/Bu hafta satırları, `reminderFor(state, now)` (bildirim dalı da bunu kullanacak), iskele ve deneme, `routineAct` (komutlar).
+- `lib/kinds.ts`: dikte türleri ve makbuz (`placementsOf`, dikte sonucunda `placed`), `rekind` (kalemi başka türe taşır) ve `retype` (cephe türü).
 - `lib/expedition/`: tasarımdaki `class Component`'in taşınmış hâli.
   - `terrain.ts`: arazi, konturlar, A* patika, dalga efekti.
   - `terrain.worker.ts` ve `load.ts`: araziyi Web Worker'da bir kez üretir.
@@ -59,7 +64,7 @@ Claude Design'ın 2 Ekim arayüz incelemesi (1a, 1d, 1f, 1g, 1h, 1i–1m, K2) bu
 - `lib/turkish.ts`: saat ve sayılardan sonraki Türkçe ekler ("08:14’te", "17:00’ye", "2’si") ve kısa tarih biçimleri.
 - `app/api/state/route.ts`: tek komut ucu (zod `Input`, kimlik ve aynı kaynak denetimi, idempotent istek kimliği).
 - `app/api/media/route.ts`: döküm.
-- `lib/domain.ts`: tipler, `propose`/`ensureOrder`, `commitChanges`/`undo`. `State.rhythm` (Tercihler › Ritim) kendi anahtarıyla geri alınabilir.
+- `lib/domain.ts`: tipler, `propose`/`ensureOrder`, `commitChanges`/`undo`. `State.rhythm` (Tercihler › Ritim) kendi anahtarıyla geri alınabilir. Rutinler `routines` anahtarında (rutinler, seanslar, ertelemeler, sayaç, deneme), tür düzeltmeleri `learned` anahtarında. `labels`/`typeNames`: Ders, Proje (lane), Başvuru, İş (general).
 - `lib/reducer.ts`: `act`, `applyParsed`.
 - `lib/calendar.ts`, `lib/research.ts`.
 - `lib/notebook.ts`: D1 erişimi.
@@ -77,8 +82,8 @@ Claude Design'ın 2 Ekim arayüz incelemesi (1a, 1d, 1f, 1g, 1h, 1i–1m, K2) bu
   - `npm run dev`: 5173 portu.
 - Tip denetimi: `node node_modules/typescript/bin/tsc --noEmit`.
 - `npm run lint`: uygulama kodunda eskiden kalan 5 hata (React hook kuralları) var. Yeni hata ekleme.
-- Testler: `node scripts/check.mjs`, ayrıca `--calendar`, `--research`, `--flow`, `--media`, `--map`, `--p5`, `--ui` bayraklarıyla.
-  - `--llm`, `--p2-llm`, `--p3-llm`, `--flow-llm` ve `--media-live` gerçek sağlayıcıyı çağırır ve kota tüketir; istenmeden çalıştırma.
+- Testler: `node scripts/check.mjs`, ayrıca `--calendar`, `--research`, `--flow`, `--media`, `--map`, `--p5`, `--ui`, `--routines` bayraklarıyla.
+  - `--llm`, `--p2-llm`, `--p3-llm`, `--flow-llm`, `--routines-llm` ve `--media-live` gerçek sağlayıcıyı çağırır ve kota tüketir; istenmeden çalıştırma.
   - `tests/*-api.mjs`, derlenmiş Worker'a karşı ayrı QA kimlikleriyle çalışır.
 
 ## Bilinen tuzak: Sites eklentisi
@@ -116,4 +121,4 @@ Sites tarafı doğrulanmadan `vite.config.ts`'i ve Worker girişini değiştirme
 
 ## Bekleyen
 
-- Bildirimler (Web Push, zamanlanmış gönderim, Tercihler › Bildirimler): kullanıcının 2 Ekim kararıyla, Sites tarafı doğrulandıktan sonra ayrı bir dalda yapılacak.
+- Bildirimler (Web Push, zamanlanmış gönderim, Tercihler › Bildirimler): kullanıcının 2 Ekim kararıyla, Sites tarafı doğrulandıktan sonra ayrı bir dalda yapılacak. Rutin hatırlatmasının içeriği ve zamanı hazır: `lib/routines.ts` › `reminderFor` (sessiz saatte `quiet: true`, yalnız uygulama içi).

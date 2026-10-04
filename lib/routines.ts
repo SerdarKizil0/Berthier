@@ -6,7 +6,7 @@
 
 import { RHYTHM, type State, dayKey, normalize, similarity, uid } from './domain';
 import { addDays, daysBetween, occurrences, validDate, validTime } from './calendar';
-import { DAY_NAMES, WD, accusative, andList, atTime, dayMonth, genitive, lowerFirst, minutesText, onDate, possessive, untilTime, upper } from './turkish';
+import { DAY_NAMES, WD, accusative, andList, atTime, dayMonth, genitive, lowerFirst, minutesText, onDate, possessive, sinceTime, untilTime, upper } from './turkish';
 
 export type RoutineStep = { key: string; title: string; offsetMin: number; activeMin: number; wait?: boolean };
 export type Routine = {
@@ -65,6 +65,11 @@ export function quantile(xs: number[], q: number) {
 }
 export const median = (xs: number[]) => quantile(xs, 0.5);
 const round5 = (n: number) => Math.max(5, Math.round(n / 5) * 5);
+/** A range as written: to 5 minutes for longer routines, to the minute for short ones; none when it collapses. */
+function spread(lo: number, hi: number, m: number): [number, number] | null {
+  const r = (x: number) => m >= 20 ? round5(x) : Math.max(1, Math.round(x)), a = r(lo), b = r(hi);
+  return a < b ? [a, b] : null;
+}
 
 // ── Records ──
 
@@ -100,7 +105,7 @@ export function usual(s: State, r: Routine): Usual {
     return { minutes: said ?? r.pattern?.minutes ?? null, range: r.pattern?.range ?? null, timed, n: 0 };
   }
   const m = Math.round(median(pool)), lo = quantile(pool, 0.1), hi = quantile(pool, 0.9);
-  return { minutes: m, range: pool.length >= 3 && hi - lo > m / 2 ? [round5(lo), round5(hi)] : null, timed, n: pool.length };
+  return { minutes: m, range: pool.length >= 3 && hi - lo > m / 2 ? spread(lo, hi, m) : null, timed, n: pool.length };
 }
 export const usualMinutes = (s: State, r: Routine) => usual(s, r).minutes;
 /** “≈32 dk”, “30–90 dk”. */
@@ -230,7 +235,7 @@ export function todayList(s: State, now: Date): TodayList {
     rows.push({ key: 'skip:' + r.id, ids: [r.id], time: '—', title: r.title, sub: `Bugün değil · ${k.slidTo ? `${DAY_NAMES[weekday(k.slidTo)]} ${untilTime(r.pattern!.time)} kaydı` : 'bu hafta kaymadı'}`, chip: '', tone: 'skip', at: 9999 });
   }
   const count = new Set(rows.filter(x => x.tone !== 'skip' && x.tone !== 'fixed').flatMap(x => x.ids)).size;
-  return { rows: rows.map(({ at: _, ...x }) => x), count, left: Math.round(left), total, planned, next: rows.find(x => x.tone === 'next') ?? null };
+  return { rows: rows.map(x => ({ key: x.key, ids: x.ids, time: x.time, title: x.title, sub: x.sub, chip: x.chip, tone: x.tone })), count, left: Math.round(left), total, planned, next: rows.find(x => x.tone === 'next') ?? null };
 }
 
 // ── Bu hafta (A1, A3) ──
@@ -335,7 +340,7 @@ export function runningInfo(s: State, now: Date): RunningInfo | null {
 
 // ── Hatırlatma (B1, B2) ──
 
-export type Reminder = { key: string; routineId: string; title: string; body: string; words: string | null; from: string; until: string; quiet: boolean };
+export type Reminder = { key: string; routineId: string; title: string; body: string; words: string | null; from: string; until: string; quiet: boolean; timer: boolean };
 
 function inQuiet(time: string, s: State) {
   const r = s.rhythm ?? RHYTHM, t = toMin(time), a = toMin(r.quietFrom), b = toMin(r.quietTo);
@@ -354,7 +359,7 @@ export function reminderFor(s: State, now: Date, hidden: string[] = []): Reminde
   for (const id of today) {
     const r = s.routines![id], p = r.pattern!;
     if (!r.reminder.on || s.running?.routineId === id || (p.after && today.has(p.after))) continue;
-    const key = `${id}:${d}`, block = at(d, p.time).getTime(), lead = (r.travel ? r.travel : 0) + (r.travel ? LEAD_MIN : r.reminder.leadMin ?? LEAD_MIN);
+    const key = `${id}:${d}`, block = at(d, p.time).getTime(), lead = r.travel ? r.travel + LEAD_MIN : r.reminder.leadMin;
     const next = settled.find(x => x.pattern!.after === id && today.has(x.id));
     const minutes = (usualMinutes(s, r) ?? p.minutes) + (next ? usualMinutes(s, next) ?? next.pattern!.minutes : 0);
     const from = block - lead * MIN, until = block + minutes * MIN;
@@ -362,7 +367,7 @@ export function reminderFor(s: State, now: Date, hidden: string[] = []): Reminde
     const n = weekDone(s, r, d), u = usual(s, r);
     const length = next ? `≈${minutesText(minutes)}` : u.range ? `${u.range[0]}–${u.range[1]} dk` : `≈${minutesText(minutes)}`;
     const body = [n ? `Bu hafta ${n}/${r.count}` : 'Haftanın ilk seansı', next ? `ardından ${lowerFirst(next.title)}` : '', length, fixedOn(s, d).length ? `${p.time} boş` : ''].filter(Boolean).join(' · ');
-    out.push({ key, routineId: id, title: `${r.title} · ${p.time}`, body, words: r.ownWords?.show ? `“${r.ownWords.text.replace(/^[“"]|[”"]$/g, '')}”` : null, from: new Date(from).toISOString(), until: new Date(until).toISOString(), quiet: inQuiet(clock(new Date(from).toISOString()), s) });
+    out.push({ key, routineId: id, title: `${r.title} · ${p.time}`, body, words: r.ownWords?.show ? `“${r.ownWords.text.replace(/^[“"]|[”"]$/g, '')}”` : null, from: new Date(from).toISOString(), until: new Date(until).toISOString(), quiet: inQuiet(clock(new Date(from).toISOString()), s), timer: r.timer });
   }
   return out.sort((a, b) => a.from.localeCompare(b.from))[0] ?? null;
 }
@@ -392,11 +397,12 @@ export function scaffolds(s: State, today: string) {
     if (r.timer && u.timed.length >= 8) {
       const m = median(u.timed), lo = Math.round(quantile(u.timed, 0.1)), hi = Math.round(quantile(u.timed, 0.9));
       if (hi - lo <= m / 4) { if (!declined(r.asked?.timerOff, today)) items.push({ routine: r, what: 'timer', title: `${genitive(r.title)} süresi oturdu.`, text: `${u.timed.length} ölçüm, ${lo}–${hi} dk. Sayaç yerine “Yaptım” yeter; ≈${Math.round(m)} dk yazılır.`, yes: 'Tek dokunuşa geç', no: 'Sayaç kalsın' }); }
-      else if (hi - lo > m / 2) notes.push(`${genitive(r.title)} süresi değişiyor (${round5(lo)}–${round5(hi)} dk); onda sayaç kalıyor.`);
+      else if (hi - lo > m / 2 && spread(lo, hi, m)) notes.push(`${genitive(r.title)} süresi değişiyor (${spread(lo, hi, m)!.join('–')} dk); onda sayaç kalıyor.`);
     }
   }
+  // At most two suggestions at a time, the reminder ones first; the rest come up on a later day.
   const first = settled.map(r => dayKey(new Date(r.pattern!.approvedAt))).sort()[0];
-  return { items, notes, weeks: first ? Math.floor(daysBetween(first, today) / 7) : 0 };
+  return { items: items.sort((a, b) => Number(b.what === 'reminder') - Number(a.what === 'reminder')).slice(0, 2), notes: notes.slice(0, 1), weeks: first ? Math.floor(daysBetween(first, today) / 7) : 0 };
 }
 
 // ── Deneme (“Yarısına”) ──
@@ -607,7 +613,7 @@ export function routineAct(n: State, c: RoutineCommand, now = new Date()) {
       const t = n.reminderTrial;
       if (!t || t.decidedAt) throw Error('Açık hatırlatma denemesi yok.');
       if (c.trial !== 'keep') for (const x of routinesOf(n).filter(x => x.status === 'settled')) x.reminder = { ...x.reminder, on: c.trial === 'all' };
-      for (const x of routinesOf(n)) if (x.reminder.group) { const { group: _, ...rest } = x.reminder; x.reminder = rest; }
+      for (const x of routinesOf(n)) if (x.reminder.group) { const rest = { ...x.reminder }; delete rest.group; x.reminder = rest; }
       n.reminderTrial = { ...t, decidedAt: now.toISOString() };
       if (n.review && !n.review.completedAt) n.review.decisions.push(`Hatırlatma denemesi: ${{ all: 'hepsine açıldı', keep: 'böyle kaldı', none: 'hepsi kapandı' }[c.trial ?? 'keep']}.`);
       return;
@@ -635,6 +641,73 @@ export function stepsOf(steps: { title: string; minutes: number | null; wait: bo
     offset += minutes;
     return step;
   });
+}
+
+/** Where “Bugün değil” would send today's session (A4 says it before the tap). */
+export function slideTarget(s: State, r: Routine, day: string, now: Date) {
+  if (r.status !== 'settled' || (s.skips ?? []).some(k => k.routineId === r.id && k.day === day)) return undefined;
+  const n = structuredClone(s);
+  return skipDay(n, n.routines![r.id], day, now).slidTo;
+}
+
+export const recentSessions = (s: State, r: Routine, count = 8) => sessionsOf(s, r.id).sort((a, b) => startOf(b).localeCompare(startOf(a))).slice(0, count);
+
+export type StepView = { step: RoutineStep; index: number; state: 'done' | 'now' | 'next'; label: string; note: string; chip: string; at?: string };
+
+/** A routine with steps (A7): each step is its own record; a waiting step writes no time and only sets when the
+ *  next one is due (the waits learned from earlier rounds, else what was said). The round is the steps after
+ *  the last finished one. */
+export function stepsView(s: State, r: Routine): StepView[] {
+  const steps = r.steps ?? [];
+  if (!steps.length) return [];
+  const xs = sessionsOf(s, r.id).sort((a, b) => startOf(a).localeCompare(startOf(b))), last = steps.at(-1)!.key;
+  const finals = xs.filter(x => x.step === last), round = xs.filter(x => !finals.length || startOf(x) > finals.at(-1)!.end);
+  const done = new Map(round.filter(x => x.step).map(x => [x.step!, x]));
+  // Learned waits: from the end of the step before a wait to the start of the step after it.
+  const waitOf = (i: number) => {
+    const before = steps[i - 1], after = steps[i + 1], said = (after?.offsetMin ?? steps[i].offsetMin) - steps[i].offsetMin;
+    if (!before || !after) return said;
+    const gaps = xs.filter(x => x.step === after.key).flatMap(x => { const b = xs.filter(y => y.step === before.key && y.end <= startOf(x)).at(-1); return b ? [(Date.parse(startOf(x)) - Date.parse(b.end)) / MIN] : []; });
+    return gaps.length ? median(gaps) : said;
+  };
+  let cursor: number | null = null, current = false;
+  return steps.map((p, i) => {
+    const x = done.get(p.key), next = steps[i + 1], nextDone = next && done.has(next.key);
+    if (x) { cursor = Date.parse(x.end); return { step: p, index: i, state: 'done' as const, label: upper(`${WD[weekday(x.day)]} ${clock(startOf(x))}`), note: '', chip: `✓ ${minutesText(x.minutes).toLocaleUpperCase('tr-TR')}` }; }
+    if (p.wait) {
+      const wait = waitOf(i);
+      if (nextDone) return { step: p, index: i, state: 'done' as const, label: 'BEKLENDİ', note: 'Bekleme', chip: '' };
+      if (cursor !== null && !current) {
+        const until = cursor + wait * MIN, since = clock(new Date(cursor).toISOString());
+        current = true;
+        const view = { step: p, index: i, state: 'now' as const, label: `ŞİMDİ · ${upper(sinceTime(since))} BERİ`, note: `Bekleme · ${WD[weekday(dayKey(new Date(until)))]} ≈${untilTime(clock(new Date(until).toISOString()))} kadar`, chip: `≈${Math.round(wait / 60)} SA`, at: new Date(until).toISOString() };
+        cursor = until;
+        return view;
+      }
+      cursor = cursor !== null ? cursor + wait * MIN : null;
+      return { step: p, index: i, state: 'next' as const, label: 'BEKLEME', note: `Bekleme · ≈${minutesText(wait)}`, chip: '' };
+    }
+    const running = s.running?.routineId === r.id && s.running.step === p.key;
+    const due = cursor !== null ? new Date(cursor).toISOString() : undefined;
+    const state = running || (!current && (i === 0 || cursor !== null)) ? 'now' as const : 'next' as const;
+    if (state === 'now') current = true;
+    if (cursor !== null) cursor += p.activeMin * MIN;
+    return { step: p, index: i, state, label: running ? 'SAYAÇ SÜRÜYOR' : due ? upper(`${WD[weekday(dayKey(new Date(due)))]} ${clock(due)}`) : i === 0 ? 'SIRADA' : 'SONRA', note: '', chip: `${minutesText(p.activeMin).toLocaleUpperCase('tr-TR')}`, ...(due ? { at: due } : {}) };
+  });
+}
+
+/** The status card after a routine command (A5, B3): what was saved and the week's number. */
+export function routineNotice(kind: string, before: State, after: State, now = new Date()): { title: string; text: string; sessionId?: string } | null {
+  if (kind === 'routineFinish' || kind === 'routineLog') {
+    const x = (after.sessions ?? []).find(y => !(before.sessions ?? []).some(z => z.id === y.id)), r = x && after.routines?.[x.routineId];
+    return x && r ? { title: `${r.title} kaydedildi.`, text: `${minutesText(x.minutes)} · ${weekNote(after, r, x.day)}.`, sessionId: x.id } : null;
+  }
+  if (kind === 'routineSkip') {
+    const k = (after.skips ?? []).find(y => !(before.skips ?? []).some(z => z.routineId === y.routineId && z.day === y.day)), r = k && after.routines?.[k.routineId];
+    if (!k || !r) return null;
+    return { title: `${r.title} ${k.day === dayKey(now) ? 'bugün değil' : `${WD[weekday(k.day)]} değil`}.`, text: k.slidTo && r.pattern ? `Seans ${DAY_NAMES[weekday(k.slidTo)]} ${untilTime(r.pattern.time)} kaydı; hafta yine ${r.count}.` : 'Bu hafta boş gün yok; sayı olduğu gibi kalır.' };
+  }
+  return null;
 }
 
 /** “Bu hafta 1/4”, after a session is saved. */

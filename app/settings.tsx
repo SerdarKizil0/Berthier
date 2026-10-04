@@ -1,12 +1,14 @@
 'use client';
 // Tercihler (design 1m): real settings as grouped, tappable rows with the value on the right. Ritim and the
 // mail signature are editable here (both undoable from the change log); what Berthier learned from corrected
-// first steps is listed with its own undo; the device rows are read-only.
+// first steps is listed with its own undo; the device rows are read-only. Kind and front-type corrections
+// (4 Ekim, K8) are listed the same way.
 import {useState, useSyncExternalStore} from 'react';
 import {ChevronRight, Compass} from 'lucide-react';
 import {Dialog, DialogContent, DialogDescription, DialogTitle} from '@/components/ui/dialog';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {RHYTHM, type MovePreference, type Rhythm, type State} from '@/lib/domain';
+import {RHYTHM, typeNames, type KindPreference, type MovePreference, type Rhythm, type State, type TypePreference} from '@/lib/domain';
+import {KIND_TAG} from '@/lib/kinds';
 import {type Profile} from '@/lib/calendar';
 import {calendarDay} from '@/lib/calendar';
 import {clockText} from '@/lib/expedition/camps';
@@ -30,8 +32,18 @@ function sourceOf(s: State, p: MovePreference) {
   return s.changes.find(c => c.ops.some(o => o.key === 'preferences' && !o.undone && (o.after as MovePreference[] | null)?.some(same) && !(o.before as MovePreference[] | null)?.some(same)));
 }
 
+/** The change that recorded a kind or type correction (rekind, retype); undoing it takes the correction back. */
+function learnedBy(s: State, p: KindPreference | TypePreference) {
+  const same = (x: {at: string}) => x.at === p.at;
+  const list = (v: unknown) => [...((v as {kindPreferences?: {at: string}[]} | null)?.kindPreferences ?? []), ...((v as {typePreferences?: {at: string}[]} | null)?.typePreferences ?? [])];
+  return s.changes.find(c => c.ops.some(o => o.key === 'learned' && !o.undone && list(o.after).some(same) && !list(o.before).some(same)));
+}
+const kindName = (k: keyof typeof KIND_TAG) => KIND_TAG[k].charAt(0) + KIND_TAG[k].slice(1).toLocaleLowerCase('tr-TR');
+
 export default function Settings({state, queued, savedAt, busy, online, why, action, exportData}: Props) {
   const rhythm = state.rhythm ?? RHYTHM, prefs = [...(state.movePreferences ?? [])].reverse();
+  const kinds = [...(state.kindPreferences ?? []).map(p => ({p, head: p.text, line: `${kindName(p.from)} → ${kindName(p.to)}`})), ...(state.typePreferences ?? []).map(p => ({p, head: p.title, line: `${typeNames[p.from]} → ${p.to === 'routine' ? 'Rutin' : typeNames[p.to]}`}))].sort((a, b) => b.p.at.localeCompare(a.p.at));
+  const [types, setTypes] = useState(false);
   const [edit, setEdit] = useState<Edit>(null), [draft, setDraft] = useState<Rhythm>(rhythm), [profile, setProfile] = useState<Profile>(state.profile ?? EMPTY), [learned, setLearned] = useState(false);
   const installed = useSyncExternalStore(watchStandalone, standalone, () => true);
   const off = busy || !online;
@@ -52,7 +64,7 @@ export default function Settings({state, queued, savedAt, busy, online, why, act
     </div></section>
 
     <section><h2>BİLDİRİMLER</h2><div className="pref-group">{row('Kurulum', 'Yakında')}</div>
-      <p className="pref-note">iPhone’da ana ekran uygulaması ve izinle çalışır; üç adımlık kurulum hazır olunca burada açılır.</p></section>
+      <p className="pref-note">iPhone’da ana ekran uygulaması ve izinle çalışır; üç adımlık kurulum hazır olunca burada açılır. Rutin hatırlatmaları şimdilik yalnız uygulama açıkken, Söyle’nin üstündeki kartta görünür; uygulama kapalıyken hatırlatma gelmez.</p></section>
 
     <section><h2>MAİL İMZASI</h2><div className="pref-group">{row('Ad, numara, bölüm, üniversite', signature, () => open('profile'))}</div>
       <p className="pref-note">Çakışma maili taslaklarının altına eklenir.</p></section>
@@ -70,8 +82,20 @@ export default function Settings({state, queued, savedAt, busy, online, why, act
         </div>;
       })}
       {learned && !prefs.length && <p className="pref-learned quiet">Henüz örnek yok. Bir ön adımı düzelttiğinde ya da “Ön adıma gerek yok” dediğinde burada görünür.</p>}
+      <button className="pref-row" aria-expanded={types} onClick={() => setTypes(!types)}><span>Tür tercihleri</span><span>{kinds.length} örnek</span><ChevronRight size={18} className={types ? 'is-open' : undefined}/></button>
+      {types && kinds.map(({p, head, line}) => {
+        const change = learnedBy(state, p), block = change ? undoBlock(state, change) : null;
+        return <div className="pref-learned" key={p.at + head}>
+          <span className="pref-learned-front">{dayMonth(calendarDay(new Date(p.at))).toLocaleUpperCase('tr-TR')}</span>
+          <span className="pref-learned-after">{head}</span>
+          <span className="pref-learned-before is-plain">{line}</span>
+          {change && <button className="ledger-undo" disabled={off || !!block} onClick={() => action({kind: 'undo', changeId: change.id})}>Geri al</button>}
+          {block && <p className="ledger-why">{block}</p>}
+        </div>;
+      })}
+      {types && !kinds.length && <p className="pref-learned quiet">Henüz örnek yok. Bir kalemin türünü ya da bir cephenin türünü değiştirdiğinde burada görünür.</p>}
     </div>
-      <p className="pref-note">Düzelttiğin ve reddettiğin ön adımlar. Benzer işlerde dikkate alınır; tek tek geri alabilirsin.</p></section>
+      <p className="pref-note">Düzelttiğin ön adımlar ve türler. Son 30 örnek benzer işlerde dikkate alınır; tek tek geri alabilirsin.</p></section>
 
     <section><h2>BU CİHAZ</h2><div className="pref-group">
       {row('Ana ekran uygulaması', installed ? '✓ Kurulu' : 'Kurulu değil')}

@@ -167,7 +167,8 @@ test('pause, merge and the scaffold suggestions', ()=>{
  for(const w of ['2026-10-05','2026-10-12','2026-10-19'])for(const d of [0,2,5,6])q.sessions.push(session('yoga',new Date(Date.parse(w+'T12:00:00Z')+d*86400000).toISOString().slice(0,10),'22:05',32));
  for(let i=0;i<12;i++)q.sessions.push(session('sprint',`2026-10-${String(5+i).padStart(2,'0')}`,'07:30',19+(i%4)));
  const sc=scaffolds(q,'2026-10-26');
- assert.deepEqual(sc.items.map(i=>i.what+': '+i.title).sort(),['reminder: Yüz yogası kendi saatinde oluyor.','timer: Sabah sprintinin süresi oturdu.','timer: Yüz yogasının süresi oturdu.']);
+ // Two at a time, the reminder first.
+ assert.deepEqual(sc.items.map(i=>i.what+': '+i.title),['reminder: Yüz yogası kendi saatinde oluyor.','timer: Sabah sprintinin süresi oturdu.']);
  assert.equal(sc.items.find(i=>i.what==='reminder')!.text,'Son 12 seansın 12’si hatırlatmadan önce başladı. Hatırlatmayı kapatalım mı? İstersen yeniden açarsın.');
  assert.match(sc.items.find(i=>i.what==='timer')!.text,/^12 ölçüm, 19–22 dk\. Sayaç yerine “Yaptım” yeter; ≈21 dk yazılır\.$/);
  const declined=run(q,{kind:'routineScaffold',routineId:'yoga',what:'reminder',accept:false},local('2026-10-26','09:00'));

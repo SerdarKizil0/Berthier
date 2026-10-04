@@ -11,7 +11,7 @@ export type ResearchCommand={kind:string;ideaId?:string;frontId?:string;decision
 export function researchAct(s:State,c:ResearchCommand){
  const log=(message:string)=>{if(s.review&&!s.review.completedAt)s.review.decisions.push(message);};
  if(c.kind==='reviewStart'){if(s.review&&!s.review.completedAt)return;if(s.review)(s.reviewHistory??=[]).push(structuredClone(s.review));s.review={id:uid(),step:0,startedAt:new Date().toISOString(),decisions:[]};return;}
- if(c.kind==='reviewStep'){if(!s.review||s.review.completedAt)throw Error('Önce teftişi başlat.');if(c.step===undefined||!Number.isInteger(c.step)||c.step<0||c.step>4)throw Error('Geçersiz teftiş adımı.');s.review.step=c.step;return;}
+ if(c.kind==='reviewStep'){if(!s.review||s.review.completedAt)throw Error('Önce teftişi başlat.');if(c.step===undefined||!Number.isInteger(c.step)||c.step<0||c.step>5)throw Error('Geçersiz teftiş adımı.');s.review.step=c.step;return;}
  // Items the review showed and the user left alone stay in the depot as seen (the removed “Depoda kalsın”).
  if(c.kind==='reviewFinish'){if(!s.review||s.review.completedAt)throw Error('Açık teftiş yok.');const now=new Date().toISOString();s.review.completedAt=now;for(const i of Object.values(s.ideas??{}))if(i.status==='stored'&&!i.reviewedAt)i.reviewedAt=now;return;}
  if(c.kind==='reviewContinue'){const f=s.fronts[c.frontId??''];if(!f)throw Error('Cephe bulunamadı.');f.touched=new Date().toISOString();log(`${f.title}: sürdür`);return;}

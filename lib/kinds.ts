@@ -75,6 +75,11 @@ export function placementsOf(before: State, after: State, p: Parsed, now = new D
   return out;
 }
 
+/** What a dictation placed, from its saved result (`placed`); older dictations have none. */
+export function placedOf(d?: { result: string | null }): Placement[] {
+  try { return JSON.parse(d?.result ?? '{}').placed ?? []; } catch { return []; }
+}
+
 /** The receipt as it stands now: an item moved later (`Change.moved`, not undone) shows where it went. */
 export function effective(s: State, sourceId: string, placed: Placement[]): (Placement & { changeId?: string })[] {
   return placed.map(first => {

@@ -1,26 +1,45 @@
 'use client';
 // Karargâh's “Bugün ve yarın” (design 1a): the morning report's sections II–IV, one line each. Unseen
 // warnings, places to be today and tomorrow, and Berthier's questions. An empty section makes no line;
-// the whole report stays one tap away (“Sabah raporunun tamamı”).
+// the whole report stays one tap away (“Sabah raporunun tamamı”). Rutinler (4 Ekim, D1): the first line is
+// always the day's routines, one line with a faint gold ground; the reminder itself is the status card's.
 import {useState} from 'react';
-import {AlertTriangle, Check, ChevronRight, HelpCircle, MapPin, Sunrise} from 'lucide-react';
-import {type Dictation, type State} from '@/lib/domain';
+import {AlertTriangle, Check, ChevronRight, HelpCircle, MapPin, Repeat, Sunrise} from 'lucide-react';
+import {dayKey, type Dictation, type State} from '@/lib/domain';
+import {OBSERVE_DAYS, observation, routinesOf, todayList} from '@/lib/routines';
 import {type CalendarEvent} from '@/lib/calendar';
 import {type Report} from '@/lib/report';
-import {shortDay, upper} from '@/lib/turkish';
+import {minutesUpper, shortDay, upper} from '@/lib/turkish';
 import {ConflictMailDialog, EventDialog} from './horizon';
 
 type Action = (body: {kind: string; [key: string]: unknown}, options?: {quiet?: boolean; silent?: boolean}) => Promise<boolean | undefined>;
-type Props = {state: State; report: Report; busy: boolean; online: boolean; action: Action; reply: (d: Dictation, text: string) => void; write: (d: Dictation) => void; open: () => void};
+type Props = {state: State; now: number; report: Report; busy: boolean; online: boolean; action: Action; reply: (d: Dictation, text: string) => void; write: (d: Dictation) => void; open: () => void; routines: () => void};
 
-export default function Today({state, report, busy, online, action, reply, write, open}: Props) {
+/** “RUTİNLER · BUGÜN 6 · KALAN ≈2 SA 10 DK” · “Sıradaki 19:00 · Yemek yapma”, or while only observing the day of 14. */
+export function routineLine(state: State, now: Date) {
+  if (!routinesOf(state).some(r => r.status !== 'paused')) return null;
+  const list = todayList(state, now), watch = observation(state, dayKey(now));
+  if (!list.planned) return {label: watch ? `RUTİNLER · GÖZLEM ${watch.day}. GÜN / ${OBSERVE_DAYS}` : 'RUTİNLER · BUGÜN', text: list.rows.length ? `Bugün ${list.rows.length} kayıt · ${minutesUpper(list.total).toLocaleLowerCase('tr-TR')}` : 'Bugün henüz kayıt yok'};
+  const next = list.rows.find(r => r.tone === 'next' || r.tone === 'running');
+  return {label: `RUTİNLER · BUGÜN ${list.count}${list.left ? ` · KALAN ≈${minutesUpper(list.left)}` : ''}`, text: next ? (next.tone === 'running' ? `Şimdi · ${next.title}` : `Sıradaki ${next.time} · ${next.title}`) : 'Bugünün rutinleri tamam.'};
+}
+
+export default function Today({state, now, report, busy, online, action, reply, write, open, routines}: Props) {
   const [editing, setEditing] = useState<CalendarEvent | null>(null), [mailId, setMailId] = useState<string | null>(null);
   const warnings = report.warnings.filter(w => !w.seen), places = report.days.flatMap(d => d.places), off = busy || !online;
   const mail = report.warnings.find(w => w.id === mailId)?.conflict;
-  const lines = warnings.length + places.length + report.questions.length;
+  const routine = routineLine(state, new Date(now)), lines = warnings.length + places.length + report.questions.length + (routine ? 1 : 0);
   return <>
     {lines > 0 && <section className="hq-today" aria-labelledby="hq-today">
       <h2 id="hq-today">BUGÜN VE YARIN</h2>
+      {routine && <div className="hq-line-item is-routine">
+        <Repeat size={18}/>
+        <div>
+          <span className="hq-line-label">{routine.label}</span>
+          <span className="hq-line-text">{routine.text}</span>
+          <button className="hq-line-action" onClick={routines}>Rutinleri aç</button>
+        </div>
+      </div>}
       {warnings.map(w => {
         const c = w.conflict, [first, second] = c ? (c.a.weekly !== c.b.weekly ? (c.a.weekly ? [c.b, c.a] : [c.a, c.b]) : [c.move, c.move === c.a ? c.b : c.a]) : [];
         return <div className="hq-line-item" key={w.id}>

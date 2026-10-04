@@ -98,9 +98,15 @@ export function withName(name: string) {
   return name + (endsInVowel(name.toLocaleLowerCase('tr-TR')) ? 'y' : '') + (back ? 'la' : 'le');
 }
 
-/** Accusative of a day name: “Cuma’yı”, “Perşembe’yi”, “Pazar’ı”. */
-export function accusative(name: string) {
-  return name + '’' + (endsInVowel(name.toLocaleLowerCase('tr-TR')) ? 'y' : '') + fourWay(name);
+/** Accusative: a day name “Cuma’yı”, “Pazar’ı”; a common noun (proper = false) “Pişirmeyi”. */
+export function accusative(name: string, proper = true) {
+  return name + (proper ? '’' : '') + (endsInVowel(name.toLocaleLowerCase('tr-TR')) ? 'y' : '') + fourWay(name);
+}
+
+/** Ablative after a clock time, as read aloud: “22:31’den beri”, “21:20’den”, “08:30’dan”. */
+export function sinceTime(hhmm: string) {
+  const word = timeWord(hhmm);
+  return hhmm + '’' + (VOICELESS.includes(word.at(-1) ?? '') ? 't' : 'd') + (FRONT.includes(lastVowel(word)) ? 'en' : 'an');
 }
 
 /** “Pzt, Çar, Cmt ve Paz”. */

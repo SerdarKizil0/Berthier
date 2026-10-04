@@ -2,12 +2,15 @@
 // Kayıt defteri (design 1l): what you said and what Berthier did, in one stream by day. Waiting and failed
 // entries come first with their action. A dictation shows the changes it made (Change.sourceId), each with
 // its own “Geri al”. A row that cannot be undone says why under itself; the undo rules themselves are
-// unchanged (lib/domain.ts `undo`).
+// unchanged (lib/domain.ts `undo`). Since 4 Ekim (C2) a dictation shows what it placed (YERLEŞTİRME), each line
+// with “Değiştir”: the four kinds, Berthier's second guess and that line's own undo. A move to another kind is a
+// change of its own; the raw dictation stays.
 import {useMemo, useState} from 'react';
-import {RotateCcw} from 'lucide-react';
+import {Check, RotateCcw} from 'lucide-react';
 import {type Change, type Dictation, type State} from '@/lib/domain';
 import {clockText} from '@/lib/expedition/camps';
 import {describeOp, ledgerDays, undoBlock, type LedgerItem} from '@/lib/ledger';
+import {KIND_TAG, TARGETS, effective, placedOf} from '@/lib/kinds';
 
 type Action = (body: {kind: string; [key: string]: unknown}, options?: {quiet?: boolean; silent?: boolean}) => Promise<boolean | undefined>;
 type Queued = {id: string; text?: unknown};
@@ -18,9 +21,12 @@ const meta = (d: Dictation): {kind?: string; source?: string; replyTo?: string; 
   try { return JSON.parse(d.result ?? '{}'); } catch { return {}; }
 };
 const PAGE = 30;
+const COUNTS: [number, string][] = [[1, '1'], [2, '2'], [3, '3'], [4, '4'], [7, 'Her gün']];
+/** Refs that can move to another kind (a finished move, a where-you-left-off or a put-off day cannot). */
+const movable = (ref: string) => /^(move|routine|event|idea|session):/.test(ref);
 
 export default function Ledger({state, dictations, outbox, now, busy, online, processing, action, retry}: Props) {
-  const [filter, setFilter] = useState<Filter>('all'), [limit, setLimit] = useState(PAGE), [full, setFull] = useState<string | null>(null);
+  const [filter, setFilter] = useState<Filter>('all'), [limit, setLimit] = useState(PAGE), [full, setFull] = useState<string | null>(null), [opened, setOpened] = useState<string | null>(null), [counting, setCounting] = useState<string | null>(null);
   const failed = dictations.filter(d => d.status === 'failed' && !outbox.some(x => x.id === d.id));
   const queued = dictations.filter(d => d.status === 'queued' && !outbox.some(x => x.id === d.id));
   const waiting = failed.length + outbox.length + queued.length, off = busy || !online;
@@ -60,23 +66,42 @@ export default function Ledger({state, dictations, outbox, now, busy, online, pr
         </div>
       </article>;
     }
-    const d = item.dictation, m = meta(d), c = item.change, live = c?.ops.length ?? 0;
+    const d = item.dictation, m = meta(d), c = item.change, live = c?.ops.length ?? 0, placed = effective(state, d.id, placedOf(d));
+    const keys = new Set(placed.map(p => p.key)), rest = c ? c.ops.map((op, i) => ({op, i})).filter(x => !placed.length || !keys.has(x.op.key)) : [];
     const who = m.replyTo ? 'Yanıtladın' : m.kind === 'complete' ? 'Kaldığın yeri yazdın' : 'Söyledin';
     return <article className="ledger-row" key={d.id}>
       <span className="ledger-time">{clockText(d.created_at)}</span>
       <div className="ledger-body">
         <div className="ledger-head"><strong>{who}</strong><span className="ledger-chip">{m.source === 'document' ? 'BELGE' : 'YAZI'}</span></div>
         {quote(d.id, d.raw)}
-        {c && live > 0 && <>
-          <p className="ledger-label">BERTHİER {live} DEĞİŞİKLİK YAPTI</p>
-          {c.ops.map((op, i) => {const line = describeOp(op, state.fronts), why = !op.undone && blocks.get(c.id + ':' + i); return <div className="ledger-op" key={i}>
+        {placed.length > 0 && <>
+          <p className="ledger-label">YERLEŞTİRME</p>
+          {placed.map(p => {
+            const id = d.id + p.ref, open = opened === id, index = c && p.key ? c.ops.findIndex(o => o.key === p.key) : -1;
+            const moved = p.changeId ? state.changes.find(x => x.id === p.changeId) : undefined, why = moved ? undoBlock(state, moved) : c && index >= 0 ? blocks.get(c.id + ':' + index) : null;
+            const gone = moved ? moved.ops.every(o => o.undone) : c && index >= 0 ? c.ops[index].undone : false;
+            return <div key={p.ref}>
+              <div className="ledger-place"><p><span>{KIND_TAG[p.kind]}</span> {p.kind === 'move' ? `${p.note}: ${p.text}` : p.text}</p>{movable(p.ref) && !gone && <button className="ledger-change" aria-expanded={open} onClick={() => { setOpened(open ? null : id); setCounting(null); }}>{open ? 'Kapat' : 'Değiştir'}</button>}{gone && <span className="ledger-undone">GERİ ALINDI</span>}</div>
+              {open && <div className="ledger-kinds">
+                {TARGETS.map(([k, label]) => <button key={k} aria-pressed={p.kind === k} disabled={off || p.kind === k} onClick={() => k === 'routine' ? setCounting(counting === id ? null : id) : void action({kind: 'rekind', sourceId: d.id, ref: p.ref, to: k}).then(ok => { if (ok) setOpened(null); })}>{label}{p.kind === k && <Check size={14}/>}</button>)}
+                {p.alt?.to === 'merge' && <button disabled={off} onClick={() => void action({kind: 'routineMerge', routineId: p.ref.split(':')[1], targetId: p.alt!.targetId, sourceId: d.id, ref: p.ref}).then(ok => { if (ok) setOpened(null); })}>{p.alt.label}</button>}
+                {(moved || index >= 0) && <button className="ledger-kinds-undo" disabled={off || !!why} onClick={() => void action(moved ? {kind: 'undo', changeId: moved.id} : {kind: 'undo', changeId: c!.id, index}).then(ok => { if (ok) setOpened(null); })}>Geri al</button>}
+                {counting === id && <><p>Haftada kaç?</p>{COUNTS.map(([n, label]) => <button key={n} disabled={off} onClick={() => void action({kind: 'rekind', sourceId: d.id, ref: p.ref, to: 'routine', count: n}).then(ok => { if (ok) { setOpened(null); setCounting(null); } })}>{label}</button>)}</>}
+                {why && <p>{why}</p>}
+              </div>}
+            </div>;
+          })}
+        </>}
+        {c && live > 0 && rest.length > 0 && <>
+          {!placed.length && <p className="ledger-label">BERTHİER {live} DEĞİŞİKLİK YAPTI</p>}
+          {rest.map(({op, i}) => {const line = describeOp(op, state.fronts), why = !op.undone && blocks.get(c.id + ':' + i); return <div className="ledger-op" key={i}>
             <p><span>{line.tag}</span> {line.text}</p>{undoButton(c, i)}
             {why && <p className="ledger-why">{why}</p>}
           </div>;})}
-          {live > 1 && <div className="ledger-all">{undoButton(c)}{blocks.get(c.id) && !c.ops.every(o => o.undone) && <p className="ledger-why">{blocks.get(c.id)}</p>}</div>}
         </>}
+        {c && live > 1 && <div className="ledger-all">{undoButton(c)}{blocks.get(c.id) && !c.ops.every(o => o.undone) && <p className="ledger-why">{blocks.get(c.id)}</p>}</div>}
         {!c && d.status === 'question' && <p className="ledger-text">Berthier sordu: {m.question}</p>}
-        {!c && d.status !== 'question' && <p className="ledger-text">Değişiklik yapılmadı.</p>}
+        {!c && d.status !== 'question' && !placed.length && <p className="ledger-text">Değişiklik yapılmadı.</p>}
         {d.status === 'done' && !state.ideaImports?.includes(d.id) && !m.replyTo && <button className="ledger-import" disabled={off} onClick={() => action({kind: 'importIdeas', sourceId: d.id})}>Fikirleri depoya aktar</button>}
       </div>
     </article>;

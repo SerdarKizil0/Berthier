@@ -67,13 +67,15 @@ Hamle, kullanıcının yapmak istediği sıradaki somut eylemdir. Söylenen iş 
 
 ## Temel kavramlar
 
-- **Cephe:** takip edilen her iş birimi. Dört tipi var: **ders** (ritmi dışarıdan gelir: sınav, sunum, ödev), **kulvar** (araştırma, proje, özel çalışma; tarihi yok, ritmini kullanıcı koyar), **başvuru** (son tarih ve gerekli belgeler), **genel** (diğer her şey).
+- **Cephe:** takip edilen her iş birimi. Dört tipi var: **ders** (ritmi dışarıdan gelir: sınav, sunum, ödev), **proje** (eski adıyla kulvar: tez, araştırma, proje, kendi çalışman; tarihi yok, ritmini kullanıcı koyar, bekletilebilir), **başvuru** (son tarih ve gerekli belgeler), **iş** (eski adıyla genel: kısa, bitince kapanan iş; kargo, imza, evrak). Tür sorulmaz; Berthier koyar, yalnız cephe sayfasında yazar ve oradan tek dokunuşla değişir (4 Ekim, K7). Veri anahtarları aynı kaldı (`course`, `lane`, `application`, `general`).
+- **Rutin:** tekrar eden, sıklığı olan ve saatini kullanıcının koyduğu iş (“haftada 4 yüz yogası”). Cepheye bağlanmaz, emre, haritaya ve Ufuk'a girmez; evi alt çubuktaki Rutinler sekmesidir. Berthier önce iki hafta yalnız kayıt tutar (gözlem), sonra gördüğü günleri, saati ve süreyi haftalık düzen olarak önerir. Sayı haftanındır; seri yok. Hatırlatma isteğe bağlıdır ve rutin oturunca kapatılmaya önerilir.
+- **Girdi türleri:** dikteden gelen her şey beş yerden birine gider: hamle, rutin, tarih, fikir ya da kayıt (hamle bitti, kaldığın yer, rutin seansı, bugün değil). Berthier ne yaptığını makbuzla söyler, ikinci tahminini tek dokunuşluk seçenek olarak hazır tutar.
 - **Hamle:** cephenin sıradaki somut adımı. Bir cephenin gösterilen sıradaki hamlesi tektir.
 - **Günün emri:** o gün için seçilen cepheler ve hamleleri, sıralı.
 - **Dikte:** kullanıcının serbest biçimli girdisi. Her şey maile düşmediği için bilginin Berthier'e girdiği ana kapı.
 - **Harita:** bütün cephelerin kaydı.
-- **Kaldığın yer notu:** her kulvarda en son nerede kalındığı ve sıradaki soru.
-- **Fikir deposu:** bir kulvara ait, henüz hamleye dönüşmemiş fikir, okuma ve sorular.
+- **Kaldığın yer notu:** her projede en son nerede kalındığı ve sıradaki soru.
+- **Fikir deposu:** bir projeye ait, henüz hamleye dönüşmemiş fikir, okuma ve sorular.
 - **Tarihli kalem:** sınav, sunum, teslim, randevu gibi tarihi olan her şey.
 - **Ufuk:** önümüzdeki 14 günün tarihli kalemleri.
 - **Teftiş:** haftalık kısa gözden geçirme.
