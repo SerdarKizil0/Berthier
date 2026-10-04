@@ -421,7 +421,7 @@ export function regionCands(g: Pick<Geo, 'H' | 'nx' | 'ny'>): RegionCands {
     if (s <= 200) for (const o of [70, -70, 110, -110]) va.push([p[0] - tg[1] * o, p[1] + tg[0] * o, 0, 60 + Math.abs(s - 120) + Math.abs(o) * 0.6]);
   }
   va.sort((a, b) => a[3] - b[3]);
-  return [['KULVAR DAĞLARI', mt.slice(0, 140)], ['DERS OVASI', pl.slice(0, 140)], ['BAŞVURU GEÇİDİ', va.slice(0, 300)]];
+  return [['PROJE DAĞLARI', mt.slice(0, 140)], ['DERS OVASI', pl.slice(0, 140)], ['BAŞVURU GEÇİDİ', va.slice(0, 300)]];
 }
 
 // Completion effect: a contour ripple spreading from the camp that was just taken.

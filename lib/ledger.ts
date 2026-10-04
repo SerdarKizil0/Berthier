@@ -2,11 +2,13 @@
 // or an action (“3 değişiklik. 1 yeni cephe, 1 hamle, 1 tarih.”) and by the change log rows.
 // Read-only: nothing here changes the state.
 
-import { type Change, type Dictation, type Front, type Op, type Order, type State, undo } from './domain';
+import { type Change, type Dictation, type Front, type Op, type Order, type State, typeNames, undo } from './domain';
 import { addDays, calendarDay, type CalendarEvent } from './calendar';
 import { clockText } from './expedition/camps';
 import { type Idea } from './research';
-import { atTime, shortDay, upper } from './turkish';
+import { type ReminderTrial, type Routine, type Running, type Session, type Skip, countText, daysText, weekday } from './routines';
+import { KIND_TAG, type Kind } from './kinds';
+import { DAY_NAMES, atTime, shortDay, untilTime, upper } from './turkish';
 
 export type OpLine = { tag: string; text: string; count: string };
 
@@ -20,6 +22,7 @@ function frontLine(before: Front | null, after: Front | null): OpLine {
   const added = after.moves.filter(m => !old.has(m.id) && !m.doneAt);
   const done = after.moves.filter(m => m.doneAt && !old.get(m.id)?.doneAt);
   const edited = after.moves.filter(m => old.has(m.id) && old.get(m.id)!.text !== m.text);
+  if (before.type !== after.type) return { tag: 'TÜR', text: `${f.title}: ${typeNames[before.type]} → ${typeNames[after.type]}`, count: 'tür' };
   if (before.status !== after.status) return { tag: 'DURUM', text: `${f.title}: ${STATUS[after.status]}`, count: 'durum' };
   if (done.length) return { tag: 'HAMLE BİTTİ', text: `${f.title}: ${done[0].text}`, count: 'hamle' };
   if (added.length) return { tag: 'YENİ HAMLE', text: `${f.title}: ${added[0].text}${added.length > 1 ? ` (+${added.length - 1})` : ''}`, count: 'hamle' };
@@ -64,8 +67,48 @@ function researchLine(before: ResearchValue | null, after: ResearchValue | null)
   if (added.length) return { tag: 'DEPO', text: added.length === 1 ? added[0].text : `${added.length} kalem depoya eklendi`, count: 'depo kalemi' };
   if (changed.length) return { tag: 'DEPO', text: `${changed[0].text} · ${changed[0].status === 'dismissed' ? 'atıldı' : changed[0].status === 'converted' ? 'hamleye çevrildi' : 'depoda'}`, count: 'depo kalemi' };
   const moved = Object.values(a).find(i => b[i.id] && b[i.id].laneId !== i.laneId);
-  if (moved) return { tag: 'DEPO', text: `${moved.text} · kulvara atandı`, count: 'depo kalemi' };
+  if (moved) return { tag: 'DEPO', text: `${moved.text} · ${moved.laneId ? 'projeye atandı' : 'sahipsiz'}`, count: 'depo kalemi' };
   return { tag: 'TEFTİŞ', text: after?.review?.completedAt && !before?.review?.completedAt ? 'Teftiş tamamlandı.' : 'Teftiş adımı', count: 'teftiş' };
+}
+
+type RoutinesValue = { routines: Record<string, Routine>; sessions: Session[]; skips: Skip[]; running: Running | null; reminderTrial: ReminderTrial | null };
+
+/** Rutinler: RUTİN (new, put away, settings), SEANS, BUGÜN DEĞİL, DÜZEN, SAYAÇ. */
+function routinesLine(before: RoutinesValue | null, after: RoutinesValue | null): OpLine {
+  const b = before?.routines ?? {}, a = after?.routines ?? {}, name = (id: string) => a[id]?.title ?? b[id]?.title ?? 'Rutin';
+  const added = Object.values(a).filter(r => !b[r.id]), removed = Object.values(b).filter(r => !a[r.id]);
+  const sessions = (after?.sessions ?? []).filter(x => !(before?.sessions ?? []).some(y => y.id === x.id));
+  const skips = (after?.skips ?? []).filter(k => !(before?.skips ?? []).some(x => x.routineId === k.routineId && x.day === k.day));
+  if (added.length) return { tag: 'RUTİN', text: `${added[0].title} · ${countText(added[0].count)}${added.length > 1 ? ` (+${added.length - 1})` : ''}`, count: 'rutin' };
+  if (removed.length && sessions.length === 0 && Object.keys(a).length < Object.keys(b).length) return { tag: 'RUTİN', text: `${removed[0].title} ${(after?.sessions ?? []).some(x => (before?.sessions ?? []).find(y => y.id === x.id)?.routineId === removed[0].id) ? 'birleştirildi' : 'kaldırıldı'}`, count: 'rutin' };
+  if (sessions.length) return { tag: 'SEANS', text: `${name(sessions[0].routineId)} · ${sessions[0].minutes} dk${sessions.length > 1 ? ` (+${sessions.length - 1})` : ''}`, count: 'seans' };
+  if (skips.length) { const k = skips[0], r = a[k.routineId]; return { tag: 'BUGÜN DEĞİL', text: `${name(k.routineId)}${k.slidTo && r?.pattern ? ` · ${DAY_NAMES[weekday(k.slidTo)]} ${untilTime(r.pattern.time)} kaydı` : ''}`, count: 'rutin' }; }
+  if (!before?.running && after?.running) return { tag: 'SAYAÇ', text: `${name(after.running.routineId)} başladı`, count: 'sayaç' };
+  const edited = (after?.sessions ?? []).find(x => { const y = (before?.sessions ?? []).find(y => y.id === x.id); return y && JSON.stringify(y) !== JSON.stringify(x); });
+  if (edited) return { tag: 'SEANS', text: `${name(edited.routineId)} · ${edited.minutes} dk`, count: 'seans' };
+  for (const r of Object.values(a)) {
+    const was = b[r.id];
+    if (!was) continue;
+    if (JSON.stringify(was.pattern) !== JSON.stringify(r.pattern) && r.pattern) return { tag: 'DÜZEN', text: `${r.title}: ${daysText(r.pattern.days)} · ${r.pattern.time}`, count: 'düzen' };
+    if (was.status !== r.status) return { tag: 'RUTİN', text: `${r.title}: ${r.status === 'paused' ? 'durduruldu' : 'yeniden açıldı'}`, count: 'rutin' };
+    if (was.reminder.on !== r.reminder.on) return { tag: 'RUTİN', text: `${r.title}: hatırlatma ${r.reminder.on ? 'açık' : 'kapalı'}`, count: 'ayar' };
+    if (was.timer !== r.timer) return { tag: 'RUTİN', text: `${r.title}: ${r.timer ? 'sayaçla' : 'tek dokunuş'}`, count: 'ayar' };
+    if (JSON.stringify(was.ownWords) !== JSON.stringify(r.ownWords)) return { tag: 'RUTİN', text: `${r.title}: kendi sözün ${r.ownWords?.show ? 'görünür' : 'gizli'}`, count: 'ayar' };
+    if (JSON.stringify(was.asked) !== JSON.stringify(r.asked)) return { tag: 'RUTİN', text: `${r.title}: öneri sonra sorulur`, count: 'ayar' };
+    if (was.count !== r.count) return { tag: 'RUTİN', text: `${r.title} · ${countText(r.count)}`, count: 'rutin' };
+  }
+  if (JSON.stringify(before?.reminderTrial) !== JSON.stringify(after?.reminderTrial)) return { tag: 'DÜZEN', text: after?.reminderTrial?.decidedAt ? 'Hatırlatma denemesi bitti' : 'Hatırlatma denemesi', count: 'düzen' };
+  return { tag: 'RUTİN', text: 'Rutin kaydı', count: 'rutin' };
+}
+
+type LearnedValue = { kindPreferences: { text: string; from: Kind; to: Kind }[]; typePreferences: { title: string; from: Front['type']; to: Front['type'] | 'routine' }[] };
+
+function learnedLine(before: LearnedValue | null, after: LearnedValue | null): OpLine {
+  const k = (after?.kindPreferences ?? []).slice((before?.kindPreferences ?? []).length)[0];
+  if (k) return { tag: 'TÜR', text: `${k.text}: ${KIND_TAG[k.from].toLocaleLowerCase('tr-TR')} → ${KIND_TAG[k.to].toLocaleLowerCase('tr-TR')}`, count: 'tür' };
+  const t = (after?.typePreferences ?? []).slice((before?.typePreferences ?? []).length)[0];
+  if (t) return { tag: 'TÜR', text: `${t.title}: ${typeNames[t.from]} → ${t.to === 'routine' ? 'Rutin' : typeNames[t.to]}`, count: 'tür' };
+  return { tag: 'TERCİH', text: 'Tür tercihi', count: 'tercih' };
 }
 
 /** One line per operation: a short tag (“YENİ HAMLE”) and what it is (“Kargo iadesi: İade paketini …”). */
@@ -75,12 +118,14 @@ export function describeOp(op: Op, fronts: State['fronts']): OpLine {
   if (op.key === 'calendar') return calendarLine(op.before as CalendarValue | null, op.after as CalendarValue | null);
   if (op.key === 'research') return researchLine(op.before as ResearchValue | null, op.after as ResearchValue | null);
   if (op.key === 'preferences') return { tag: 'TERCİH', text: 'Ön adım tercihi', count: 'tercih' };
-  if (op.key === 'setup') return { tag: 'KULVARLAR', text: 'Aktif kulvar seçimi', count: 'ayar' };
+  if (op.key === 'routines') return routinesLine(op.before as RoutinesValue | null, op.after as RoutinesValue | null);
+  if (op.key === 'learned') return learnedLine(op.before as LearnedValue | null, op.after as LearnedValue | null);
+  if (op.key === 'setup') return { tag: 'PROJELER', text: 'Aktif proje seçimi', count: 'ayar' };
   if (op.key === 'rhythm') return { tag: 'RİTİM', text: 'Ritim ayarı', count: 'ayar' };
   return { tag: 'KAYIT', text: op.key, count: 'kayıt' };
 }
 
-const ORDER = ['yeni cephe', 'hamle', 'kamp', 'tarih', 'emir', 'sıra', 'durum', 'not', 'depo kalemi', 'çakışma', 'teftiş', 'tercih', 'ayar'];
+const ORDER = ['yeni cephe', 'hamle', 'rutin', 'seans', 'kamp', 'tarih', 'emir', 'sıra', 'durum', 'tür', 'düzen', 'sayaç', 'not', 'depo kalemi', 'çakışma', 'teftiş', 'tercih', 'ayar'];
 
 /** “1 yeni cephe, 1 hamle, 1 tarih.” for the operations a change made (undone ones are left out). */
 export function breakdown(change: Change, fronts: State['fronts']) {

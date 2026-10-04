@@ -65,7 +65,7 @@ export type Metric = { title: string; value: string; note: string };
 export type Logbook = { window: Window | null; sub: string; cells: Cell[]; camps: number; closed: number; entries: Entry[]; metrics: Metric[] };
 
 const REORDER = 'Rotanın sırası değiştirildi', SELECT = 'Günün emri değiştirildi', EDIT = 'Hamle düzenlendi';
-const SETTINGS = ['Aktif kulvarlar seçildi', 'Mail imzası kaydedildi', 'Ritim ayarı değiştirildi'];
+const SETTINGS = ['Aktif projeler seçildi', 'Aktif kulvarlar seçildi', 'Mail imzası kaydedildi', 'Ritim ayarı değiştirildi'];
 
 function duration(seconds: number) {
   const s = Math.round(seconds), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60;

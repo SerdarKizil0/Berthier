@@ -51,8 +51,8 @@ test('A busy morning fills the four sections in a fixed order',()=>{
  const r=buildReport(s,dictations,[],NOW);
  assert.equal(r.header,'CMT 26 EYLÜL · 08:00’DE HAZIRLANDI');
  assert.deepEqual(r.counts,[4,2,2,2]);
- assert.equal(r.path,'Güzergâh: Karargâh → Başvuru Geçidi → Genel Düzlük → Ders Ovası → Kulvar Dağları');
- assert.deepEqual(r.rows.map(x=>[x.num,x.head,x.chip,x.tone]),[['01','Erasmus+ başvurusu · Başvuru Geçidi','4 GÜN','near'],['02','Kargo iadesi · Genel Düzlük','BUGÜN','crit'],['03','Biyokimya · Ders Ovası','TARİHSİZ','calm'],['04','Mikrobiyom derlemesi · Kulvar Dağları','TARİHSİZ','calm']]);
+ assert.equal(r.path,'Güzergâh: Karargâh → Başvuru Geçidi → İş Düzlüğü → Ders Ovası → Proje Dağları');
+ assert.deepEqual(r.rows.map(x=>[x.num,x.head,x.chip,x.tone]),[['01','Erasmus+ başvurusu · Başvuru Geçidi','4 GÜN','near'],['02','Kargo iadesi · İş Düzlüğü','BUGÜN','crit'],['03','Biyokimya · Ders Ovası','TARİHSİZ','calm'],['04','Mikrobiyom derlemesi · Proje Dağları','TARİHSİZ','calm']]);
  assert.equal(r.rows[0].why,'Erasmus+ son başvuru Çar 30 Eyl 23:59.');
  assert.equal(r.rows[1].why,'Son iade günü bugün.');
  assert.equal(r.rows[3].why,'Bu hafta aktif seçtiğin kulvar. Kaldığın yer: Literatür tablosunda 12. makalede kaldın.');
