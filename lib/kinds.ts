@@ -54,7 +54,7 @@ export function placementsOf(before: State, after: State, p: Parsed, now = new D
   const sessions = new Set((before.sessions ?? []).map(x => x.id)), skips = new Set((before.skips ?? []).map(k => k.routineId + k.day));
   for (const x of after.sessions ?? []) {
     const r = after.routines?.[x.routineId];
-    if (!sessions.has(x.id) && r) out.push({ ref: `session:${x.id}`, kind: 'record', key: `session:${x.id}`, text: `${r.title} · ${x.minutes} dk`, note: `Seans yazıldı · ${weekNote(after, r, today)}` });
+    if (!sessions.has(x.id) && r) out.push({ ref: `session:${x.id}`, kind: 'record', key: `session:${x.id}`, text: `${r.title} · ${x.minutes} dk`, note: `Seans yazıldı · ${weekNote(after, r, x.day, today)}` });
   }
   for (const k of after.skips ?? []) {
     const r = after.routines?.[k.routineId];

@@ -8,8 +8,8 @@ import {Check, ChevronRight, Play, Plus, Repeat} from 'lucide-react';
 import {dayKey, type State} from '@/lib/domain';
 import {addDays, daysBetween} from '@/lib/calendar';
 import {
-  LEAD_MIN, OBSERVE_DAYS, WEEK_ORDER, at, clock, daysText, durationChip, observation, proposals, recentSessions, routinesOf,
-  runningInfo, scaffolds, slideTarget, startOf, stepsView, todayList, trialResult, usual, weekDone, weekLine, weekOf, weekRows, weekStart, weekday,
+  LEAD_MIN, OBSERVE_DAYS, WEEK_ORDER, at, clock, daysText, durationChip, observation, openDay, proposals, recentSessions, routinesOf,
+  runningInfo, scaffolds, slideTarget, startOf, stepMinutes, stepsView, todayList, trialResult, usual, weekDone, weekLine, weekOf, weekRows, weekStart, weekday,
   type Routine, type Scaffold,
 } from '@/lib/routines';
 import {DAY_NAMES, WD, andList, dayMonth, genitive, minutesText, minutesUpper, onDate, shortDay, untilTime, upper} from '@/lib/turkish';
@@ -232,7 +232,7 @@ export function RoutineDetail({state, id, now, busy, online, why, action, back, 
 function Steps({state, r, now, busy, online, action, record}: Pick<Common, 'state' | 'busy' | 'online' | 'action'> & {r: Routine; now: Date; record: (id: string) => void}) {
   const view = stepsView(state, r), off = busy || !online, current = view.find(v => v.state === 'now'), next = current ? view.find(v => v.index > current.index && !v.step.wait) : undefined;
   const waiting = current?.step.wait;
-  const today = dayKey(now), canSkip = r.status === 'settled' && !(state.skips ?? []).some(k => k.routineId === r.id && k.day === today);
+  const today = dayKey(now), canSkip = openDay(state, r, today, today);
   return <>
     <p className="rt-lead">Günün toplamına yalnız elinle geçen süre girer; bekleme girmez.</p>
     <div className="rt-steps">
@@ -268,8 +268,9 @@ export function RecordSheet({state, id, now, busy, online, why, action, close, o
   const mine = run?.routine.id === r.id, other = run && !mine ? run.routine.title : null;
   const start = <button key="start" className={r.timer ? 'btn-main' : 'btn-quiet'} disabled={off || !!run} onClick={() => void action({kind: 'routineStart', routineId: r.id, ...(step ? {stepKey: step.step.key} : {})}, {quiet: true}).then(ok => { if (ok) close(); })}><Play size={18}/>Başlat{step ? ' · ' + step.step.title.toLocaleLowerCase('tr-TR') : ''}</button>;
   const log = <button key="log" className={r.timer ? 'btn-quiet' : 'btn-main'} disabled={off} onClick={() => void action({kind: 'routineLog', routineId: r.id, ...(step ? {stepKey: step.step.key} : {})}).then(ok => { if (ok) close(); })}>Yaptım</button>;
-  const skip = settled && !skipped && !done.length && <button key="skip" className="btn-quiet" disabled={off} onClick={() => void action({kind: 'routineSkip', routineId: r.id, day: today}).then(ok => { if (ok) close(); })}>Bugün değil</button>;
-  const said = u.minutes !== null ? `Yaptım, ölçülen ${u.range ? `${u.minutes} dk` : `≈${minutesText(u.minutes)}`}’yı yazar; sonra düzeltebilirsin.` : 'Yaptım, 30 dk yazar; sonra düzeltebilirsin.';
+  const skip = settled && !skipped && !done.length && openDay(state, r, today, today) && <button key="skip" className="btn-quiet" disabled={off} onClick={() => void action({kind: 'routineSkip', routineId: r.id, day: today}).then(ok => { if (ok) close(); })}>Bugün değil</button>;
+  const stepMin = step ? stepMinutes(state, r, step.step.key) : null;
+  const said = stepMin !== null ? `Yaptım, ${step!.step.title.toLocaleLowerCase('tr-TR')} için ≈${minutesText(stepMin)}’yı yazar; sonra düzeltebilirsin.` : u.minutes !== null ? `Yaptım, ölçülen ${u.range ? `${u.minutes} dk` : `≈${minutesText(u.minutes)}`}’yı yazar; sonra düzeltebilirsin.` : 'Yaptım, 30 dk yazar; sonra düzeltebilirsin.';
   const slide = skip ? (slid ? ` Bugün değil dersen seans ${DAY_NAMES[weekday(slid)]} ${untilTime(r.pattern!.time)} kayar.` : ' Bugün değil dersen bu hafta kayacak boş gün yok; sayı olduğu gibi kalır.') : '';
   return <SaySheet open={!!id} onClose={close} locked={busy} title={r.title} description={meta} metaDescription>
     {mine ? <>

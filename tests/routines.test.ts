@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {fresh,commitChanges,undo,type Front,type State} from '../lib/domain';
 import {act,applyParsed} from '../lib/reducer';
-import {type Routine,type Session,at,dayMin,weekStart,weekLine,pastDay,observation,readyToPropose,mirror,weekPlan,weekRows,todayList,reminderFor,routineAct,routineLabel,scaffolds,trialResult,proposals,type RoutineCommand} from '../lib/routines';
+import {type Routine,type Session,at,dayMin,weekStart,weekLine,pastDay,observation,readyToPropose,mirror,weekPlan,weekRows,todayList,reminderFor,routineAct,routineLabel,routineNotice,scaffolds,stepMinutes,stepsOf,trialResult,proposals,type RoutineCommand} from '../lib/routines';
 import {addDays} from '../lib/calendar';
 import {placementsOf,effective,receiptTitle} from '../lib/kinds';
 import {checkRoutines,type Parsed} from '../lib/llm';
@@ -314,6 +314,24 @@ test('a merge moves records quietly and undoes exactly; undo never leaves a time
  assert.throws(()=>undo(u,reopened.id),/Durdurulan rutinde sayaç süremez/);
  // Taken back in order, all is well.
  t=undo(t,t.changes.at(-1)!.id);t=undo(t,finished.id);assert.equal(t.running?.routineId,'yoga');assert.equal(t.routines!.yoga.status,'settled');
+});
+
+test('“geçen” days, open days for “Bugün değil”, a past week’s count and a step’s own length', ()=>{
+ // “geçen pazartesi” said on a Monday is a week ago.
+ assert.equal(pastDay('geçen pazartesi',MON),'2026-09-28');assert.equal(pastDay('geçen pazar',MON),'2026-10-04');assert.equal(pastDay('pazartesi',MON),MON);
+ // Only an open planned day is put off: not an off day, not a day already done.
+ const now=local(MON,'12:00');
+ assert.throws(()=>run(week(),{kind:'routineSkip',routineId:'yoga',day:'2026-10-06'},now),/açık bir seans yok/);
+ assert.throws(()=>run(week(),{kind:'routineSkip',routineId:'cook',day:MON},now),/açık bir seans yok/);
+ // A session of last week counts in last week, on the receipt and on the status card.
+ const s=week(),p=parsed({sessions:[{routineId:'yoga',title:'Yüz yogası',dayText:'dün',end:'23:00',minutes:30,skip:false,done:true}]});
+ const after=applyParsed(s,p,'Dün yüz yogası yaptım, 30 dakika.',MON,'d7');
+ assert.equal(placementsOf(s,after,p,now).find(x=>x.kind==='record')!.note,'Seans yazıldı · geçen hafta 1/4');
+ assert.equal(routineNotice('routineLog',s,run(s,{kind:'routineLog',routineId:'yoga',day:'2026-10-04'},now),now)!.text,'32 dk · geçen hafta 1/4.');
+ // A stepped routine: “Yaptım” on a step writes that step’s length, not the whole routine’s.
+ const st=week();st.routines!.mask=routine('mask','Saç maskesi',1,{steps:stepsOf([{title:'Maskeyi sür',minutes:10,wait:false},{title:'Bekle',minutes:30,wait:true},{title:'Durula',minutes:15,wait:false}])});
+ const masked=run(st,{kind:'routineLog',routineId:'mask',stepKey:'s1'},now);
+ assert.equal(masked.sessions!.at(-1)!.minutes,10);assert.equal(stepMinutes(masked,masked.routines!.mask,'s3'),15);
 });
 
 test('60 days of routine use: the saved state grows linearly and stays far below the D1 row limit', ()=>{

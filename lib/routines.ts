@@ -84,6 +84,8 @@ export function weekDone(s: State, r: Routine, day: string) {
   return sessionsOf(s, r.id).filter(x => x.day >= w[0] && x.day <= w[6] && counts(r)(x)).length;
 }
 const skippedOn = (s: State, r: Routine, day: string) => (s.skips ?? []).some(k => k.routineId === r.id && k.day === day);
+/** A day “Bugün değil” can put off: one of this week's planned (or slid-to) days, not done and not put off yet. */
+export const openDay = (s: State, r: Routine, day: string, today: string) => weekPlan(s, r, today).days.includes(day) && !doneOn(s, r, day).length;
 export const findRoutine = (s: State, title: string) => routinesOf(s).find(r => normalize(r.title) === normalize(title) || similarity(r.title, title) >= 0.6);
 export const countText = (n: number) => n >= 7 ? 'her gün' : `haftada ${n}`;
 
@@ -95,7 +97,7 @@ export type Usual = { minutes: number | null; range: [number, number] | null; ti
  *  range when the spread is wide ((p90 − p10) > median / 2). Waiting steps take no time of the day. */
 export function usual(s: State, r: Routine): Usual {
   if (r.steps?.length) {
-    const parts = r.steps.filter(p => !p.wait).map(p => { const xs = sessionsOf(s, r.id).filter(x => x.step === p.key).map(x => x.minutes); return xs.length ? median(xs) : p.activeMin; });
+    const parts = r.steps.filter(p => !p.wait).map(p => stepUsual(s, r, p));
     const timed = sessionsOf(s, r.id).filter(x => x.source === 'timer').map(x => x.minutes);
     return { minutes: Math.round(parts.reduce((a, b) => a + b, 0)), range: null, timed, n: sessionsOf(s, r.id).filter(counts(r)).length };
   }
@@ -108,6 +110,12 @@ export function usual(s: State, r: Routine): Usual {
   return { minutes: m, range: pool.length >= 3 && hi - lo > m / 2 ? spread(lo, hi, m) : null, timed, n: pool.length };
 }
 export const usualMinutes = (s: State, r: Routine) => usual(s, r).minutes;
+/** One step's usual length: the median of its own sessions, else the length set for it. */
+const stepUsual = (s: State, r: Routine, p: RoutineStep) => { const xs = sessionsOf(s, r.id).filter(x => x.step === p.key).map(x => x.minutes); return xs.length ? median(xs) : p.activeMin; };
+export function stepMinutes(s: State, r: Routine, key: string) {
+  const p = r.steps?.find(p => p.key === key);
+  return p && !p.wait ? Math.round(stepUsual(s, r, p)) : null;
+}
 /** “≈32 dk”, “30–90 dk”. */
 export function durationText(s: State, r: Routine) {
   const u = usual(s, r);
@@ -531,7 +539,7 @@ export function routineAct(n: State, c: RoutineCommand, now = new Date()) {
       if (r!.status === 'paused') throw Error('Durdurulan rutine kayıt eklenmez.');
       const day = c.day ?? today;
       if (!validDate(day) || day > today) throw Error('Gün geçersiz.');
-      const minutes = c.minutes ?? usualMinutes(n, r!) ?? 30;
+      const minutes = c.minutes ?? (c.stepKey ? stepMinutes(n, r!, step(c.stepKey)!) : usualMinutes(n, r!)) ?? 30;
       const end = c.end ? moment(day, c.end) : c.start ? new Date(Date.parse(moment(day, c.start)) + minutes * MIN).toISOString() : day === today ? now.toISOString() : new Date(at(day, r!.pattern?.time ?? r!.estimate?.time ?? '12:00').getTime() + minutes * MIN).toISOString();
       addSession(n, { routineId: r!.id, day, end, minutes, source: day === today ? 'tap' : 'review', ...(c.stepKey ? { step: step(c.stepKey) } : {}) });
       return;
@@ -549,6 +557,7 @@ export function routineAct(n: State, c: RoutineCommand, now = new Date()) {
       const day = c.day ?? today;
       if (day < weekStart(today) || day > weekOf(today)[6]) throw Error('Yalnız bu haftanın bir günü ertelenebilir.');
       if (n.running?.routineId === r!.id) throw Error('Önce süren sayacı bitir.');
+      if (!skippedOn(n, r!, day) && !openDay(n, r!, day, today)) throw Error('Bu günde açık bir seans yok.');
       skipDay(n, r!, day, now);
       return;
     }
@@ -627,15 +636,17 @@ export function routineAct(n: State, c: RoutineCommand, now = new Date()) {
   }
 }
 
-/** A day spoken about a session: “bugün”, “dün”, a weekday name (the last one, today included) or a date. */
+/** A day spoken about a session: “bugün”, “dün”, a weekday name (the last one, today included; with “geçen”,
+ *  before today) or a date. */
 export function pastDay(text: string | null | undefined, today: string) {
   const x = (text ?? '').toLocaleLowerCase('tr-TR').trim();
   if (!x || /^bu (akşam|sabah|gece)$/.test(x) || x === 'bugün') return today;
   if (validDate(x)) return x <= today ? x : today;
   if (x.startsWith('dün')) return addDays(today, -1);
   if (x === 'evvelsi gün' || x === 'önceki gün') return addDays(today, -2);
-  const name = x.replace(/^geçen /, ''), i = DAY_NAMES.map((d, i) => [d.toLocaleLowerCase('tr-TR'), i] as const).filter(([d]) => name.startsWith(d)).sort((a, b) => b[0].length - a[0].length)[0]?.[1] ?? -1;
-  return i >= 0 ? addDays(today, -((weekday(today) - i + 7) % 7)) : today;
+  const last = x.startsWith('geçen '), name = x.replace(/^geçen /, ''), i = DAY_NAMES.map((d, i) => [d.toLocaleLowerCase('tr-TR'), i] as const).filter(([d]) => name.startsWith(d)).sort((a, b) => b[0].length - a[0].length)[0]?.[1] ?? -1;
+  // “geçen pazartesi” said on a Monday is a week ago, not today.
+  return i >= 0 ? addDays(today, -((weekday(today) - i + 7) % 7 || (last ? 7 : 0))) : today;
 }
 
 /** Steps as the model gives them (title, minutes, wait) with keys and offsets from the first step. */
@@ -705,7 +716,7 @@ export function stepsView(s: State, r: Routine): StepView[] {
 export function routineNotice(kind: string, before: State, after: State, now = new Date()): { title: string; text: string; sessionId?: string } | null {
   if (kind === 'routineFinish' || kind === 'routineLog') {
     const x = (after.sessions ?? []).find(y => !(before.sessions ?? []).some(z => z.id === y.id)), r = x && after.routines?.[x.routineId];
-    return x && r ? { title: `${r.title} kaydedildi.`, text: `${minutesText(x.minutes)} · ${weekNote(after, r, x.day)}.`, sessionId: x.id } : null;
+    return x && r ? { title: `${r.title} kaydedildi.`, text: `${minutesText(x.minutes)} · ${weekNote(after, r, x.day, dayKey(now))}.`, sessionId: x.id } : null;
   }
   if (kind === 'routineSkip') {
     const k = (after.skips ?? []).find(y => !(before.skips ?? []).some(z => z.routineId === y.routineId && z.day === y.day)), r = k && after.routines?.[k.routineId];
@@ -715,7 +726,8 @@ export function routineNotice(kind: string, before: State, after: State, now = n
   return null;
 }
 
-/** “Bu hafta 1/4”, after a session is saved. */
-export function weekNote(s: State, r: Routine, day: string) {
-  return `bu hafta ${weekDone(s, r, day)}/${r.count}`;
+/** “bu hafta 1/4” after a session is saved, counted in the session's own week (“geçen hafta 4/4”). */
+export function weekNote(s: State, r: Routine, day: string, today = day) {
+  const w = weekStart(day), which = w === weekStart(today) ? 'bu hafta' : w === weekStart(addDays(today, -7)) ? 'geçen hafta' : 'o hafta';
+  return `${which} ${weekDone(s, r, day)}/${r.count}`;
 }
