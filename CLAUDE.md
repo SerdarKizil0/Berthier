@@ -64,7 +64,7 @@ Claude Design'ın 2 Ekim arayüz incelemesi (1a, 1d, 1f, 1g, 1h, 1i–1m, K2) bu
 - `lib/turkish.ts`: saat ve sayılardan sonraki Türkçe ekler ("08:14’te", "17:00’ye", "2’si") ve kısa tarih biçimleri.
 - `app/api/state/route.ts`: tek komut ucu (zod `Input`, kimlik ve aynı kaynak denetimi, idempotent istek kimliği).
 - `app/api/media/route.ts`: döküm.
-- `lib/domain.ts`: tipler, `propose`/`ensureOrder`, `commitChanges`/`undo`. `State.rhythm` (Tercihler › Ritim) kendi anahtarıyla geri alınabilir. Rutinler `routines` anahtarında (rutinler, seanslar, ertelemeler, sayaç, deneme), tür düzeltmeleri `learned` anahtarında. `labels`/`typeNames`: Ders, Proje (lane), Başvuru, İş (general).
+- `lib/domain.ts`: tipler, `propose`/`ensureOrder`, `commitChanges`/`undo`. `State.rhythm` (Tercihler › Ritim) kendi anahtarıyla geri alınabilir. Rutin kayıtları değişiklik kaydında kayıt başına anahtar taşır: `routine:<id>`, `session:<id>`, `skip:<rutin>:<gün>`, `running`, `reminderTrial` (front:/order: gibi). Bir komut yalnız dokunduğu kaydı saklar; bütün durum tek D1 satırında (2 MB sınırı) olduğu için koleksiyonun tamamını tek anahtara koyma. Tür düzeltmeleri `learned` anahtarında. `labels`/`typeNames`: Ders, Proje (lane), Başvuru, İş (general).
 - `lib/reducer.ts`: `act`, `applyParsed`.
 - `lib/calendar.ts`, `lib/research.ts`.
 - `lib/notebook.ts`: D1 erişimi.
