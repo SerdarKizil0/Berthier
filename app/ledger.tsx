@@ -9,7 +9,7 @@ import {useMemo, useState} from 'react';
 import {Check, RotateCcw} from 'lucide-react';
 import {type Change, type Dictation, type State} from '@/lib/domain';
 import {clockText} from '@/lib/expedition/camps';
-import {changeLines, describeOp, ledgerDays, undoBlock, type LedgerItem} from '@/lib/ledger';
+import {changeLines, describeOp, ledgerDays, ledgerRoutines, undoBlock, type LedgerItem} from '@/lib/ledger';
 import {KIND_TAG, TARGETS, effective, placedOf} from '@/lib/kinds';
 
 type Action = (body: {kind: string; [key: string]: unknown}, options?: {quiet?: boolean; silent?: boolean}) => Promise<boolean | undefined>;
@@ -46,6 +46,8 @@ export default function Ledger({state, dictations, outbox, now, busy, online, pr
     }
     return {days, more: all.reduce((n, d) => n + d.items.length, 0) > limit, blocks};
   }, [state, dictations, now, filter, limit]);
+  // Rows keep a routine's name after it was merged or moved away.
+  const routines = useMemo(() => ledgerRoutines(state), [state]);
 
   const undoButton = (c: Change, index?: number) => {
     const done = index === undefined ? c.ops.every(o => o.undone) : c.ops[index].undone, key = index === undefined ? c.id : c.id + ':' + index, why = blocks.get(key);
@@ -56,7 +58,7 @@ export default function Ledger({state, dictations, outbox, now, busy, online, pr
 
   function entry(item: LedgerItem) {
     if (item.kind === 'change') {
-      const c = item.change, lines = changeLines(c, state.fronts, state.routines), why = blocks.get(c.id);
+      const c = item.change, lines = changeLines(c, state.fronts, routines), why = blocks.get(c.id);
       return <article className="ledger-row" key={c.id}>
         <span className="ledger-time">{clockText(c.at)}</span>
         <div className="ledger-body">
@@ -66,8 +68,9 @@ export default function Ledger({state, dictations, outbox, now, busy, online, pr
         </div>
       </article>;
     }
-    const d = item.dictation, m = meta(d), c = item.change, live = c?.ops.length ?? 0, placed = effective(state, d.id, placedOf(d));
-    const keys = new Set(placed.map(p => p.key)), rest = c ? c.ops.map((op, i) => ({op, i})).filter(x => !placed.length || !keys.has(x.op.key)) : [];
+    const d = item.dictation, m = meta(d), c = item.change, live = c?.ops.length ?? 0, raw = placedOf(d), placed = effective(state, d.id, raw);
+    // A line that moved later (Değiştir, a merge) still covers the op it was first placed with.
+    const keys = new Set([...raw, ...placed].map(p => p.key)), rest = c ? c.ops.map((op, i) => ({op, i})).filter(x => !placed.length || !keys.has(x.op.key)) : [];
     const who = m.replyTo ? 'Yanıtladın' : m.kind === 'complete' ? 'Kaldığın yeri yazdın' : 'Söyledin';
     return <article className="ledger-row" key={d.id}>
       <span className="ledger-time">{clockText(d.created_at)}</span>
@@ -94,7 +97,7 @@ export default function Ledger({state, dictations, outbox, now, busy, online, pr
         </>}
         {c && live > 0 && rest.length > 0 && <>
           {!placed.length && <p className="ledger-label">BERTHİER {live} DEĞİŞİKLİK YAPTI</p>}
-          {rest.map(({op, i}) => {const line = describeOp(op, state.fronts, state.routines, c), why = !op.undone && blocks.get(c.id + ':' + i); return <div className="ledger-op" key={i}>
+          {rest.map(({op, i}) => {const line = describeOp(op, state.fronts, routines, c), why = !op.undone && blocks.get(c.id + ':' + i); return <div className="ledger-op" key={i}>
             <p><span>{line.tag}</span> {line.text}</p>{undoButton(c, i)}
             {why && <p className="ledger-why">{why}</p>}
           </div>;})}

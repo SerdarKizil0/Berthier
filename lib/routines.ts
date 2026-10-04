@@ -595,7 +595,12 @@ export function routineAct(n: State, c: RoutineCommand, now = new Date()) {
       const target = n.routines?.[c.targetId ?? ''];
       if (!target || target.id === r!.id) throw Error('Birleştirilecek rutin bulunamadı.');
       for (const x of n.sessions ?? []) if (x.routineId === r!.id) x.routineId = target.id;
-      for (const k of n.skips ?? []) if (k.routineId === r!.id) k.routineId = target.id;
+      // A day both put off stays once, the target's (one record per skip key, so the merge undoes exactly).
+      if (n.skips) {
+        const kept = n.skips.filter(k => k.routineId !== r!.id || !n.skips!.some(t => t.routineId === target.id && t.day === k.day));
+        for (const k of kept) if (k.routineId === r!.id) k.routineId = target.id;
+        n.skips = kept;
+      }
       if (n.running?.routineId === r!.id) n.running.routineId = target.id;
       if (!target.ownWords && r!.ownWords) target.ownWords = r!.ownWords;
       if (n.reminderTrial) n.reminderTrial = { ...n.reminderTrial, a: n.reminderTrial.a.filter(id => id !== r!.id), b: n.reminderTrial.b.filter(id => id !== r!.id) };

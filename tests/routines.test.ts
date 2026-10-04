@@ -6,7 +6,7 @@ import {type Routine,type Session,at,dayMin,weekStart,weekLine,pastDay,observati
 import {addDays} from '../lib/calendar';
 import {placementsOf,effective,receiptTitle} from '../lib/kinds';
 import {checkRoutines,type Parsed} from '../lib/llm';
-import {describeOp,breakdown} from '../lib/ledger';
+import {describeOp,breakdown,changeNotice,changeLines,ledgerRoutines} from '../lib/ledger';
 import {placeCamps} from '../lib/expedition/camps';
 import {type CalendarEvent} from '../lib/calendar';
 import {genitive,withName,accusative,minutesUpper,minutesText,onDate} from '../lib/turkish';
@@ -281,6 +281,39 @@ test('each routine record keeps its own change-log key; undo keeps a routine and
  // Taken back as a whole, both go together.
  const fresh9=applyParsed(week(),p,'Haftada iki pilates; bugün yaptım, 40 dakika.',undefined,'d9'),whole=undo(fresh9,fresh9.changes.at(-1)!.id);
  assert.deepEqual([Object.values(whole.routines!).some(r=>r.title==='Pilates'),whole.sessions!.length],[false,week().sessions!.length]);
+});
+
+test('a merge moves records quietly and undoes exactly; undo never leaves a timer on a paused routine', ()=>{
+ const TUE=addDays(MON,1),skip=(routineId:string,day:string)=>({routineId,day,at:local(day,'09:00').toISOString()});
+ const keys=(x:State)=>(x.skips??[]).map(k=>k.routineId+':'+k.day).sort();
+ let s=week();s.routines!.neck=routine('neck','Boyun germe',2,{ownWords:{text:'Boynum ağrımasın.',show:true,sourceId:'d1'}});s.routines!.neck2=routine('neck2','Boyun antrenmanı',3);
+ s.skips=[skip('neck',MON),skip('neck',TUE),skip('neck2',MON)];
+ s=run(s,{kind:'routineLog',routineId:'neck'},local(MON,'10:30'),'Rutin kaydedildi');
+ const logged=s.changes.at(-1)!,before=s;
+ s=run(s,{kind:'routineMerge',routineId:'neck',targetId:'neck2'},local(MON,'12:00'),routineLabel({kind:'routineMerge'} as RoutineCommand));
+ // A day both put off stays once; the own words and the other day move along without lines of their own.
+ assert.deepEqual(keys(s),['neck2:'+MON,'neck2:'+TUE]);assert.equal(s.routines!.neck2.ownWords?.text,'Boynum ağrımasın.');
+ const merge=s.changes.at(-1)!;
+ assert.deepEqual(changeLines(merge,s.fronts,s.routines),['Boyun germe birleştirildi']);
+ assert.deepEqual(changeNotice(merge,s.fronts,s.routines),{title:'Rutinler birleştirildi.',text:''});
+ assert.deepEqual(keys(undo(s,merge.id)),keys(before));
+ // An earlier row keeps the merged routine's name.
+ assert.equal(changeLines(logged,s.fronts,s.routines)[0],'Rutin · 30 dk');
+ assert.equal(changeLines(logged,s.fronts,ledgerRoutines(s))[0],'Boyun germe · 30 dk');
+ // A dictation that only refines a known routine's timing still counts as one change.
+ const known=applyParsed(week(),parsed({routines:[{id:'yoga',title:'Yüz yogası',count:4,time:'22:00',minutes:20,travel:null,ownWords:null,steps:null,alt:null}]}),'Yüz yogasını genelde 22:00’de 20 dakika yapıyorum.',undefined,'d5');
+ assert.deepEqual(changeNotice(known.changes.at(-1)!,known.fronts,known.routines),{title:'1 değişiklik.',text:'1 rutin.'});
+ // A paused routine never keeps a running timer, whatever is taken back.
+ let t=run(week(),{kind:'routineStart',routineId:'yoga'},local(MON,'22:31'));
+ t=run(t,{kind:'routineFinish'},local(MON,'23:00'),'Rutin kaydedildi');const finished=t.changes.at(-1)!;
+ t=run(t,{kind:'routinePause',routineId:'yoga',paused:true},local(MON,'23:05'));
+ assert.throws(()=>undo(t,finished.id),/Durdurulan rutinde sayaç süremez/);
+ let u=run(week(),{kind:'routinePause',routineId:'yoga',paused:true},local(MON,'21:00'));
+ u=run(u,{kind:'routinePause',routineId:'yoga',paused:false},local(MON,'21:05'));const reopened=u.changes.at(-1)!;
+ u=run(u,{kind:'routineStart',routineId:'yoga'},local(MON,'22:31'));
+ assert.throws(()=>undo(u,reopened.id),/Durdurulan rutinde sayaç süremez/);
+ // Taken back in order, all is well.
+ t=undo(t,t.changes.at(-1)!.id);t=undo(t,finished.id);assert.equal(t.running?.routineId,'yoga');assert.equal(t.routines!.yoga.status,'settled');
 });
 
 test('60 days of routine use: the saved state grows linearly and stays far below the D1 row limit', ()=>{

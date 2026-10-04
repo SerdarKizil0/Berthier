@@ -130,8 +130,14 @@ function learnedLine(before: LearnedValue | null, after: LearnedValue | null): O
 }
 
 /** One line per operation: a short tag (“YENİ HAMLE”) and what it is (“Kargo iadesi: İade paketini …”).
- *  Routine records name their routine from `routines` (or from the change holding the routine's line). */
+ *  Routine records name their routine from `routines` (or from the change holding the routine's line). A merge
+ *  names the routine it took away; what moved with it (sessions, days, the timer, own words) follows quietly. */
 export function describeOp(op: Op, fronts: State['fronts'], routines: State['routines'] = {}, change?: Change): OpLine {
+  const line = opLine(op, fronts, routines, change);
+  return change?.label === routineLabel({ kind: 'routineMerge' }) && !(op.key.startsWith('routine:') && !op.after) ? { ...line, quiet: true } : line;
+}
+
+function opLine(op: Op, fronts: State['fronts'], routines: State['routines'], change?: Change): OpLine {
   if (op.key.startsWith('front:')) return frontLine(op.before as Front | null, op.after as Front | null);
   if (op.key.startsWith('order:')) return orderLine(op.before as Order | null, op.after as Order | null, fronts);
   if (op.key === 'calendar') return calendarLine(op.before as CalendarValue | null, op.after as CalendarValue | null);
@@ -150,25 +156,37 @@ export function describeOp(op: Op, fronts: State['fronts'], routines: State['rou
 
 const ORDER = ['yeni cephe', 'hamle', 'rutin', 'seans', 'kamp', 'tarih', 'emir', 'sıra', 'durum', 'tür', 'düzen', 'sayaç', 'not', 'depo kalemi', 'çakışma', 'teftiş', 'tercih', 'ayar'];
 
+/** A change's lines that are not undone: the quiet ones only when nothing else is left. */
+function liveLines(change: Change, fronts: State['fronts'], routines: State['routines'] = {}) {
+  const all = change.ops.filter(o => !o.undone).map(o => describeOp(o, fronts, routines, change));
+  return all.some(l => !l.quiet) ? all.filter(l => !l.quiet) : all;
+}
+
 /** “1 yeni cephe, 1 hamle, 1 tarih.” for the operations a change made (undone ones are left out). */
 export function breakdown(change: Change, fronts: State['fronts'], routines: State['routines'] = {}) {
   const counts = new Map<string, number>();
-  for (const op of change.ops) if (!op.undone) { const line = describeOp(op, fronts, routines, change); if (!line.quiet) counts.set(line.count, (counts.get(line.count) ?? 0) + 1); }
+  for (const line of liveLines(change, fronts, routines)) counts.set(line.count, (counts.get(line.count) ?? 0) + 1);
   const rank = (name: string) => (ORDER.indexOf(name) + ORDER.length + 1) % (ORDER.length + 1);
   return [...counts].sort((a, b) => rank(a[0]) - rank(b[0])).map(([name, n]) => `${n} ${name}`).join(', ') + (counts.size ? '.' : '');
 }
 
 /** The status card after a change: a dictation tells how many changes it made, an action names itself. */
 export function changeNotice(change: Change, fronts: State['fronts'], routines: State['routines'] = {}) {
-  const live = change.ops.filter(o => !o.undone && !describeOp(o, fronts, routines, change).quiet).length;
+  const live = liveLines(change, fronts, routines).length;
   if (change.sourceId) return { title: `${live} değişiklik.`, text: breakdown(change, fronts, routines) };
   return { title: change.label.replace(/[.]?$/, '.'), text: live > 1 ? breakdown(change, fronts, routines) : '' };
 }
 
 /** A change row's lines: the quiet ones only when nothing else is left. */
 export function changeLines(change: Change, fronts: State['fronts'], routines: State['routines'] = {}) {
-  const all = change.ops.filter(o => !o.undone).map(o => describeOp(o, fronts, routines, change));
-  return (all.some(l => !l.quiet) ? all.filter(l => !l.quiet) : all).map(l => l.text);
+  return liveLines(change, fronts, routines).map(l => l.text);
+}
+
+/** Routines the change log can name: the live ones, and those merged or moved away (from their own lines). */
+export function ledgerRoutines(s: State): State['routines'] {
+  const gone: Record<string, Routine> = {};
+  for (const c of s.changes) for (const o of c.ops) if (o.key.startsWith('routine:')) { const r = (o.after ?? o.before) as Routine | null; if (r) gone[r.id] = r; }
+  return { ...gone, ...s.routines };
 }
 
 // ── Kayıt defteri (design 1l): one stream by day; a dictation and the changes it made sit together. ──
