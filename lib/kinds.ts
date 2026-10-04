@@ -7,7 +7,7 @@ import { type Front, type FrontType, type Moved, type State, canonicalTitle, day
 import { calendarDay, syncPlans, type CalendarEvent } from './calendar';
 import { type Idea } from './research';
 import type { Parsed } from './llm';
-import { type Routine, type Session, countText, dayMin, durationText, findRoutine, newRoutine, routinesOf, weekDone, weekNote, weekPlan, weekday } from './routines';
+import { countText, dayMin, durationText, findRoutine, newRoutine, routinesOf, weekDone, weekNote, weekPlan, weekday } from './routines';
 import { DAY_NAMES, shortDay, untilTime, withName } from './turkish';
 
 export type Kind = 'move' | 'routine' | 'event' | 'idea' | 'record';
@@ -17,8 +17,6 @@ export const TARGETS: [Exclude<Kind, 'record'>, string][] = [['move', 'Hamle'], 
 export type Alt = { to: Kind | 'merge'; label: string; targetId?: string };
 /** One item a dictation placed. `key` is the change-log key holding it; null when nothing changed (a pointer). */
 export type Placement = { ref: string; kind: Kind; key: string | null; text: string; note: string; alt?: Alt };
-
-type RoutinesValue = { routines?: Record<string, Routine>; sessions?: Session[] };
 
 function eventNote(s: State, e: CalendarEvent) {
   const when = e.weekly && e.date ? `Her ${DAY_NAMES[weekday(e.date)]}${e.time ? ' ' + e.time : ''}` : e.date ? shortDay(e.date) + (e.time ? ' ' + e.time : '') : 'Tarihi belli değil';
@@ -50,18 +48,18 @@ export function placementsOf(before: State, after: State, p: Parsed, now = new D
     if (!was) {
       const twin = routinesOf(before).find(x => similarity(x.title, r.title) >= 0.3), said = p.routines?.find(x => normalize(x.title) === normalize(r.title));
       const alt: Alt | undefined = twin ? { to: 'merge', label: `${withName(twin.title)} aynı`, targetId: twin.id } : said?.alt === 'move' ? { to: 'move', label: 'Tek seferlik hamle yap' } : undefined;
-      out.push({ ref: `routine:${r.id}`, kind: 'routine', key: 'routines', text: `${r.title} · ${countText(r.count)}`, note: 'Gözlem başladı', ...(alt ? { alt } : {}) });
-    } else if (was.count !== r.count) out.push({ ref: `count:${r.id}`, kind: 'record', key: 'routines', text: `${r.title} · ${countText(r.count)}`, note: 'Sıklık değişti' });
+      out.push({ ref: `routine:${r.id}`, kind: 'routine', key: `routine:${r.id}`, text: `${r.title} · ${countText(r.count)}`, note: 'Gözlem başladı', ...(alt ? { alt } : {}) });
+    } else if (was.count !== r.count) out.push({ ref: `count:${r.id}`, kind: 'record', key: `routine:${r.id}`, text: `${r.title} · ${countText(r.count)}`, note: 'Sıklık değişti' });
   }
   const sessions = new Set((before.sessions ?? []).map(x => x.id)), skips = new Set((before.skips ?? []).map(k => k.routineId + k.day));
   for (const x of after.sessions ?? []) {
     const r = after.routines?.[x.routineId];
-    if (!sessions.has(x.id) && r) out.push({ ref: `session:${x.id}`, kind: 'record', key: 'routines', text: `${r.title} · ${x.minutes} dk`, note: `Seans yazıldı · ${weekNote(after, r, today)}` });
+    if (!sessions.has(x.id) && r) out.push({ ref: `session:${x.id}`, kind: 'record', key: `session:${x.id}`, text: `${r.title} · ${x.minutes} dk`, note: `Seans yazıldı · ${weekNote(after, r, today)}` });
   }
   for (const k of after.skips ?? []) {
     const r = after.routines?.[k.routineId];
     if (skips.has(k.routineId + k.day) || !r) continue;
-    out.push({ ref: `skip:${k.routineId}:${k.day}`, kind: 'record', key: 'routines', text: `${r.title} · ${k.day === today ? 'bugün değil' : shortDay(k.day) + ' olmadı'}`, note: k.slidTo && r.pattern ? `Seans ${DAY_NAMES[weekday(k.slidTo)]} ${untilTime(r.pattern.time)} kaydı` : 'Kayıt düştü' });
+    out.push({ ref: `skip:${k.routineId}:${k.day}`, kind: 'record', key: `skip:${k.routineId}:${k.day}`, text: `${r.title} · ${k.day === today ? 'bugün değil' : shortDay(k.day) + ' olmadı'}`, note: k.slidTo && r.pattern ? `Seans ${DAY_NAMES[weekday(k.slidTo)]} ${untilTime(r.pattern.time)} kaydı` : 'Kayıt düştü' });
   }
   // Rule 3: an existing routine only pointed at (“yüz yogası yap”) changes nothing; the receipt says where it is.
   for (const x of p.sessions ?? []) {
@@ -132,7 +130,7 @@ export function rekind(n: State, c: { sourceId?: string; ref?: string; to?: stri
       const r = n.routines?.[a];
       if (!r) throw Error('Rutin bulunamadı.');
       text = r.title; from = 'routine';
-      if (born('routines', v => !!(v as RoutinesValue | null)?.routines?.[a])) remove = () => {
+      if (born('routine:' + a, v => !!v)) remove = () => {
         if (n.running?.routineId === a) throw Error('Önce süren sayacı bitir.');
         delete n.routines![a]; n.sessions = (n.sessions ?? []).filter(x => x.routineId !== a); n.skips = (n.skips ?? []).filter(k => k.routineId !== a);
       };
@@ -143,7 +141,7 @@ export function rekind(n: State, c: { sourceId?: string; ref?: string; to?: stri
       if (!x || !r) throw Error('Kayıt bulunamadı.');
       if (to === 'routine') throw Error('Bu zaten bir rutinin kaydı.');
       text = r.title; from = 'record';
-      if (born('routines', v => !!(v as RoutinesValue | null)?.sessions?.some(y => y.id === a))) remove = () => { n.sessions = n.sessions!.filter(y => y.id !== a); };
+      if (born('session:' + a, v => !!v)) remove = () => { n.sessions = n.sessions!.filter(y => y.id !== a); };
       break;
     }
     case 'event': {
@@ -181,7 +179,7 @@ export function rekind(n: State, c: { sourceId?: string; ref?: string; to?: stri
       if (findRoutine(n, title)) throw Error('Bu adla bir rutin var.');
       const r = newRoutine(title, c.count, now);
       (n.routines ??= {})[r.id] = r;
-      moved = { newRef: `routine:${r.id}`, key: 'routines', text: `${r.title} · ${countText(r.count)}`, note: 'Gözlem başladı' };
+      moved = { newRef: `routine:${r.id}`, key: `routine:${r.id}`, text: `${r.title} · ${countText(r.count)}`, note: 'Gözlem başladı' };
       break;
     }
     case 'event': {

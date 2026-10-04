@@ -2,7 +2,8 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {fresh,commitChanges,undo,type Front,type State} from '../lib/domain';
 import {act,applyParsed} from '../lib/reducer';
-import {type Routine,type Session,at,dayMin,weekStart,weekLine,pastDay,observation,readyToPropose,mirror,weekPlan,weekRows,todayList,reminderFor,routineAct,scaffolds,trialResult,proposals,type RoutineCommand} from '../lib/routines';
+import {type Routine,type Session,at,dayMin,weekStart,weekLine,pastDay,observation,readyToPropose,mirror,weekPlan,weekRows,todayList,reminderFor,routineAct,routineLabel,scaffolds,trialResult,proposals,type RoutineCommand} from '../lib/routines';
+import {addDays} from '../lib/calendar';
 import {placementsOf,effective,receiptTitle} from '../lib/kinds';
 import {checkRoutines,type Parsed} from '../lib/llm';
 import {describeOp,breakdown} from '../lib/ledger';
@@ -66,7 +67,8 @@ test('approving the pattern settles routines; “Yarısına” reminds one of tw
  s=run(s,{kind:'routinePatternAll',patterns:[{routineId:'yoga',days:[1,3,6,0],time:'22:30'}],reminder:'half'},now,'Haftalık düzen onaylandı');
  const yoga=s.routines!.yoga;
  assert.equal(yoga.status,'settled');assert.equal(yoga.pattern?.minutes,32);assert.equal(yoga.reminder.on,true);assert.equal(s.reminderTrial?.a[0],'yoga');
- assert.equal(describeOp(s.changes.at(-1)!.ops[0],s.fronts).tag,'DÜZEN');
+ assert.deepEqual(s.changes.at(-1)!.ops.map(o=>o.key),['routine:yoga','reminderTrial']);
+ assert.equal(describeOp(s.changes.at(-1)!.ops[0],s.fronts,s.routines).tag,'DÜZEN');
  assert.throws(()=>run(s,{kind:'routineReminder',routineId:'neck',on:true},now),/Gözlem sürerken hatırlatma yok/);
  s=undo(s,s.changes.at(-1)!.id);assert.equal(s.routines!.yoga.status,'observing');assert.equal(s.reminderTrial??null,null);
 });
@@ -104,7 +106,8 @@ test('“Bugün değil” slides the session to a free day of the week; a missed
  let s=week();const now=local(MON,'22:00');
  s=run(s,{kind:'routineSkip',routineId:'yoga',day:MON},now,'Bugün değil');
  assert.equal(s.skips![0].slidTo,'2026-10-06');
- assert.equal(describeOp(s.changes.at(-1)!.ops[0],s.fronts).text,'Yüz yogası · Salı 22:30’a kaydı');
+ assert.deepEqual(s.changes.at(-1)!.ops.map(o=>o.key),['skip:yoga:'+MON]);
+ assert.equal(describeOp(s.changes.at(-1)!.ops[0],s.fronts,s.routines).text,'Yüz yogası · Salı 22:30’a kaydı');
  const list=todayList(s,now),last=list.rows.at(-1)!;
  assert.deepEqual([last.time,last.title,last.sub],['—','Yüz yogası','Bugün değil · Salı 22:30’a kaydı']);
  assert.equal(list.count,5);
@@ -138,19 +141,23 @@ test('the reminder says the state, once per block, quiet hours only in the app',
 test('timer, one tap, corrections and the change log lines', ()=>{
  let s=week();const start=local(MON,'22:31');
  s=run(s,{kind:'routineStart',routineId:'yoga'},start,'Sayaç başladı');
- assert.equal(describeOp(s.changes.at(-1)!.ops[0],s.fronts).text,'Yüz yogası başladı');
+ assert.deepEqual(s.changes.at(-1)!.ops.map(o=>o.key),['running']);
+ assert.equal(describeOp(s.changes.at(-1)!.ops[0],s.fronts,s.routines).text,'Yüz yogası başladı');
  assert.throws(()=>run(s,{kind:'routineStart',routineId:'book'},start),/Önce süren sayacı bitir/);
  assert.equal(todayList(s,local(MON,'22:43')).rows.find(r=>r.tone==='running')!.chip,'12 DK');
  assert.equal(reminderFor(s,local(MON,'22:35')),null);
  s=run(s,{kind:'routineFinish'},local(MON,'23:02'),'Rutin kaydedildi');
  const x=s.sessions!.at(-1)!;assert.deepEqual([x.minutes,x.source,s.running],[31,'timer',null]);
- const line=describeOp(s.changes.at(-1)!.ops[0],s.fronts);assert.deepEqual([line.tag,line.text],['SEANS','Yüz yogası · 31 dk']);
+ // The change holds that one session (and the timer stopping), not the session history.
+ const done=s.changes.at(-1)!;assert.deepEqual(done.ops.map(o=>[o.key,o.before===null]),[['session:'+x.id,true],['running',false]]);assert.deepEqual(done.ops[0].after,x);
+ const line=describeOp(done.ops[0],s.fronts,s.routines);assert.deepEqual([line.tag,line.text],['SEANS','Yüz yogası · 31 dk']);
+ assert.equal(describeOp(done.ops[1],s.fronts,s.routines).quiet,true);
  s=run(s,{kind:'routineEdit',sessionId:x.id,minutes:28},local(MON,'23:03'));assert.equal(s.sessions!.at(-1)!.minutes,28);
  s=run(s,{kind:'routineLog',routineId:'book'},local(MON,'23:50'));assert.deepEqual([s.sessions!.at(-1)!.minutes,s.sessions!.at(-1)!.source],[30,'tap']);
  // A forgotten timer is finished with a corrected end.
  s=run(s,{kind:'routineStart',routineId:'cook'},local('2026-10-06','19:00'));
  s=run(s,{kind:'routineFinish',end:'19:50'},local('2026-10-06','23:59'));assert.equal(s.sessions!.at(-1)!.minutes,50);
- assert.equal(breakdown({...s.changes.at(-1)!,sourceId:'d'},s.fronts),'1 seans.');
+ assert.equal(breakdown({...s.changes.at(-1)!,sourceId:'d'},s.fronts,s.routines),'1 seans.');
 });
 
 test('pause, merge and the scaffold suggestions', ()=>{
@@ -161,7 +168,8 @@ test('pause, merge and the scaffold suggestions', ()=>{
  s.routines!.neck2=routine('neck2','Boyun antrenmanı',3);
  s=run(s,{kind:'routineMerge',routineId:'neck',targetId:'neck2'},now);
  assert.equal(s.routines!.neck,undefined);assert.ok(s.sessions!.some(x=>x.routineId==='neck2'));
- assert.equal(describeOp(s.changes.at(-1)!.ops[0],s.fronts).text,'Boyun germe birleştirildi');
+ const merge=s.changes.at(-1)!;assert.equal(describeOp(merge.ops[0],s.fronts,s.routines,merge).text,'Boyun germe birleştirildi');
+ assert.ok(merge.ops.slice(1).every(o=>describeOp(o,s.fronts,s.routines,merge).quiet));
  // Three weeks on pattern, every week met, sessions started before the reminder; twelve steady timings.
  const q=week();q.sessions=[];
  for(const w of ['2026-10-05','2026-10-12','2026-10-19'])for(const d of [0,2,5,6])q.sessions.push(session('yoga',new Date(Date.parse(w+'T12:00:00Z')+d*86400000).toISOString().slice(0,10),'22:05',32));
@@ -187,7 +195,7 @@ test('a dictation places routines, sessions and pointers; the receipt names each
  const p=parsed({routines:[{id:null,title:'Boyun germe',count:2,time:null,minutes:null,travel:null,ownWords:null,steps:null,alt:null}],sessions:[{routineId:'yoga',title:'Yüz yogası',dayText:null,end:null,minutes:null,skip:false,done:false},{routineId:'book',title:'Kitap okuma',dayText:'dün',end:'23:50',minutes:25,skip:false,done:true}]});
  s=applyParsed(s,p,'Haftada iki kez boyun germe yapacağım. Yüz yogası yap. Dün kitabı 25 dakika okudum.',undefined,'d1');
  const placed=placementsOf(before,s,p);
- const routineLine=placed.find(x=>x.kind==='routine'&&x.key==='routines')!;
+ const routineLine=placed.find(x=>x.kind==='routine'&&x.key?.startsWith('routine:'))!;
  assert.deepEqual([routineLine.text,routineLine.note,routineLine.alt?.label,routineLine.alt?.to],['Boyun germe · haftada 2','Gözlem başladı','Boyun antrenmanıyla aynı','merge']);
  const pointer=placed.find(x=>x.key===null)!;assert.equal(pointer.alt?.label,'Tek seferlik hamle yap');assert.match(pointer.text,/^Yüz yogası · /);
  const record=placed.find(x=>x.kind==='record')!;assert.equal(record.text,'Kitap okuma · 25 dk');
@@ -247,3 +255,54 @@ test('the model output keeps rule 3 and quotes own words only', ()=>{
  const q=parsed({routines:[],sessions:[{routineId:null,title:'Pilates',dayText:null,end:null,minutes:null,skip:false,done:true}]});
  assert.throws(()=>checkRoutines(q,s,'Pilates yaptım'),/mevcut ya da bu diktede/);
 });
+
+test('each routine record keeps its own change-log key; undo keeps a routine and its records together', ()=>{
+ let s=week();
+ s=run(s,{kind:'routineLog',routineId:'book'},local(MON,'23:50'),'Rutin kaydedildi');
+ const c=s.changes.at(-1)!,x=s.sessions!.at(-1)!;
+ assert.deepEqual(c.ops.map(o=>[o.key,o.before]),[['session:'+x.id,null]]);assert.deepEqual(c.ops[0].after,x);
+ const back=undo(s,c.id);assert.deepEqual(back.sessions!.map(y=>y.id),s.sessions!.slice(0,-1).map(y=>y.id));
+ // A corrected session: only that session, before and after.
+ s=run(s,{kind:'routineEdit',sessionId:x.id,minutes:25},local(MON,'23:55'));
+ assert.deepEqual(s.changes.at(-1)!.ops.map(o=>[o.key,(o.before as Session).minutes,(o.after as Session).minutes]),[['session:'+x.id,30,25]]);
+ assert.equal(undo(s,s.changes.at(-1)!.id).sessions!.find(y=>y.id===x.id)!.minutes,30);
+ // A dictation that opened a routine and wrote its session: the routine's line does not go back alone.
+ const p=parsed({routines:[{id:null,title:'Pilates',count:2,time:null,minutes:null,travel:null,ownWords:null,steps:null,alt:null}],sessions:[{routineId:null,title:'Pilates',dayText:null,end:null,minutes:40,skip:false,done:true}]});
+ let d=applyParsed(week(),p,'Haftada iki pilates; bugün yaptım, 40 dakika.',undefined,'d9');
+ const dc=d.changes.at(-1)!,ri=dc.ops.findIndex(o=>o.key.startsWith('routine:')),si=dc.ops.findIndex(o=>o.key.startsWith('session:'));
+ assert.ok(ri>=0&&si>=0);
+ assert.throws(()=>undo(d,dc.id,ri),/Bu rutine bağlı kayıtlar var/);
+ const id=dc.ops[ri].key.slice(8);
+ // A later session too: the dictation as a whole waits for it.
+ const later=run(d,{kind:'routineLog',routineId:id},new Date());
+ assert.throws(()=>undo(later,dc.id),/Bu rutine bağlı kayıtlar var/);
+ d=undo(d,dc.id,si);d=undo(d,dc.id,ri);
+ assert.equal(d.routines![id],undefined);assert.equal(d.sessions!.some(y=>y.routineId===id),false);
+ // Taken back as a whole, both go together.
+ const fresh9=applyParsed(week(),p,'Haftada iki pilates; bugün yaptım, 40 dakika.',undefined,'d9'),whole=undo(fresh9,fresh9.changes.at(-1)!.id);
+ assert.deepEqual([Object.values(whole.routines!).some(r=>r.title==='Pilates'),whole.sessions!.length],[false,week().sessions!.length]);
+});
+
+test('60 days of routine use: the saved state grows linearly and stays far below the D1 row limit', ()=>{
+ // Ten sessions and fifteen commands a day (five timed: Başlat + Bitti; five one-tap: Yaptım), each saved as
+ // the API saves it (one change and one request id).
+ let s=fresh();const ids=['r1','r2','r3','r4','r5'],hour=(i:number,h:number)=>String(h+i*3).padStart(2,'0');
+ s.routines=Object.fromEntries(ids.map((id,i)=>[id,settled(id,`Rutin ${i+1}`,[0,1,2,3,4,5,6],`${hour(i,7)}:00`,30)]));
+ const cmd=(st:State,c:RoutineCommand,now:Date)=>{const n=commitChanges(st,routineLabel(c),draft=>routineAct(draft,c,now));n.receipts.push(crypto.randomUUID());return n;};
+ const bytes=(st:State)=>new TextEncoder().encode(JSON.stringify(st)).length,sizes:number[]=[];
+ for(let d=0;d<60;d++){
+  const day=addDays(MON,d);
+  for(let i=0;i<5;i++){const t=local(day,`${hour(i,7)}:00`);s=cmd(s,{kind:'routineStart',routineId:ids[i]},t);s=cmd(s,{kind:'routineFinish'},new Date(t.getTime()+(25+i)*60000));}
+  for(let i=0;i<5;i++)s=cmd(s,{kind:'routineLog',routineId:ids[i]},local(day,`${hour(i,8)}:30`));
+  sizes.push(bytes(s));
+ }
+ assert.deepEqual([s.sessions!.length,s.changes.length],[600,900]);
+ const growth=sizes.slice(1).map((x,i)=>x-sizes[i]);
+ assert.ok(Math.max(...growth)-Math.min(...growth)<=64,`each day adds the same: ${Math.min(...growth)}–${Math.max(...growth)} bytes`);
+ assert.ok(sizes.at(-1)!<500_000,`60 days: ${sizes.at(-1)} bytes`);
+ if(process.env.SIZE_REPORT)console.log(JSON.stringify({day1:sizes[0],day30:sizes[29],day60:sizes[59],perDay:[Math.min(...growth),Math.max(...growth)]}));
+ // One session's change is the same size on day 1 and day 60.
+ const logs=s.changes.filter(c=>c.label==='Rutin kaydedildi'&&c.ops.length===1),size=(x:unknown)=>JSON.stringify(x).length;
+ assert.ok(size(logs.at(-1))-size(logs[0])<=8);assert.ok(size(logs.at(-1))<600);
+});
+

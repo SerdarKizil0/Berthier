@@ -9,7 +9,7 @@ import {useMemo, useState} from 'react';
 import {Check, RotateCcw} from 'lucide-react';
 import {type Change, type Dictation, type State} from '@/lib/domain';
 import {clockText} from '@/lib/expedition/camps';
-import {describeOp, ledgerDays, undoBlock, type LedgerItem} from '@/lib/ledger';
+import {changeLines, describeOp, ledgerDays, undoBlock, type LedgerItem} from '@/lib/ledger';
 import {KIND_TAG, TARGETS, effective, placedOf} from '@/lib/kinds';
 
 type Action = (body: {kind: string; [key: string]: unknown}, options?: {quiet?: boolean; silent?: boolean}) => Promise<boolean | undefined>;
@@ -56,7 +56,7 @@ export default function Ledger({state, dictations, outbox, now, busy, online, pr
 
   function entry(item: LedgerItem) {
     if (item.kind === 'change') {
-      const c = item.change, lines = c.ops.filter(o => !o.undone).map(o => describeOp(o, state.fronts).text), why = blocks.get(c.id);
+      const c = item.change, lines = changeLines(c, state.fronts, state.routines), why = blocks.get(c.id);
       return <article className="ledger-row" key={c.id}>
         <span className="ledger-time">{clockText(c.at)}</span>
         <div className="ledger-body">
@@ -94,7 +94,7 @@ export default function Ledger({state, dictations, outbox, now, busy, online, pr
         </>}
         {c && live > 0 && rest.length > 0 && <>
           {!placed.length && <p className="ledger-label">BERTHİER {live} DEĞİŞİKLİK YAPTI</p>}
-          {rest.map(({op, i}) => {const line = describeOp(op, state.fronts), why = !op.undone && blocks.get(c.id + ':' + i); return <div className="ledger-op" key={i}>
+          {rest.map(({op, i}) => {const line = describeOp(op, state.fronts, state.routines, c), why = !op.undone && blocks.get(c.id + ':' + i); return <div className="ledger-op" key={i}>
             <p><span>{line.tag}</span> {line.text}</p>{undoButton(c, i)}
             {why && <p className="ledger-why">{why}</p>}
           </div>;})}

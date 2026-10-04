@@ -6,11 +6,13 @@ import { type Change, type Dictation, type Front, type Op, type Order, type Stat
 import { addDays, calendarDay, type CalendarEvent } from './calendar';
 import { clockText } from './expedition/camps';
 import { type Idea } from './research';
-import { type ReminderTrial, type Routine, type Running, type Session, type Skip, countText, daysText, weekday } from './routines';
+import { type ReminderTrial, type Routine, type Running, type Session, type Skip, countText, daysText, routineLabel, weekday } from './routines';
 import { KIND_TAG, type Kind } from './kinds';
 import { DAY_NAMES, atTime, shortDay, untilTime, upper } from './turkish';
 
-export type OpLine = { tag: string; text: string; count: string };
+/** `quiet`: a line that only follows another one in the same change (the timer stopping when a session is
+ *  saved, sessions moving with a merge); it is left out of counts and, when others exist, of the row. */
+export type OpLine = { tag: string; text: string; count: string; quiet?: boolean };
 
 const STATUS: Record<Front['status'], string> = { active: 'aktif', held: 'bekletiliyor', closed: 'kapandı' };
 
@@ -71,34 +73,50 @@ function researchLine(before: ResearchValue | null, after: ResearchValue | null)
   return { tag: 'TEFTİŞ', text: after?.review?.completedAt && !before?.review?.completedAt ? 'Teftiş tamamlandı.' : 'Teftiş adımı', count: 'teftiş' };
 }
 
-type RoutinesValue = { routines: Record<string, Routine>; sessions: Session[]; skips: Skip[]; running: Running | null; reminderTrial: ReminderTrial | null };
+/** A routine's name for a record: from the state, else from the change that holds the routine's own line. */
+function routineName(id: string, routines: State['routines'], change?: Change) {
+  const op = change?.ops.find(o => o.key === 'routine:' + id);
+  return routines?.[id]?.title ?? (op?.after as Routine | null)?.title ?? (op?.before as Routine | null)?.title ?? 'Rutin';
+}
 
-/** Rutinler: RUTİN (new, put away, settings), SEANS, BUGÜN DEĞİL, DÜZEN, SAYAÇ. */
-function routinesLine(before: RoutinesValue | null, after: RoutinesValue | null): OpLine {
-  const b = before?.routines ?? {}, a = after?.routines ?? {}, name = (id: string) => a[id]?.title ?? b[id]?.title ?? 'Rutin';
-  const added = Object.values(a).filter(r => !b[r.id]), removed = Object.values(b).filter(r => !a[r.id]);
-  const sessions = (after?.sessions ?? []).filter(x => !(before?.sessions ?? []).some(y => y.id === x.id));
-  const skips = (after?.skips ?? []).filter(k => !(before?.skips ?? []).some(x => x.routineId === k.routineId && x.day === k.day));
-  if (added.length) return { tag: 'RUTİN', text: `${added[0].title} · ${countText(added[0].count)}${added.length > 1 ? ` (+${added.length - 1})` : ''}`, count: 'rutin' };
-  if (removed.length && sessions.length === 0 && Object.keys(a).length < Object.keys(b).length) return { tag: 'RUTİN', text: `${removed[0].title} ${(after?.sessions ?? []).some(x => (before?.sessions ?? []).find(y => y.id === x.id)?.routineId === removed[0].id) ? 'birleştirildi' : 'kaldırıldı'}`, count: 'rutin' };
-  if (sessions.length) return { tag: 'SEANS', text: `${name(sessions[0].routineId)} · ${sessions[0].minutes} dk${sessions.length > 1 ? ` (+${sessions.length - 1})` : ''}`, count: 'seans' };
-  if (skips.length) { const k = skips[0], r = a[k.routineId]; return { tag: 'BUGÜN DEĞİL', text: `${name(k.routineId)}${k.slidTo && r?.pattern ? ` · ${DAY_NAMES[weekday(k.slidTo)]} ${untilTime(r.pattern.time)} kaydı` : ''}`, count: 'rutin' }; }
-  if (!before?.running && after?.running) return { tag: 'SAYAÇ', text: `${name(after.running.routineId)} başladı`, count: 'sayaç' };
-  const edited = (after?.sessions ?? []).find(x => { const y = (before?.sessions ?? []).find(y => y.id === x.id); return y && JSON.stringify(y) !== JSON.stringify(x); });
-  if (edited) return { tag: 'SEANS', text: `${name(edited.routineId)} · ${edited.minutes} dk`, count: 'seans' };
-  for (const r of Object.values(a)) {
-    const was = b[r.id];
-    if (!was) continue;
-    if (JSON.stringify(was.pattern) !== JSON.stringify(r.pattern) && r.pattern) return { tag: 'DÜZEN', text: `${r.title}: ${daysText(r.pattern.days)} · ${r.pattern.time}`, count: 'düzen' };
-    if (was.status !== r.status) return { tag: 'RUTİN', text: `${r.title}: ${r.status === 'paused' ? 'durduruldu' : 'yeniden açıldı'}`, count: 'rutin' };
-    if (was.reminder.on !== r.reminder.on) return { tag: 'RUTİN', text: `${r.title}: hatırlatma ${r.reminder.on ? 'açık' : 'kapalı'}`, count: 'ayar' };
-    if (was.timer !== r.timer) return { tag: 'RUTİN', text: `${r.title}: ${r.timer ? 'sayaçla' : 'tek dokunuş'}`, count: 'ayar' };
-    if (JSON.stringify(was.ownWords) !== JSON.stringify(r.ownWords)) return { tag: 'RUTİN', text: `${r.title}: kendi sözün ${r.ownWords?.show ? 'görünür' : 'gizli'}`, count: 'ayar' };
-    if (JSON.stringify(was.asked) !== JSON.stringify(r.asked)) return { tag: 'RUTİN', text: `${r.title}: öneri sonra sorulur`, count: 'ayar' };
-    if (was.count !== r.count) return { tag: 'RUTİN', text: `${r.title} · ${countText(r.count)}`, count: 'rutin' };
+/** RUTİN (new, put away, merged, settings) and DÜZEN, for one routine's own key. */
+function routineLine(before: Routine | null, after: Routine | null, change?: Change): OpLine {
+  const r = after ?? before!;
+  if (!before) return { tag: 'RUTİN', text: `${r.title} · ${countText(r.count)}`, count: 'rutin' };
+  if (!after) {
+    const merged = change?.label === routineLabel({ kind: 'routineMerge' }) || !!change?.ops.some(o => o.key.startsWith('session:') && (o.before as Session | null)?.routineId === r.id && !!o.after && (o.after as Session).routineId !== r.id);
+    return { tag: 'RUTİN', text: `${r.title} ${merged ? 'birleştirildi' : 'kaldırıldı'}`, count: 'rutin' };
   }
-  if (JSON.stringify(before?.reminderTrial) !== JSON.stringify(after?.reminderTrial)) return { tag: 'DÜZEN', text: after?.reminderTrial?.decidedAt ? 'Hatırlatma denemesi bitti' : 'Hatırlatma denemesi', count: 'düzen' };
-  return { tag: 'RUTİN', text: 'Rutin kaydı', count: 'rutin' };
+  if (JSON.stringify(before.pattern) !== JSON.stringify(after.pattern) && after.pattern) return { tag: 'DÜZEN', text: `${r.title}: ${daysText(after.pattern.days)} · ${after.pattern.time}`, count: 'düzen' };
+  if (before.status !== after.status) return { tag: 'RUTİN', text: `${r.title}: ${after.status === 'paused' ? 'durduruldu' : 'yeniden açıldı'}`, count: 'rutin' };
+  if (before.reminder.on !== after.reminder.on) return { tag: 'RUTİN', text: `${r.title}: hatırlatma ${after.reminder.on ? 'açık' : 'kapalı'}`, count: 'ayar' };
+  if (before.timer !== after.timer) return { tag: 'RUTİN', text: `${r.title}: ${after.timer ? 'sayaçla' : 'tek dokunuş'}`, count: 'ayar' };
+  if (JSON.stringify(before.ownWords) !== JSON.stringify(after.ownWords)) return { tag: 'RUTİN', text: `${r.title}: kendi sözün ${after.ownWords?.show ? 'görünür' : 'gizli'}`, count: 'ayar' };
+  if (JSON.stringify(before.asked) !== JSON.stringify(after.asked)) return { tag: 'RUTİN', text: `${r.title}: öneri sonra sorulur`, count: 'ayar' };
+  if (before.count !== after.count) return { tag: 'RUTİN', text: `${r.title} · ${countText(after.count)}`, count: 'rutin' };
+  return { tag: 'RUTİN', text: r.title, count: 'rutin', quiet: true };
+}
+
+/** SEANS: a session written, corrected, or taken out with its routine. */
+function sessionLine(before: Session | null, after: Session | null, routines: State['routines'], change?: Change): OpLine {
+  const x = after ?? before!, name = routineName(x.routineId, routines, change);
+  if (!before) return { tag: 'SEANS', text: `${name} · ${x.minutes} dk`, count: 'seans' };
+  if (!after) return { tag: 'SEANS', text: `${name} · ${x.minutes} dk kaldırıldı`, count: 'seans', quiet: true };
+  if (before.routineId !== after.routineId) return { tag: 'SEANS', text: `${routineName(before.routineId, routines, change)} → ${name}`, count: 'seans', quiet: true };
+  return { tag: 'SEANS', text: `${name} · ${after.minutes} dk`, count: 'seans' };
+}
+
+/** BUGÜN DEĞİL: a day put off and where its session slid. */
+function skipLine(before: Skip | null, after: Skip | null, routines: State['routines'], change?: Change): OpLine {
+  const k = after ?? before!, name = routineName(k.routineId, routines, change), r = routines?.[k.routineId];
+  if (!before) return { tag: 'BUGÜN DEĞİL', text: `${name}${k.slidTo && r?.pattern ? ` · ${DAY_NAMES[weekday(k.slidTo)]} ${untilTime(r.pattern.time)} kaydı` : ''}`, count: 'rutin' };
+  return { tag: 'BUGÜN DEĞİL', text: after ? name : `${name} · kaldırıldı`, count: 'rutin', quiet: true };
+}
+
+/** SAYAÇ: the timer starting; its stopping goes with the session it saved. */
+function runningLine(before: Running | null, after: Running | null, routines: State['routines'], change?: Change): OpLine {
+  const name = routineName((after ?? before!).routineId, routines, change);
+  return !before && after ? { tag: 'SAYAÇ', text: `${name} başladı`, count: 'sayaç' } : { tag: 'SAYAÇ', text: after ? name : `${name} durdu`, count: 'sayaç', quiet: true };
 }
 
 type LearnedValue = { kindPreferences: { text: string; from: Kind; to: Kind }[]; typePreferences: { title: string; from: Front['type']; to: Front['type'] | 'routine' }[] };
@@ -111,14 +129,19 @@ function learnedLine(before: LearnedValue | null, after: LearnedValue | null): O
   return { tag: 'TERCİH', text: 'Tür tercihi', count: 'tercih' };
 }
 
-/** One line per operation: a short tag (“YENİ HAMLE”) and what it is (“Kargo iadesi: İade paketini …”). */
-export function describeOp(op: Op, fronts: State['fronts']): OpLine {
+/** One line per operation: a short tag (“YENİ HAMLE”) and what it is (“Kargo iadesi: İade paketini …”).
+ *  Routine records name their routine from `routines` (or from the change holding the routine's line). */
+export function describeOp(op: Op, fronts: State['fronts'], routines: State['routines'] = {}, change?: Change): OpLine {
   if (op.key.startsWith('front:')) return frontLine(op.before as Front | null, op.after as Front | null);
   if (op.key.startsWith('order:')) return orderLine(op.before as Order | null, op.after as Order | null, fronts);
   if (op.key === 'calendar') return calendarLine(op.before as CalendarValue | null, op.after as CalendarValue | null);
   if (op.key === 'research') return researchLine(op.before as ResearchValue | null, op.after as ResearchValue | null);
   if (op.key === 'preferences') return { tag: 'TERCİH', text: 'Ön adım tercihi', count: 'tercih' };
-  if (op.key === 'routines') return routinesLine(op.before as RoutinesValue | null, op.after as RoutinesValue | null);
+  if (op.key.startsWith('routine:')) return routineLine(op.before as Routine | null, op.after as Routine | null, change);
+  if (op.key.startsWith('session:')) return sessionLine(op.before as Session | null, op.after as Session | null, routines, change);
+  if (op.key.startsWith('skip:')) return skipLine(op.before as Skip | null, op.after as Skip | null, routines, change);
+  if (op.key === 'running') return runningLine(op.before as Running | null, op.after as Running | null, routines, change);
+  if (op.key === 'reminderTrial') return { tag: 'DÜZEN', text: (op.after as ReminderTrial | null)?.decidedAt ? 'Hatırlatma denemesi bitti' : op.after ? 'Hatırlatma denemesi' : 'Hatırlatma denemesi kaldırıldı', count: 'düzen' };
   if (op.key === 'learned') return learnedLine(op.before as LearnedValue | null, op.after as LearnedValue | null);
   if (op.key === 'setup') return { tag: 'PROJELER', text: 'Aktif proje seçimi', count: 'ayar' };
   if (op.key === 'rhythm') return { tag: 'RİTİM', text: 'Ritim ayarı', count: 'ayar' };
@@ -128,18 +151,24 @@ export function describeOp(op: Op, fronts: State['fronts']): OpLine {
 const ORDER = ['yeni cephe', 'hamle', 'rutin', 'seans', 'kamp', 'tarih', 'emir', 'sıra', 'durum', 'tür', 'düzen', 'sayaç', 'not', 'depo kalemi', 'çakışma', 'teftiş', 'tercih', 'ayar'];
 
 /** “1 yeni cephe, 1 hamle, 1 tarih.” for the operations a change made (undone ones are left out). */
-export function breakdown(change: Change, fronts: State['fronts']) {
+export function breakdown(change: Change, fronts: State['fronts'], routines: State['routines'] = {}) {
   const counts = new Map<string, number>();
-  for (const op of change.ops) if (!op.undone) { const c = describeOp(op, fronts).count; counts.set(c, (counts.get(c) ?? 0) + 1); }
+  for (const op of change.ops) if (!op.undone) { const line = describeOp(op, fronts, routines, change); if (!line.quiet) counts.set(line.count, (counts.get(line.count) ?? 0) + 1); }
   const rank = (name: string) => (ORDER.indexOf(name) + ORDER.length + 1) % (ORDER.length + 1);
   return [...counts].sort((a, b) => rank(a[0]) - rank(b[0])).map(([name, n]) => `${n} ${name}`).join(', ') + (counts.size ? '.' : '');
 }
 
 /** The status card after a change: a dictation tells how many changes it made, an action names itself. */
-export function changeNotice(change: Change, fronts: State['fronts']) {
-  const live = change.ops.filter(o => !o.undone).length;
-  if (change.sourceId) return { title: `${live} değişiklik.`, text: breakdown(change, fronts) };
-  return { title: change.label.replace(/[.]?$/, '.'), text: live > 1 ? breakdown(change, fronts) : '' };
+export function changeNotice(change: Change, fronts: State['fronts'], routines: State['routines'] = {}) {
+  const live = change.ops.filter(o => !o.undone && !describeOp(o, fronts, routines, change).quiet).length;
+  if (change.sourceId) return { title: `${live} değişiklik.`, text: breakdown(change, fronts, routines) };
+  return { title: change.label.replace(/[.]?$/, '.'), text: live > 1 ? breakdown(change, fronts, routines) : '' };
+}
+
+/** A change row's lines: the quiet ones only when nothing else is left. */
+export function changeLines(change: Change, fronts: State['fronts'], routines: State['routines'] = {}) {
+  const all = change.ops.filter(o => !o.undone).map(o => describeOp(o, fronts, routines, change));
+  return (all.some(l => !l.quiet) ? all.filter(l => !l.quiet) : all).map(l => l.text);
 }
 
 // ── Kayıt defteri (design 1l): one stream by day; a dictation and the changes it made sit together. ──

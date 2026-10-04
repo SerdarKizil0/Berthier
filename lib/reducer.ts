@@ -48,7 +48,7 @@ const label=ROUTINE_KINDS.includes(c.kind)?routineLabel(c):c.kind==='rekind'?'T�
  if(['reviewStart','reviewStep','reviewFinish','reviewContinue','ideaAssign','ideaDecide'].includes(c.kind)){researchAct(n,c);return;}
  if(c.kind==='rekind'){moved=rekind(n,c);return;}
  if(c.kind==='retype'){retype(n,c);if(n.review&&!n.review.completedAt)n.review.decisions.push(`${n.fronts[c.frontId!].title}: tür değişti.`);return;}
- if(ROUTINE_KINDS.includes(c.kind)){const target=c.kind==='routineMerge'?n.routines?.[c.targetId??'']:undefined;routineAct(n,c);if(target&&c.sourceId&&c.ref)moved={sourceId:c.sourceId,ref:c.ref,to:'routine',newRef:'routine:'+target.id,key:'routines',text:target.title,note:`${withName(target.title)} birleşti`};return;}
+ if(ROUTINE_KINDS.includes(c.kind)){const target=c.kind==='routineMerge'?n.routines?.[c.targetId??'']:undefined;routineAct(n,c);if(target&&c.sourceId&&c.ref)moved={sourceId:c.sourceId,ref:c.ref,to:'routine',newRef:'routine:'+target.id,key:'routine:'+target.id,text:target.title,note:`${withName(target.title)} birleşti`};return;}
  switch(c.kind){
  case 'event':{const e=c.event!;if(!e||!n.events?.[e.id])throw Error('Tarihli kalem bulunamadı.');if(e.date&&!validDate(e.date)||e.time&&!validTime(e.time)||e.endTime&&(!validTime(e.endTime)||!e.time||e.endTime<=e.time))throw Error('Tarih veya saat geçersiz.');if(e.frontId&&!n.fronts[e.frontId])throw Error('Cephe bulunamadı.');n.events[e.id]=e;syncPlans(n,calendarDay());break;}
  case 'cancelEvent':if(!n.events?.[c.eventId!])throw Error('Kalem bulunamadı.');n.events[c.eventId!].cancelled=true;syncPlans(n,calendarDay());break;
