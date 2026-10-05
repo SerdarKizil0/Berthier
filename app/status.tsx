@@ -118,7 +118,7 @@ export function StatusCard(props: Props) {
   </div>;
   if (!online && queued) return <div className="status-card" role="status">
     <span className="status-icon"><WifiOff size={18}/></span>
-    <p><strong>Çevrimdışı.</strong> {queued} dikte cihazda; bağlantı gelince kaydedilir.</p>
+    <p><strong>Çevrimdışı.</strong> {queued} girdi cihazda; bağlantı gelince kaydedilir.</p>
     <button className="status-action" onClick={see}>Ayrıntı</button>
   </div>;
   return null;

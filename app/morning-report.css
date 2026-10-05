@@ -482,3 +482,20 @@ body .mr-place h3 {
     padding: 10px 0 12px;
   }
 }
+
+/* 5 Ekim · Kaldır under each open row's chip. */
+.mr-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.morning-report .mr-remove {
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--muted-foreground);
+}

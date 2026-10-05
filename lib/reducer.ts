@@ -1,6 +1,6 @@
 import {addIdeas,researchAct,type ResearchCommand} from './research';
 import {addDays,calendarDay,resolveDate,syncPlans,type CalendarEvent,type Profile,type EventKind,validDate,validTime} from './calendar';
-import {type State,type Front,type Order,type Move,type Moved,type Rhythm,uid,nextMove,normalize,canonicalTitle,similarity,fallbackMove,commitChanges,undo,dayKey,propose,replaceSlot,materializeOrder,validMove,directGoal} from './domain';
+import {type State,type Front,type Order,type Move,type Moved,type Rhythm,uid,nextMove,isOpen,MOVE_LIMIT,moveText,normalize,canonicalTitle,similarity,fallbackMove,commitChanges,undo,dayKey,propose,replaceSlot,materializeOrder,validMove,directGoal} from './domain';
 import type {Parsed} from './llm';
 import {ROUTINE_KINDS,addSession,at,findRoutine,newRoutine,pastDay,routineAct,routineLabel,skipDay,stepsOf,usualMinutes,type RoutineCommand} from './routines';
 import {rekind,retype} from './kinds';
@@ -13,7 +13,7 @@ export function applyParsed(s:State,p:Parsed,raw:string,today=calendarDay(),sour
  if(!f){f={id:uid(),title:item.title,type:item.type,status:item.type==='lane'?'held':'active',moves:[],where:'',question:'',notes:[],touched:new Date().toISOString()};n.fronts[f.id]=f;}
  let done:Move|undefined;if(item.complete){const m=item.completedMoveId?f.moves.find(m=>m.id===item.completedMoveId):nextMove(f);if(m){materializeOrder(n,f.id);m.doneAt=new Date().toISOString();done=m;}}
  if(item.where!==null)f.where=item.where;if(item.question!==null)f.question=item.question;
- if(item.moves.length){const existing=new Set(f.moves.filter(m=>!m.doneAt).map(m=>normalize(m.text)));for(const text of item.moves)if(!existing.has(normalize(text))){f.moves.push({id:uid(),text,...(text===item.moves[0]&&item.prerequisite?{directGoal:item.prerequisite.goal,prerequisiteReason:item.prerequisite.reason}:{})});existing.add(normalize(text));}}
+ if(item.moves.length){const existing=new Set(f.moves.filter(isOpen).map(m=>normalize(m.text)));for(const text of item.moves)if(!existing.has(normalize(text))){f.moves.push({id:uid(),text,...(text===item.moves[0]&&item.prerequisite?{directGoal:item.prerequisite.goal,prerequisiteReason:item.prerequisite.reason}:{})});existing.add(normalize(text));}}
  if(!f.moves.length&&!(p.events??[]).some(e=>e.frontTitle===f!.title&&resolveDate(e.dateText,today)))f.moves.push({id:uid(),text:fallbackMove(f)});
  f.notes.push(raw);f.touched=new Date().toISOString();if(item.complete)replaceSlot(n,f,done);
  }
@@ -36,15 +36,28 @@ export function applyParsed(s:State,p:Parsed,raw:string,today=calendarDay(),sour
  });
  if(sourceId&&result.changes.length>s.changes.length)result.changes.at(-1)!.sourceId=sourceId;return result;
 }
-export type Command=ResearchCommand & RoutineCommand & {sourceId?:string;ref?:string;to?:string;count?:number;type?:string;id:string;kind:string;frontId?:string;text?:string;status?:Front['status'];ids?:string[];orderDate?:string;orderSnapshot?:string;changeId?:string;index?:number;targetId?:string;where?:string;question?:string;event?:CalendarEvent;eventId?:string;profile?:Profile;conflictId?:string;warningId?:string;seen?:boolean;rhythm?:Rhythm};
+export type Command=ResearchCommand & RoutineCommand & {moveId?:string;today?:boolean;sourceId?:string;ref?:string;to?:string;count?:number;type?:string;id:string;kind:string;frontId?:string;text?:string;status?:Front['status'];ids?:string[];orderDate?:string;orderSnapshot?:string;changeId?:string;index?:number;targetId?:string;where?:string;question?:string;event?:CalendarEvent;eventId?:string;profile?:Profile;conflictId?:string;warningId?:string;seen?:boolean;rhythm?:Rhythm};
+// “Olduğu gibi ekle” (5 Ekim): the text becomes a move exactly as written — no model, no move rules, only the length
+// limit — at the end of the chosen front's queue (the next move when it has none open). A new front opens as İş (K7),
+// active; a front gone in the meantime comes back under its id and title, so a queued entry never blocks the device
+// queue. `today` follows “Cephe ekle / çıkar”: an active front not yet on today's route joins it at the end.
+const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function addMove(n:State,c:Command){
+ const text=moveText(c.text??''),title=moveText(c.title??'').slice(0,90),at=new Date().toISOString();if(!text)throw Error('Önce eklemek istediğini yaz.');if(text.length>MOVE_LIMIT)throw Error(`Hamle en fazla ${MOVE_LIMIT} karakter olabilir.`);
+ const id=UUID.test(c.frontId??'')?c.frontId!:uid(),f=n.fronts[c.frontId??'']??(title?Object.values(n.fronts).find(x=>x.status!=='closed'&&normalize(x.title)===normalize(title))??(n.fronts[id]={id,title,type:'general',status:'active',moves:[],where:'',question:'',notes:[],touched:at}):undefined);if(!f)throw Error('Cephe bulunamadı.');
+ if(f.status==='closed'){f.status='active';delete f.closedAt;}
+ f.moves.push({id:uid(),text,userEdited:true});f.touched=at;replaceSlot(n,f);
+ if(c.today){const date=dayKey(),o=n.orders[date]??=propose(n,date),m=nextMove(f);if(f.status==='active'&&m&&!o.slots.some(x=>x.frontId===f.id))o.slots.push({frontId:f.id,moveId:m.id,text:m.text,reason:'Senin seçtiğin cephe.'});}
+}
 export function act(s:State,c:Command):State{
  if(c.kind==='undo')return undo(s,c.changeId!,c.index);
-const label=ROUTINE_KINDS.includes(c.kind)?routineLabel(c):c.kind==='rekind'?'Tür değiştirildi':c.kind==='retype'?'Cephe türü değiştirildi':undefined;
+const closing=c.kind==='closeFronts'?[...new Set(c.ids??[])].filter(id=>s.fronts[id]&&s.fronts[id].status!=='closed').length:0;
+const label=ROUTINE_KINDS.includes(c.kind)?routineLabel(c):c.kind==='rekind'?'Tür değiştirildi':c.kind==='retype'?'Cephe türü değiştirildi':c.kind==='closeFronts'?`${closing} cephe kapatıldı`:undefined;
  // A dictation item moved to another kind (or merged into a routine from the receipt) keeps the receipt's trail.
  let moved:Moved|undefined;
- const result=commitChanges(s,label??(c.kind==='seenConflict'&&c.seen===false?'Çakışma yeniden açıldı':({approve:'Günün emri onaylandı',select:'Günün emri değiştirildi',reorder:'Rotanın sırası değiştirildi',setup:'Aktif projeler seçildi',status:'Cephe durumu değiştirildi',skipPrerequisite:'Ön adım kaldırıldı',edit:'Hamle düzenlendi',complete:'Hamle tamamlandı',merge:'Cepheler birleştirildi',event:'Tarihli kalem düzenlendi',cancelEvent:'Tarihli kalem kaldırıldı',profile:'Mail imzası kaydedildi',rhythm:'Ritim ayarı değiştirildi',seenConflict:'Çakışma görüldü',reviewStart:'Teftiş başladı',reviewStep:'Teftiş adımı',reviewFinish:'Teftiş tamamlandı',reviewContinue:'Cephe sürdürülüyor',ideaAssign:'Depo kalemi projeye atandı',ideaDecide:c.decision==='discard'?'Depo kalemi atıldı':c.decision==='keep'?'Depo kalemi depoda kaldı':'Depo kalemi hamleye çevrildi'} as Record<string,string>)[c.kind]??'Değişiklik'),n=>{
+ const result=commitChanges(s,label??(c.kind==='seenConflict'&&c.seen===false?'Çakışma yeniden açıldı':({addMove:'Hamle eklendi',removeMove:'Hamle kaldırıldı',approve:'Günün emri onaylandı',select:'Günün emri değiştirildi',reorder:'Rotanın sırası değiştirildi',setup:'Aktif projeler seçildi',status:'Cephe durumu değiştirildi',skipPrerequisite:'Ön adım kaldırıldı',edit:'Hamle düzenlendi',complete:'Hamle tamamlandı',merge:'Cepheler birleştirildi',event:'Tarihli kalem düzenlendi',cancelEvent:'Tarihli kalem kaldırıldı',profile:'Mail imzası kaydedildi',rhythm:'Ritim ayarı değiştirildi',seenConflict:'Çakışma görüldü',reviewStart:'Teftiş başladı',reviewStep:'Teftiş adımı',reviewFinish:'Teftiş tamamlandı',reviewContinue:'Cephe sürdürülüyor',ideaAssign:'Depo kalemi projeye atandı',ideaDecide:c.decision==='discard'?'Depo kalemi atıldı':c.decision==='keep'?'Depo kalemi depoda kaldı':'Depo kalemi hamleye çevrildi'} as Record<string,string>)[c.kind]??'Değişiklik'),n=>{
  const f=c.frontId?n.fronts[c.frontId]:undefined;
- if(['status','edit','skipPrerequisite','complete','merge'].includes(c.kind)&&!f)throw Error('Cephe bulunamadı.');
+ if(['status','edit','skipPrerequisite','complete','merge','removeMove'].includes(c.kind)&&!f)throw Error('Cephe bulunamadı.');
  if(['reviewStart','reviewStep','reviewFinish','reviewContinue','ideaAssign','ideaDecide'].includes(c.kind)){researchAct(n,c);return;}
  if(c.kind==='rekind'){moved=rekind(n,c);return;}
  if(c.kind==='retype'){retype(n,c);if(n.review&&!n.review.completedAt)n.review.decisions.push(`${n.fronts[c.frontId!].title}: tür değişti.`);return;}
@@ -65,6 +78,12 @@ const label=ROUTINE_KINDS.includes(c.kind)?routineLabel(c):c.kind==='rekind'?'T�
  case 'select':{const date=dayKey(),old=n.orders[date]??propose(n),passed=old.slots.filter(x=>x.doneAt);const ids=[...new Set(c.ids??[])].filter(id=>!passed.some(x=>x.frontId===id));const chosen=ids.map(id=>{const front=n.fronts[id];if(!front||front.status!=='active'||!nextMove(front))throw Error('Yalnızca aktif, açık hamlesi olan cepheler seçilebilir.');const previous=old.slots.find(x=>x.frontId===id);return {frontId:id,moveId:nextMove(front)!.id,text:nextMove(front)!.text,reason:previous?.reason??'Senin seçtiğin cephe.'};});const slots=old.slots.flatMap(x=>x.doneAt?[x]:chosen.length?[chosen.shift()!]:[]);n.orders[date]={...old,slots:slots.concat(chosen)};break;}
  case 'status':if(c.status==='held'&&f!.type!=='lane')throw Error('Bekletme yalnız projeler için kullanılır.');if(!['active','held','closed'].includes(c.status??''))throw Error('Geçersiz durum.');f!.status=c.status!;if(c.status==='closed')f!.closedAt??=new Date().toISOString();else delete f!.closedAt;if(n.review&&!n.review.completedAt)n.review.decisions.push(f!.title+': '+({active:'aktif',held:'bekletildi',closed:'kapatıldı'}[c.status!]));f!.touched=new Date().toISOString();break;
  case 'skipPrerequisite':case 'edit':{const text=c.kind==='skipPrerequisite'?directGoal(f!):c.text?.trim();if(!text||!validMove(text))throw Error('Nesnesi belli, en fazla 120 karakterlik bir eylem yaz.');const m=nextMove(f!);if(m){if(m.text!==text)(n.movePreferences??=[]).push({frontTitle:f!.title,before:m.text,after:text,at:new Date().toISOString()});m.text=text;m.userEdited=true;delete m.directGoal;delete m.prerequisiteReason;}else f!.moves.push({id:uid(),text});f!.touched=new Date().toISOString();replaceSlot(n,f!);break;}
+ case 'addMove':addMove(n,c);break;
+ // Kaldır (5 Ekim): nothing is deleted. The move keeps its place on record with removedAt; today's slot takes the
+ // front's next move (or leaves the route when none is left). The change takes it back.
+ case 'removeMove':{const m=f!.moves.find(x=>x.id===c.moveId);if(!m||!isOpen(m))throw Error('Hamle bulunamadı; bitmiş ya da kaldırılmış olabilir.');m.removedAt=new Date().toISOString();f!.touched=m.removedAt;replaceSlot(n,f!);break;}
+ // Harita › Seç: the chosen fronts close together (one change, one “Geri al”) and leave today's route; passed camps stay.
+ case 'closeFronts':{const ids=[...new Set(c.ids??[])],at=new Date().toISOString();if(!ids.length)throw Error('Kapatılacak cepheyi seç.');for(const id of ids){const x=n.fronts[id];if(!x)throw Error('Cephe bulunamadı.');if(x.status==='closed')continue;x.status='closed';x.closedAt??=at;x.touched=at;if(n.review&&!n.review.completedAt)n.review.decisions.push(x.title+': kapatıldı');}const o=n.orders[dayKey()];if(o)o.slots=o.slots.filter(x=>!!x.doneAt||!ids.includes(x.frontId));break;}
  case 'complete':{const m=nextMove(f!);if(!m)throw Error('Tamamlanacak hamle yok.');materializeOrder(n,f!.id);m.doneAt=new Date().toISOString();if(c.where!==undefined)f!.where=c.where;if(c.question!==undefined)f!.question=c.question;f!.touched=new Date().toISOString();replaceSlot(n,f!,m);break;}
  case 'merge':{const target=n.fronts[c.targetId??''];if(!target||target.id===f!.id)throw Error('Birleştirilecek cephe bulunamadı.');for(const i of Object.values(n.ideas??{}))if(i.laneId===f!.id)i.laneId=target.id;for(const e of Object.values(n.events??{}))if(e.frontId===f!.id)e.frontId=target.id;target.moves.push(...f!.moves);target.notes.push(...f!.notes);target.where=target.where||f!.where;target.question=target.question||f!.question;target.touched=new Date().toISOString();f!.status='closed';f!.closedAt??=new Date().toISOString();for(const o of Object.values(n.orders)){if(o.date!==dayKey())continue;const seen=new Set<string>();o.slots=o.slots.map(x=>x.frontId===f!.id?{...x,frontId:target.id}:x).filter(x=>!seen.has(x.frontId)&&!!seen.add(x.frontId));}break;}
  default:throw Error('İşlem tanınmadı.');

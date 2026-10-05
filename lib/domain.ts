@@ -3,7 +3,8 @@ import type {CalendarEvent,EventKind,Profile} from './calendar';
 import type {Routine,Session,Skip,Running,ReminderTrial} from './routines';
 import type {Kind} from './kinds';
 export type FrontType='course'|'lane'|'application'|'general';
-export type Move={id:string;text:string;userEdited?:boolean;directGoal?:string;prerequisiteReason?:string;doneAt?:string;eventId?:string;prepareAt?:string;dependent?:boolean};
+// removedAt (5 Ekim, “Kaldır”): the move left the queue but stays on record; the change that set it takes it back.
+export type Move={id:string;text:string;userEdited?:boolean;directGoal?:string;prerequisiteReason?:string;doneAt?:string;removedAt?:string;eventId?:string;prepareAt?:string;dependent?:boolean};
 export type MovePreference={frontTitle:string;before:string;after:string;at:string};
 export type Front={id:string;title:string;type:FrontType;status:'active'|'held'|'closed';moves:Move[];where:string;question:string;notes:string[];touched:string;closedAt?:string;was?:FrontType[]};
 export type Slot={frontId:string;moveId:string;text:string;reason:string;doneAt?:string};
@@ -31,6 +32,8 @@ export const normalize=(s:string)=>s.toLocaleLowerCase('tr-TR').replace(/[^\p{L}
 export const canonicalTitle=(s:string)=>normalize(s).split(' ').filter(w=>!['projesi','proje','başvurusu','başvuru','dersi','ders','araştırması'].includes(w)).join(' ');
 export function similarity(a:string,b:string){const x=new Set(normalize(a).split(' ')),y=new Set(normalize(b).split(' '));return [...x].filter(t=>y.has(t)).length/new Set([...x,...y]).size;}
 export function dayKey(now=new Date()){return new Date(now.getTime()-3600000).toISOString().slice(0,10);}// Istanbul UTC+3 minus 04:00 day boundary.
+// “Olduğu gibi ekle” keeps the text as written; only the move length limit holds (one line, spaces collapsed).
+export const MOVE_LIMIT=120,moveText=(text:string)=>text.replace(/\s+/g,' ').trim();
 export function validMove(text:string){return text.length<=120&&text.trim().split(/\s+/).length>=2&&!/(?:^|\s)(çalış|ilgilen|hallet|düşün|araştır|bak|gözden geçir|organize et|planla|hazırlan|uğraş)[.!]?$/iu.test(text.trim());}
 export function directGoal(f:Front):string|undefined {
  const m=nextMove(f);if(!m||m.eventId||m.userEdited)return;
@@ -38,7 +41,11 @@ export function directGoal(f:Front):string|undefined {
  // Old records predate prerequisite metadata: only offer a short, explicit original action.
  return [...f.notes].reverse().find(raw=>raw.length<=120&&!/[\n?!]/.test(raw)&&/\b(yap|al|git|oku|yaz|pişir|gönder|ara|temizle|öde)[.!]?$/iu.test(raw.trim())&&similarity(raw,f.title)>=.2&&normalize(raw)!==normalize(m.text));
 }
-export const nextMove=(f:Front,date=dayKey())=>f.moves.filter(m=>!m.doneAt&&(!m.prepareAt||m.prepareAt<=date)).sort((a,b)=>Number(!!b.eventId)-Number(!!a.eventId)||(a.prepareAt??'').localeCompare(b.prepareAt??'')||Number(!!b.dependent)-Number(!!a.dependent))[0];
+export const isOpen=(m:Move)=>!m.doneAt&&!m.removedAt;
+const byTurn=(a:Move,b:Move)=>Number(!!b.eventId)-Number(!!a.eventId)||(a.prepareAt??'').localeCompare(b.prepareAt??'')||Number(!!b.dependent)-Number(!!a.dependent);
+export const nextMove=(f:Front,date=dayKey())=>f.moves.filter(m=>isOpen(m)&&(!m.prepareAt||m.prepareAt<=date)).sort(byTurn)[0];
+// The front's queue in the order Berthier takes it: the open moves due now (the first is nextMove), then the preparations still ahead.
+export function openMoves(f:Front,date=dayKey()){const open=f.moves.filter(isOpen),due=open.filter(m=>!m.prepareAt||m.prepareAt<=date).sort(byTurn);return [...due,...open.filter(m=>!due.includes(m)).sort((a,b)=>a.prepareAt!.localeCompare(b.prepareAt!))];}
 export function fallbackMove(f:Pick<Front,'title'|'type'>){const t=f.title.slice(0,60);return f.type==='course'?`${t} ders sayfasını aç ve sıradaki konuları listele.`:f.type==='application'?`${t} başvuru sayfasını aç ve istenen belgeleri listele.`:`${t} için mevcut notlarını aç ve yanıtlanacak ilk soruyu yaz.`;}
 export function propose(s:State,date=dayKey()):Order{
  const previous=Object.values(s.orders).filter(o=>o.date<date&&o.approvedAt).sort((a,b)=>b.date.localeCompare(a.date))[0];

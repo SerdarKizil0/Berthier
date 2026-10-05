@@ -13,7 +13,7 @@ import {changeLines, describeOp, ledgerDays, ledgerRoutines, undoBlock, type Led
 import {KIND_TAG, TARGETS, effective, placedOf} from '@/lib/kinds';
 
 type Action = (body: {kind: string; [key: string]: unknown}, options?: {quiet?: boolean; silent?: boolean}) => Promise<boolean | undefined>;
-type Queued = {id: string; text?: unknown};
+type Queued = {id: string; kind?: unknown; text?: unknown};
 type Props = {state: State; dictations: Dictation[]; outbox: Queued[]; now: number; busy: boolean; online: boolean; processing: boolean; action: Action; retry: (d: Dictation) => void};
 type Filter = 'all' | 'said' | 'changes' | 'waiting';
 
@@ -123,7 +123,7 @@ export default function Ledger({state, dictations, outbox, now, busy, online, pr
         <p className="ledger-why">{[meta(d).summary || 'İşlenemedi.', /sakl|kaydedildi/i.test(meta(d).summary ?? '') ? '' : 'Metnin cihazda ve sunucuda saklı.'].filter(Boolean).join(' ')}</p>
       </article>)}
       {outbox.map(x => <article className="ledger-wait" key={x.id}>
-        <div className="ledger-head"><span className="ledger-chip">CİHAZDA</span><span className="ledger-note">{!online ? 'Bağlantı gelince işlenir' : processing ? 'İşleniyor…' : 'Sırada'}</span></div>
+        <div className="ledger-head"><span className="ledger-chip">CİHAZDA</span><span className="ledger-note">{x.kind === 'addMove' ? (online ? 'Olduğu gibi ekleniyor…' : 'Bağlantı gelince olduğu gibi eklenir') : !online ? 'Bağlantı gelince işlenir' : processing ? 'İşleniyor…' : 'Sırada'}</span></div>
         {quote(x.id, String(x.text ?? ''))}
       </article>)}
       {queued.map(d => <article className="ledger-wait" key={d.id}>

@@ -78,7 +78,7 @@ function prepWarning(s: State, e: CalendarEvent, today: string): Omit<Warning, '
   const left = daysBetween(today, e.date), start = e.prepDays ?? s.prepDefaults?.[e.kind] ?? PREP_START[e.kind] ?? 7;
   if (left < 0 || left > YAKLASAN || (start > 0 && left / start > 0.5)) return null;
   const docs = e.kind === 'application' ? e.documents : [];
-  const moves = Object.values(s.fronts).flatMap(f => f.moves).filter(m => m.eventId === e.id);
+  const moves = Object.values(s.fronts).flatMap(f => f.moves).filter(m => m.eventId === e.id && !m.removedAt);
   const total = docs.length || moves.length;
   const done = docs.length ? docs.filter(d => d.status === 'ready' || d.status === 'uploaded').length : moves.filter(m => m.doneAt).length;
   if (!total || done >= total || (total - done) / total <= (start > 0 ? left / start : 0)) return null;

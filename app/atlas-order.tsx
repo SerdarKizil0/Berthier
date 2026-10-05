@@ -2,7 +2,7 @@
 import {Fragment,useEffect,useRef,useState} from 'react';
 import {ArrowDownUp,ArrowUpRight,Check,ChevronRight,Ellipsis,GripVertical} from 'lucide-react';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
-import {type State,type Front,type Order,directGoal,nextMove,keepPassed} from '@/lib/domain';
+import {type State,type Front,type Order,directGoal,isOpen,nextMove,keepPassed} from '@/lib/domain';
 import {clockText,daysTag,nextDated,urgency} from '@/lib/expedition/camps';
 import {calendarDay} from '@/lib/calendar';
 import {atTime} from '@/lib/turkish';
@@ -23,6 +23,9 @@ export default function AtlasOrder({state,order,busy,online,why,open,complete,ed
  // Urgency as on the map: the front's nearest dated item (critical ≤2 days, near ≤7).
  const tag=(frontId:string,done?:string)=>{const f=state.fronts[frontId];if(!f)return {tone:'calm',chip:''};if(done)return {tone:'done',chip:'GEÇİLDİ '+clockText(done)};const days=nextDated(state,frontId,today)?.days??null;return {tone:urgency(f,days,false),chip:daysTag(f,days)};};
  function pick(id:string){setMore(false);setPicked({id,done:!!slots.find(s=>s.frontId===id)?.doneAt});}
+ // Kaldır (5 Ekim): the slot's move leaves its front's queue; the front's next move takes the slot (or the camp leaves the route).
+ const openMove=(frontId:string,moveId:string)=>{const m=state.fronts[frontId]?.moves.find(x=>x.id===moveId);return m&&isOpen(m)?m:undefined;};
+ function remove(frontId:string,moveId:string){setMore(false);void action({kind:'removeMove',frontId,moveId});}
  const reorder=useReorder({state,order,busy,online,action,saved:ids=>{const first=ids.find(id=>!order.slots.find(s=>s.frontId===id)?.doneAt);if(first)pick(first);}});
  const head=slot?tag(slot.frontId,slot.doneAt):null,stale=!!front&&!passed&&nextMove(front)?.id!==slot?.moveId;
  return <>
@@ -34,14 +37,14 @@ export default function AtlasOrder({state,order,busy,online,why,open,complete,ed
    <h2 className={passed?'hq-move-text is-passed':'hq-move-text'} key={slot.moveId}>{slot.text}</h2>
    <p className="hq-why">↳ {passed?`Bugün ${atTime(passed)} tamamlandı.`:current?.prerequisiteReason??slot.reason}</p>
    <div className="hq-actions">{passed?<button className="btn-quiet" onClick={()=>passedChange&&action({kind:'undo',changeId:passedChange.id})} disabled={busy||!online||!passedChange}>Geri al</button>:<><button className="btn-main" disabled={busy||!online||current?.doneAt!==undefined||stale} onClick={()=>complete(front)}><Check size={18}/>Bitti</button><button className="btn-quiet" onClick={()=>edit(front,slot.text)} disabled={busy}>Düzenle</button><button className="btn-quiet hq-more" aria-label="Diğer" aria-expanded={more} onClick={()=>setMore(!more)}><Ellipsis size={20}/></button></>}</div>
-   {more&&!passed&&<div className="hq-more-list"><button className="text-button" onClick={()=>open(front.id)}>Cepheyi aç</button><button className="text-button" onClick={()=>say(front.id)}>Bu cepheye söyle</button>{directGoal(front)&&<button className="text-button" disabled={busy||!online} onClick={()=>action({kind:'skipPrerequisite',frontId:front.id})}>Ön adıma gerek yok</button>}</div>}
+   {more&&!passed&&<div className="hq-more-list"><button className="text-button" onClick={()=>open(front.id)}>Cepheyi aç</button><button className="text-button" onClick={()=>say(front.id)}>Bu cepheye söyle</button>{directGoal(front)&&<button className="text-button" disabled={busy||!online} onClick={()=>action({kind:'skipPrerequisite',frontId:front.id})}>Ön adıma gerek yok</button>}<button className="text-button" disabled={busy||!online||!openMove(front.id,slot.moveId)} onClick={()=>remove(front.id,slot.moveId)}>Kaldır</button></div>}
    {!passed&&why&&<p className="why">{why}</p>}{stale&&<p className="why">Cephe güncellendi. Yeni hamleyi görmek için cephe seçimini güncelle.</p>}</>
   :<><div className="hq-move-top"><span>GÜNÜN EMRİ</span></div><h2 className="hq-move-text">Bugün açık emir yok.</h2><p className="hq-why">Haritandan cephe seçebilir ya da bugünü boş bırakabilirsin.</p><div className="hq-actions"><button className="btn-quiet" disabled={busy} onClick={select}>Cephe ekle</button></div></>}
   </section>
   {slots.length>0&&<section className="hq-route" aria-label="Rota">
    <div className="hq-route-head"><h2>ROTA · {slots.length} CEPHE{order.approvedAt?' · ONAYLI':''}</h2><button onClick={()=>open('map')}>HARİTADA AÇ<ArrowUpRight size={14}/></button></div>
    <div className="hq-strip" aria-hidden="true"><span className="mr-hq">✳</span>{slots.map((s,i)=><Fragment key={s.frontId}><span className={s.doneAt&&(i===0||slots[i-1].doneAt)?'hq-line is-sealed':'mr-dots'}/><span className={`mr-node is-${tag(s.frontId,s.doneAt).tone}${slot?.frontId===s.frontId&&!allDone?' is-current':''}`}>{s.doneAt?<Check size={14}/>:pad(i+1)}</span></Fragment>)}</div>
-   {slots.map((s,i)=>{const t=tag(s.frontId,s.doneAt);return <button key={s.frontId} className={['hq-row',s.doneAt?'is-done':'',s===firstOpen?'is-next':'',slot?.frontId===s.frontId&&!allDone?'is-current':''].join(' ').trim()} aria-current={slot?.frontId===s.frontId&&!allDone?'true':undefined} onClick={()=>pick(s.frontId)}><span className="hq-num">{s.doneAt?'✓':pad(i+1)}</span><span className="hq-row-body"><small>{state.fronts[s.frontId]?.title}</small><span>{s.text}</span></span>{t.chip&&<span className={`hq-chip is-${t.tone}`}>{t.chip}</span>}</button>;})}
+   {slots.map((s,i)=>{const t=tag(s.frontId,s.doneAt),title=state.fronts[s.frontId]?.title;return <div className="hq-item" key={s.frontId}><button className={['hq-row',s.doneAt?'is-done':'',s===firstOpen?'is-next':'',slot?.frontId===s.frontId&&!allDone?'is-current':''].join(' ').trim()} aria-current={slot?.frontId===s.frontId&&!allDone?'true':undefined} onClick={()=>pick(s.frontId)}><span className="hq-num">{s.doneAt?'✓':pad(i+1)}</span><span className="hq-row-body"><small>{title}</small><span>{s.text}</span></span>{t.chip&&<span className={`hq-chip is-${t.tone}`}>{t.chip}</span>}</button>{!s.doneAt&&openMove(s.frontId,s.moveId)&&<button className="hq-remove" aria-label={`Kaldır: ${title} · ${s.text}`} disabled={busy||!online} onClick={()=>remove(s.frontId,s.moveId)}>Kaldır</button>}</div>;})}
    {!order.approvedAt&&<button className="hq-approve" disabled={busy||!online||!state.setup} onClick={()=>action({kind:'approve'})}><span>Emri onayla</span><span>{slots.length} CEPHE</span></button>}
    {!order.approvedAt&&(why?<p className="why">{why}</p>:!state.setup&&<p className="why">Önce bu haftanın aktif projelerini seç.</p>)}
    <div className="hq-links">{slots.length>1&&<button className="text-button" onClick={reorder.begin} disabled={busy}><ArrowDownUp size={16}/>Sırayı düzenle</button>}<button className="text-button" disabled={busy} onClick={select}>Cephe ekle / çıkar</button></div>

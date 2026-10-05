@@ -117,7 +117,7 @@ export function rekind(n: State, c: { sourceId?: string; ref?: string; to?: stri
   let text = '', from: Kind, frontId: string | null = null, remove = () => {};
   switch (type) {
     case 'move': {
-      const f = n.fronts[a], m = f?.moves.find(x => x.id === b && !x.doneAt);
+      const f = n.fronts[a], m = f?.moves.find(x => x.id === b && !x.doneAt && !x.removedAt);
       if (!f || !m) throw Error('Hamle bulunamadı ya da tamamlandı.');
       text = m.text; from = 'move'; frontId = f.id;
       if (born('front:' + f.id, v => !!(v as Front | null)?.moves.some(x => x.id === b))) remove = () => {
