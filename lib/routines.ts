@@ -32,7 +32,8 @@ export type Routine = {
   asked?: { reminderOff?: string; timerOff?: string };
 };
 export type Session = { id: string; routineId: string; day: string; start?: string; end: string; minutes: number; source: 'timer' | 'tap' | 'dictation' | 'review'; step?: string };
-export type Skip = { routineId: string; day: string; at: string; slidTo?: string };
+/** A day put off. `week` (“Bu hafta değil”, A7): that day and the rest of its week drop, nothing slides. */
+export type Skip = { routineId: string; day: string; at: string; slidTo?: string; week?: true };
 export type Running = { routineId: string; start: string; step?: string };
 export type ReminderTrial = { startedAt: string; a: string[]; b: string[]; decidedAt?: string };
 
@@ -161,10 +162,11 @@ export function weekPlan(s: State, r: Routine, today: string): WeekPlan {
   const week = weekOf(today), since = dayKey(new Date(p.approvedAt)), avoid = avoided(s, r, today), minutes = usualMinutes(s, r) ?? p.minutes;
   const done = (d: string) => doneOn(s, r, d).length > 0;
   const planned = new Set(week.filter(d => d >= since && p.days.includes(weekday(d)))), slid: Record<string, string> = {}, days: string[] = [];
+  const off = (s.skips ?? []).find(k => k.routineId === r.id && k.week && week.includes(k.day))?.day, open = (x: string) => !off || x < off;
   for (const d of week) {
-    if (!planned.has(d)) continue;
+    if (!planned.has(d) || !open(d)) continue;
     if (!skippedOn(s, r, d) && !(d < today && !done(d))) { days.push(d); continue; }
-    const to = week.find(x => x > d && !planned.has(x) && !p.days.includes(weekday(x)) && !avoid.includes(weekday(x)) && !skippedOn(s, r, x) && !busyAt(s, x, p.time, minutes));
+    const to = week.find(x => x > d && open(x) && !planned.has(x) && !p.days.includes(weekday(x)) && !avoid.includes(weekday(x)) && !skippedOn(s, r, x) && !busyAt(s, x, p.time, minutes));
     if (to) { planned.add(to); slid[to] = slid[d] ?? d; }
   }
   const left = Math.max(0, r.count - weekDone(s, r, today));
@@ -240,7 +242,7 @@ export function todayList(s: State, now: Date): TodayList {
   for (const r of settled) {
     if (!skippedOn(s, r, d)) continue;
     const k = (s.skips ?? []).find(x => x.routineId === r.id && x.day === d)!;
-    rows.push({ key: 'skip:' + r.id, ids: [r.id], time: '—', title: r.title, sub: `Bugün değil · ${k.slidTo ? `${DAY_NAMES[weekday(k.slidTo)]} ${untilTime(r.pattern!.time)} kaydı` : 'bu hafta kaymadı'}`, chip: '', tone: 'skip', at: 9999 });
+    rows.push({ key: 'skip:' + r.id, ids: [r.id], time: '—', title: r.title, sub: k.week ? 'Bu hafta değil' : `Bugün değil · ${k.slidTo ? `${DAY_NAMES[weekday(k.slidTo)]} ${untilTime(r.pattern!.time)} kaydı` : 'bu hafta kaymadı'}`, chip: '', tone: 'skip', at: 9999 });
   }
   const count = new Set(rows.filter(x => x.tone !== 'skip' && x.tone !== 'fixed').flatMap(x => x.ids)).size;
   return { rows: rows.map(x => ({ key: x.key, ids: x.ids, time: x.time, title: x.title, sub: x.sub, chip: x.chip, tone: x.tone })), count, left: Math.round(left), total, planned, next: rows.find(x => x.tone === 'next') ?? null };
@@ -456,7 +458,7 @@ export function slideSuggestions(s: State, today: string) {
 // ── Komutlar ──
 
 export type RoutineCommand = {
-  kind: string; routineId?: string; targetId?: string; stepKey?: string; day?: string; start?: string; end?: string; minutes?: number; sessionId?: string;
+  kind: string; routineId?: string; targetId?: string; stepKey?: string; day?: string; week?: boolean; start?: string; end?: string; minutes?: number; sessionId?: string;
   days?: number[]; time?: string; patterns?: { routineId: string; days: number[]; time: string }[]; reminder?: 'none' | 'half' | 'all';
   on?: boolean; leadMin?: number; show?: boolean; paused?: boolean; what?: 'reminder' | 'timer'; accept?: boolean; trial?: 'all' | 'keep' | 'none';
 };
@@ -468,7 +470,7 @@ export function routineLabel(c: RoutineCommand) {
     case 'routineStart': return 'Sayaç başladı';
     case 'routineFinish': case 'routineLog': return 'Rutin kaydedildi';
     case 'routineEdit': return 'Seans düzeltildi';
-    case 'routineSkip': return 'Bugün değil';
+    case 'routineSkip': return c.week ? 'Bu hafta değil' : 'Bugün değil';
     case 'routinePattern': return 'Haftalık düzen değişti';
     case 'routinePatternAll': return 'Haftalık düzen onaylandı';
     case 'routineReminder': return c.on ? 'Hatırlatma açıldı' : 'Hatırlatma kapandı';
@@ -504,11 +506,13 @@ export function addSession(n: State, x: Omit<Session, 'id'>) {
   return session;
 }
 
-/** Puts a routine's session of `day` off: the skip and where the session slid this week. */
-export function skipDay(n: State, r: Routine, day: string, now: Date) {
+/** Puts a routine's session of `day` off: the skip and where the session slid this week (with `week`, the rest
+ *  of the week goes too and nothing slides). */
+export function skipDay(n: State, r: Routine, day: string, now: Date, week = false) {
   if ((n.skips ?? []).some(k => k.routineId === r.id && k.day === day)) throw Error('Bu gün zaten ertelendi.');
-  const skip: Skip = { routineId: r.id, day, at: now.toISOString() };
+  const skip: Skip = { routineId: r.id, day, at: now.toISOString(), ...(week ? { week: true as const } : {}) };
   (n.skips ??= []).push(skip);
+  if (week) return skip;
   const slid = Object.entries(weekPlan(n, r, dayKey(now)).slid).find(([, from]) => from === day)?.[0];
   if (slid) skip.slidTo = slid;
   return skip;
@@ -558,7 +562,7 @@ export function routineAct(n: State, c: RoutineCommand, now = new Date()) {
       if (day < weekStart(today) || day > weekOf(today)[6]) throw Error('Yalnız bu haftanın bir günü ertelenebilir.');
       if (n.running?.routineId === r!.id) throw Error('Önce süren sayacı bitir.');
       if (!skippedOn(n, r!, day) && !openDay(n, r!, day, today)) throw Error('Bu günde açık bir seans yok.');
-      skipDay(n, r!, day, now);
+      skipDay(n, r!, day, now, !!c.week);
       return;
     }
     case 'routinePattern': {
@@ -721,6 +725,7 @@ export function routineNotice(kind: string, before: State, after: State, now = n
   if (kind === 'routineSkip') {
     const k = (after.skips ?? []).find(y => !(before.skips ?? []).some(z => z.routineId === y.routineId && z.day === y.day)), r = k && after.routines?.[k.routineId];
     if (!k || !r) return null;
+    if (k.week) return { title: `${r.title} bu hafta değil.`, text: 'Sayı olduğu gibi kalır; düzen gelecek hafta sürer.' };
     return { title: `${r.title} ${k.day === dayKey(now) ? 'bugün değil' : `${WD[weekday(k.day)]} değil`}.`, text: k.slidTo && r.pattern ? `Seans ${DAY_NAMES[weekday(k.slidTo)]} ${untilTime(r.pattern.time)} kaydı; hafta yine ${r.count}.` : 'Bu hafta boş gün yok; sayı olduğu gibi kalır.' };
   }
   return null;

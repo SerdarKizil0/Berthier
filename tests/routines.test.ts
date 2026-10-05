@@ -325,13 +325,29 @@ test('“geçen” days, open days for “Bugün değil”, a past week’s coun
  assert.throws(()=>run(week(),{kind:'routineSkip',routineId:'cook',day:MON},now),/açık bir seans yok/);
  // A session of last week counts in last week, on the receipt and on the status card.
  const s=week(),p=parsed({sessions:[{routineId:'yoga',title:'Yüz yogası',dayText:'dün',end:'23:00',minutes:30,skip:false,done:true}]});
- const after=applyParsed(s,p,'Dün yüz yogası yaptım, 30 dakika.',MON,'d7');
+ const after=run(s,{kind:'routineLog',routineId:'yoga',day:'2026-10-04',minutes:30},now);
  assert.equal(placementsOf(s,after,p,now).find(x=>x.kind==='record')!.note,'Seans yazıldı · geçen hafta 1/4');
  assert.equal(routineNotice('routineLog',s,run(s,{kind:'routineLog',routineId:'yoga',day:'2026-10-04'},now),now)!.text,'32 dk · geçen hafta 1/4.');
  // A stepped routine: “Yaptım” on a step writes that step’s length, not the whole routine’s.
  const st=week();st.routines!.mask=routine('mask','Saç maskesi',1,{steps:stepsOf([{title:'Maskeyi sür',minutes:10,wait:false},{title:'Bekle',minutes:30,wait:true},{title:'Durula',minutes:15,wait:false}])});
  const masked=run(st,{kind:'routineLog',routineId:'mask',stepKey:'s1'},now);
  assert.equal(masked.sessions!.at(-1)!.minutes,10);assert.equal(stepMinutes(masked,masked.routines!.mask,'s3'),15);
+ // A7: a round over two days. While the dough rises on Saturday night, “Bu hafta değil” drops Sunday’s bake;
+ // nothing slides, and next week stands.
+ const SAT='2026-10-10',SUN='2026-10-11',late=local(SAT,'23:40'),bread=week();
+ bread.routines!.bread=settled('bread','Ekmek mayalama',[0],'08:00',25,{steps:stepsOf([{title:'Hamur',minutes:15,wait:false},{title:'Mayalanma',minutes:660,wait:true},{title:'Pişirme',minutes:10,wait:false}])});
+ bread.sessions!.push({...session('bread',SAT,'21:05',15,'tap'),step:'s1'});
+ assert.deepEqual(weekPlan(bread,bread.routines!.bread,SAT).upcoming,[SUN]);
+ assert.throws(()=>run(bread,{kind:'routineSkip',routineId:'bread',day:SAT},late),/açık bir seans yok/);
+ const skipped=run(bread,{kind:'routineSkip',routineId:'bread',day:SUN,week:true},late,routineLabel({kind:'routineSkip',week:true}));
+ assert.deepEqual([skipped.skips!.at(-1),weekPlan(skipped,skipped.routines!.bread,SAT).upcoming,weekPlan(skipped,skipped.routines!.bread,addDays(SUN,1)).days],[{routineId:'bread',day:SUN,at:late.toISOString(),week:true},[],['2026-10-18']]);
+ assert.deepEqual(routineNotice('routineSkip',bread,skipped,late),{title:'Ekmek mayalama bu hafta değil.',text:'Sayı olduğu gibi kalır; düzen gelecek hafta sürer.'});
+ assert.deepEqual([skipped.changes.at(-1)!.label,describeOp(skipped.changes.at(-1)!.ops[0],skipped.fronts,skipped.routines).tag],['Bu hafta değil','BU HAFTA DEĞİL']);
+ assert.equal(todayList(skipped,local(SUN,'09:00')).rows.at(-1)!.sub,'Bu hafta değil');
+ // Several sessions left: the rest of the week goes with it; taken back, the week is as it was.
+ const wed=local('2026-10-07','09:00'),off=run(week(),{kind:'routineSkip',routineId:'book',day:'2026-10-07',week:true},wed);
+ assert.deepEqual(weekPlan(off,off.routines!.book,'2026-10-07').upcoming,[]);
+ assert.deepEqual(weekPlan(undo(off,off.changes.at(-1)!.id),off.routines!.book,'2026-10-07').upcoming,weekPlan(week(),week().routines!.book,'2026-10-07').upcoming);
 });
 
 test('60 days of routine use: the saved state grows linearly and stays far below the D1 row limit', ()=>{

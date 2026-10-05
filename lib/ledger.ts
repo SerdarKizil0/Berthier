@@ -106,11 +106,12 @@ function sessionLine(before: Session | null, after: Session | null, routines: St
   return { tag: 'SEANS', text: `${name} · ${after.minutes} dk`, count: 'seans' };
 }
 
-/** BUGÜN DEĞİL: a day put off and where its session slid. */
+/** BUGÜN DEĞİL: a day put off and where its session slid (BU HAFTA DEĞİL: the rest of the week). */
 function skipLine(before: Skip | null, after: Skip | null, routines: State['routines'], change?: Change): OpLine {
   const k = after ?? before!, name = routineName(k.routineId, routines, change), r = routines?.[k.routineId];
-  if (!before) return { tag: 'BUGÜN DEĞİL', text: `${name}${k.slidTo && r?.pattern ? ` · ${DAY_NAMES[weekday(k.slidTo)]} ${untilTime(r.pattern.time)} kaydı` : ''}`, count: 'rutin' };
-  return { tag: 'BUGÜN DEĞİL', text: after ? name : `${name} · kaldırıldı`, count: 'rutin', quiet: true };
+  const tag = k.week ? 'BU HAFTA DEĞİL' : 'BUGÜN DEĞİL';
+  if (!before) return { tag, text: `${name}${k.slidTo && r?.pattern ? ` · ${DAY_NAMES[weekday(k.slidTo)]} ${untilTime(r.pattern.time)} kaydı` : ''}`, count: 'rutin' };
+  return { tag, text: after ? name : `${name} · kaldırıldı`, count: 'rutin', quiet: true };
 }
 
 /** SAYAÇ: the timer starting; its stopping goes with the session it saved. */

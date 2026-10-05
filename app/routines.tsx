@@ -9,7 +9,7 @@ import {dayKey, type State} from '@/lib/domain';
 import {addDays, daysBetween} from '@/lib/calendar';
 import {
   LEAD_MIN, OBSERVE_DAYS, WEEK_ORDER, at, clock, daysText, durationChip, observation, openDay, proposals, recentSessions, routinesOf,
-  runningInfo, scaffolds, slideTarget, startOf, stepMinutes, stepsView, todayList, trialResult, usual, weekDone, weekLine, weekOf, weekRows, weekStart, weekday,
+  runningInfo, scaffolds, slideTarget, startOf, stepMinutes, stepsView, todayList, trialResult, usual, weekDone, weekLine, weekOf, weekPlan, weekRows, weekStart, weekday,
   type Routine, type Scaffold,
 } from '@/lib/routines';
 import {DAY_NAMES, WD, andList, dayMonth, genitive, minutesText, minutesUpper, onDate, shortDay, untilTime, upper} from '@/lib/turkish';
@@ -232,7 +232,9 @@ export function RoutineDetail({state, id, now, busy, online, why, action, back, 
 function Steps({state, r, now, busy, online, action, record}: Pick<Common, 'state' | 'busy' | 'online' | 'action'> & {r: Routine; now: Date; record: (id: string) => void}) {
   const view = stepsView(state, r), off = busy || !online, current = view.find(v => v.state === 'now'), next = current ? view.find(v => v.index > current.index && !v.step.wait) : undefined;
   const waiting = current?.step.wait;
-  const today = dayKey(now), canSkip = openDay(state, r, today, today);
+  // “Bu hafta değil” drops the rest of the week from its next open session (for a round over two days, the last
+  // step's day); nothing slides.
+  const skipOn = weekPlan(state, r, dayKey(now)).upcoming[0];
   return <>
     <p className="rt-lead">Günün toplamına yalnız elinle geçen süre girer; bekleme girmez.</p>
     <div className="rt-steps">
@@ -245,7 +247,7 @@ function Steps({state, r, now, busy, online, action, record}: Pick<Common, 'stat
     <div className="rt-step-actions">
       {waiting && next ? <button className="btn-quiet" disabled={off} onClick={() => void action({kind: 'routineStart', routineId: r.id, stepKey: next.step.key}, {quiet: true})}>{next.step.title} öne al</button>
         : <button className="btn-quiet" disabled={off} onClick={() => record(r.id)}>{current ? `${current.step.title}: kaydet` : 'Kaydet'}</button>}
-      {canSkip && <button className="btn-quiet" disabled={off} onClick={() => void action({kind: 'routineSkip', routineId: r.id, day: today})}>Bu hafta değil</button>}
+      {skipOn && <button className="btn-quiet" disabled={off} onClick={() => void action({kind: 'routineSkip', routineId: r.id, day: skipOn, week: true})}>Bu hafta değil</button>}
     </div>
   </>;
 }
@@ -270,7 +272,7 @@ export function RecordSheet({state, id, now, busy, online, why, action, close, o
   const log = <button key="log" className={r.timer ? 'btn-quiet' : 'btn-main'} disabled={off} onClick={() => void action({kind: 'routineLog', routineId: r.id, ...(step ? {stepKey: step.step.key} : {})}).then(ok => { if (ok) close(); })}>Yaptım</button>;
   const skip = settled && !skipped && !done.length && openDay(state, r, today, today) && <button key="skip" className="btn-quiet" disabled={off} onClick={() => void action({kind: 'routineSkip', routineId: r.id, day: today}).then(ok => { if (ok) close(); })}>Bugün değil</button>;
   const stepMin = step ? stepMinutes(state, r, step.step.key) : null;
-  const said = stepMin !== null ? `Yaptım, ${step!.step.title.toLocaleLowerCase('tr-TR')} için ≈${minutesText(stepMin)}’yı yazar; sonra düzeltebilirsin.` : u.minutes !== null ? `Yaptım, ölçülen ${u.range ? `${u.minutes} dk` : `≈${minutesText(u.minutes)}`}’yı yazar; sonra düzeltebilirsin.` : 'Yaptım, 30 dk yazar; sonra düzeltebilirsin.';
+  const said = stepMin !== null ? `Yaptım, bu adım için ≈${minutesText(stepMin)}’yı yazar; sonra düzeltebilirsin.` : u.minutes !== null ? `Yaptım, ölçülen ${u.range ? `${u.minutes} dk` : `≈${minutesText(u.minutes)}`}’yı yazar; sonra düzeltebilirsin.` : 'Yaptım, 30 dk yazar; sonra düzeltebilirsin.';
   const slide = skip ? (slid ? ` Bugün değil dersen seans ${DAY_NAMES[weekday(slid)]} ${untilTime(r.pattern!.time)} kayar.` : ' Bugün değil dersen bu hafta kayacak boş gün yok; sayı olduğu gibi kalır.') : '';
   return <SaySheet open={!!id} onClose={close} locked={busy} title={r.title} description={meta} metaDescription>
     {mine ? <>
