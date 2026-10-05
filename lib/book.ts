@@ -6,6 +6,7 @@ import { RHYTHM, type Dictation, type Front, type State } from './domain';
 import { addDays, calendarDay, conflicts, occurrences, type CalendarEvent } from './calendar';
 import { clockText } from './expedition/camps';
 import { pendingIdeas, staleFronts } from './research';
+import { routinesOf } from './routines';
 import { dayMonth, shortDay, upper } from './turkish';
 
 /** The saved review time (Tercihler › Ritim; Sunday 20:00 Istanbul unless changed). */
@@ -38,10 +39,21 @@ export function reviewDue(s: State, now: Date, r: ReviewTime = reviewTimeOf(s)) 
 export const STEPS = [
   { tag: 'BAYAT', title: 'Bayat cepheler' },
   { tag: 'DEPO', title: 'Fikir deposu' },
-  { tag: 'KULVAR', title: 'Aktif kulvarlar' },
+  { tag: 'PROJE', title: 'Aktif projeler' },
   { tag: 'UFUK', title: 'Ufuk' },
+  { tag: 'RUTİN', title: 'Rutinler' },
   { tag: 'ÖZET', title: 'Özet' },
 ] as const;
+export const ROUTINE_STEP = 4;
+
+/** K9 (4 Ekim): the steps this review shows. Rutinler comes before Özet and only when there is a routine;
+ *  a step keeps its index either way (review.step). */
+export function reviewSteps(s: State) {
+  const routines = routinesOf(s).some(r => r.status !== 'paused');
+  return STEPS.map((step, index) => ({ ...step, index })).filter(x => routines || x.index !== ROUTINE_STEP);
+}
+/** Where step `index` sits among the steps shown (a hidden step counts as the next shown one). */
+export const stepPosition = (steps: ReturnType<typeof reviewSteps>, index: number) => Math.max(0, steps.findIndex(x => x.index >= index));
 
 export type ReviewCard = { open: boolean; label: string; when: string; title: string; meta: string; action: string };
 
@@ -49,13 +61,14 @@ export type ReviewCard = { open: boolean; label: string; when: string; title: st
 export function reviewCard(s: State, now: Date, r: ReviewTime = reviewTimeOf(s)): ReviewCard {
   const stale = staleFronts(s, now.getTime()).length, ideas = pendingIdeas(s).length;
   const counts = [stale ? `${stale} bayat cephe` : 'bayat cephe yok', ideas ? `${ideas} yeni fikir` : 'yeni fikir yok'];
+  const steps = reviewSteps(s);
   if (s.review && !s.review.completedAt) {
-    const step = s.review.step;
-    return { open: true, label: 'HAFTALIK TEFTİŞ', when: `ADIM ${step + 1} / ${STEPS.length}`, title: 'Kaldığın yerden devam et.', meta: [STEPS[step].title, ...counts].join(' · '), action: 'Devam et' };
+    const at = stepPosition(steps, s.review.step);
+    return { open: true, label: 'HAFTALIK TEFTİŞ', when: `ADIM ${at + 1} / ${steps.length}`, title: 'Kaldığın yerden devam et.', meta: [steps[at].title, ...counts].join(' · '), action: 'Devam et' };
   }
   const today = calendarDay(now), { nextDay } = reviewSchedule(now, r);
   const day = nextDay === today ? 'BUGÜN' : nextDay === addDays(today, 1) ? 'YARIN' : upper(shortDay(nextDay));
-  return { open: false, label: 'HAFTALIK TEFTİŞ', when: reviewDue(s, now, r) ? 'ZAMANI GELDİ' : `${day} ${r.time}`, title: 'Haritaya birlikte bakalım.', meta: [`${STEPS.length} adım`, ...counts].join(' · '), action: 'Şimdi başlat' };
+  return { open: false, label: 'HAFTALIK TEFTİŞ', when: reviewDue(s, now, r) ? 'ZAMANI GELDİ' : `${day} ${r.time}`, title: 'Haritaya birlikte bakalım.', meta: [`${steps.length} adım`, ...counts].join(' · '), action: 'Şimdi başlat' };
 }
 
 export type Decision = 'continue' | 'hold' | 'close';

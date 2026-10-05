@@ -9,9 +9,9 @@ import { MO, WD } from '../turkish';
 
 export const REGIONS: Record<FrontType, { label: string; region: string; name: string }> = {
   course: { label: 'DERSLER', region: 'DERS OVASI', name: 'Ders Ovası' },
-  lane: { label: 'KULVARLAR', region: 'KULVAR DAĞLARI', name: 'Kulvar Dağları' },
+  lane: { label: 'PROJELER', region: 'PROJE DAĞLARI', name: 'Proje Dağları' },
   application: { label: 'BAŞVURULAR', region: 'BAŞVURU GEÇİDİ', name: 'Başvuru Geçidi' },
-  general: { label: 'GENEL', region: 'GENEL DÜZLÜK', name: 'Genel Düzlük' },
+  general: { label: 'İŞLER', region: 'İŞ DÜZLÜĞÜ', name: 'İş Düzlüğü' },
 };
 
 // Hand-picked spots from the design. The n-th front of a type tries the n-th spot first, so the first
@@ -31,11 +31,11 @@ export function inRegion(type: FrontType, [x, y]: Pt): boolean {
   const hq = Math.hypot(x - C.HQ[0], y - C.HQ[1]);
   if (hq < HQ_GAP) return false;
   switch (type) {
-    // Genel Düzlük: the open ground around the headquarters, off the valley and the river.
+    // İş Düzlüğü: the open ground around the headquarters, off the valley and the river.
     case 'general': return hq <= 250 && y >= 440 && y <= 840 && pdist(x, y, C.VAL).d >= 60 && pdist(x, y, C.RIVER).d >= 40;
     // Ders Ovası: the southern plain, clear of the river.
     case 'course': return x >= 80 && x <= 720 && y >= 860 && y <= 1200 && pdist(x, y, C.RIVER).d >= 45;
-    // Kulvar Dağları: the mountains in the north, clear of the valley.
+    // Proje Dağları: the mountains in the north, clear of the valley.
     case 'lane': return x >= 40 && x <= 640 && y >= 60 && y <= 380 && pdist(x, y, C.VAL).d >= 90;
     // Başvuru Geçidi: along the valley floor up to the pass and beyond.
     case 'application': { const v = pdist(x, y, C.VAL); return v.d <= 46 && v.s >= 40 && v.s <= 830 && hq >= 130; }
@@ -93,17 +93,21 @@ function candidates(f: Pick<Front, 'id' | 'type'>, nth: number): Pt[] {
  * candidates that keeps CAMP_GAP from every camp placed before it; when a region is crowded the gap
  * shrinks step by step, so there is never a limit on the number of fronts.
  */
-export function placeCamps(fronts: Pick<Front, 'id' | 'type'>[]): Record<string, Pt> {
+export function placeCamps(fronts: Pick<Front, 'id' | 'type' | 'was'>[]): Record<string, Pt> {
   const out: Record<string, Pt> = {}, placed: Pt[] = [], count: Partial<Record<FrontType, number>> = {};
   const room = (p: Pt) => placed.reduce((m, q) => Math.min(m, Math.hypot(p[0] - q[0], p[1] - q[1])), Infinity);
-  for (const f of fronts) {
+  const place = (f: Pick<Front, 'id' | 'type'>) => {
     const nth = count[f.type] = (count[f.type] ?? -1) + 1, cands = candidates(f, nth);
     let spot: Pt | undefined;
     for (const gap of [CAMP_GAP, 50, 42, 34, 26]) { spot = cands.find(p => room(p) >= gap); if (spot) break; }
     spot ??= cands.reduce((best, p) => room(p) > room(best) ? p : best, cands[0]);
-    out[f.id] = spot;
     placed.push(spot);
-  }
+    return spot;
+  };
+  // A front whose type changed (K7, “Bu cephe ne?”) keeps an empty place in its first type's region, so the
+  // fronts after it do not move; its own camp comes after every other front, in the new type's region.
+  for (const f of fronts) if (f.was?.length) place({ id: f.id, type: f.was[0] }); else out[f.id] = place(f);
+  for (const f of fronts) if (f.was?.length) out[f.id] = place(f);
   return out;
 }
 

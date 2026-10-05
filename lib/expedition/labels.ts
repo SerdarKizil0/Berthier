@@ -89,7 +89,7 @@ export const NO_TEXT: TextPlace = { tf: 'translate(-999 -999)', on: false };
 
 const REGION_FONT: [number, number][] = [[13, 0.22], [13, 0.22], [12, 0.16]];
 
-/** Kulvar Dağları, Ders Ovası and Başvuru Geçidi: the first candidate whose letters stay clear. */
+/** Proje Dağları, Ders Ovası and Başvuru Geçidi: the first candidate whose letters stay clear. */
 export function regionLabels(PL: Placement, S: Project, sz: Size, top: number, bot: number, legHit: (b: Box) => boolean, prev: TextPlace[] | null, cands: RegionCands, tw: TextWidth): TextPlace[] {
   return cands.map(([text, list], ri) => {
     if (prev && prev[ri].on) return prev[ri];
@@ -110,10 +110,10 @@ export function regionLabels(PL: Placement, S: Project, sz: Size, top: number, b
   });
 }
 
-const GENEL = 'GENEL DÜZLÜK';
+const GENEL = 'İŞ DÜZLÜĞÜ';
 const genelWidth = (tw: TextWidth) => tw(GENEL, "italic 400 12px 'Instrument Serif'") + GENEL.length * 12 * 0.16;
 
-/** Genel Düzlük written straight, close to the headquarters (fallback when no arc fits). */
+/** İş Düzlüğü written straight, close to the headquarters (fallback when no arc fits). */
 export function genelFlat(PL: Placement, S: Project, sz: Size, top: number, bot: number, tw: TextWidth): TextPlace {
   const w = genelWidth(tw), c = S(C.HQ);
   for (const [ox, oy] of [[0, 52], [0, -32], [0, 68], [0, -48], [-84, -26], [84, -26], [-84, 54], [84, 54]]) {
@@ -125,7 +125,7 @@ export function genelFlat(PL: Placement, S: Project, sz: Size, top: number, bot:
   return NO_TEXT;
 }
 
-/** Genel Düzlük along an arc around the headquarters. Returns the arc path for a <textPath>. */
+/** İş Düzlüğü along an arc around the headquarters. Returns the arc path for a <textPath>. */
 export function genelArc(PL: Placement, S: Project, k: number, sz: Size, top: number, bot: number, legHit: (b: Box) => boolean, tw: TextWidth): { arc: string; on: boolean } {
   const w = genelWidth(tw), c = S(C.HQ);
   for (const [rw, up] of C.ARC) {

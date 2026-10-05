@@ -490,12 +490,12 @@ export default function ExpeditionMap({variant, state, order, focus, onFocus, on
       {legPaths.map((l, i) => <path key={'c' + i} d={l.d} className="xm-leg-casing"/>)}
       {legPaths.map((l, i) => <path key={'l' + i} d={l.d} className={l.next ? 'xm-leg is-next' : 'xm-leg'}/>)}
       {[1, 2, 3, 4].map(layer => sealPaths.map((d, i) => <path key={layer + '-' + i} d={d} className={'xm-seal is-' + layer}/>))}
-      <text transform={regions[0].tf} className="xm-region" display={regions[0].on ? 'inline' : 'none'}>KULVAR DAĞLARI</text>
+      <text transform={regions[0].tf} className="xm-region" display={regions[0].on ? 'inline' : 'none'}>PROJE DAĞLARI</text>
       <text transform={regions[1].tf} className="xm-region" display={regions[1].on ? 'inline' : 'none'}>DERS OVASI</text>
       <text transform={regions[2].tf} className="xm-region is-small" display={regions[2].on ? 'inline' : 'none'}>BAŞVURU GEÇİDİ</text>
       <path id={arcId} d={arc.arc} fill="none" stroke="none"/>
-      <text className="xm-region is-small is-arc" display={arc.on ? 'inline' : 'none'}><textPath href={'#' + arcId} startOffset="50%">GENEL DÜZLÜK</textPath></text>
-      <text transform={flat.tf} className="xm-region is-small" display={flat.on ? 'inline' : 'none'}>GENEL DÜZLÜK</text>
+      <text className="xm-region is-small is-arc" display={arc.on ? 'inline' : 'none'}><textPath href={'#' + arcId} startOffset="50%">İŞ DÜZLÜĞÜ</textPath></text>
+      <text transform={flat.tf} className="xm-region is-small" display={flat.on ? 'inline' : 'none'}>İŞ DÜZLÜĞÜ</text>
       {captured && last && <g transform={`translate(${last[0].toFixed(1)} ${last[1].toFixed(1)})`}><g className="xm-summit"><circle r="50" style={{opacity: 0.14}}/><circle r="36" style={{opacity: 0.26}}/><circle r="27" style={{opacity: 0.42}}/></g></g>}
     </svg>
     <div className="xm-vignette"/>
@@ -537,10 +537,10 @@ export default function ExpeditionMap({variant, state, order, focus, onFocus, on
     {atlas && !card && !showPending && (legendOpen
       ? <div className="xm-legend" role="button" tabIndex={0} aria-label="Lejantı kapat" onPointerDown={stopProp} onClick={() => setLegend(false)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') { e.preventDefault(); setLegend(false); } }}>
           <span className="xm-legend-lead">Kampın yeri cephe tipini, rengi aciliyeti söyler.</span>
-          <span><svg viewBox="0 0 16 12"><path d="M1 11 5.5 3 8.5 7.5 11 4.5 15 11"/><path d="M4 11 5.5 8 7 10"/></svg>DAĞLIK · KULVARLAR</span>
+          <span><svg viewBox="0 0 16 12"><path d="M1 11 5.5 3 8.5 7.5 11 4.5 15 11"/><path d="M4 11 5.5 8 7 10"/></svg>DAĞLIK · PROJELER</span>
           <span><svg viewBox="0 0 16 12"><path d="M1 4.5c3-1.6 6 1.6 9 0s4-.8 5 0"/><path d="M1 9c4-1.4 9 1.4 14 0"/></svg>OVA · DERSLER</span>
           <span><svg viewBox="0 0 16 12"><path d="M1 2c3 0 5 8 7 8s4-8 7-8"/><path d="M4.5 2c2 0 2.6 4.5 3.5 4.5S9.5 2 11.5 2"/></svg>GEÇİT · BAŞVURULAR</span>
-          <span><svg viewBox="0 0 16 12"><path d="M1 8.5h14"/><path d="M5 5.5h6"/></svg>DÜZLÜK · GENEL</span>
+          <span><svg viewBox="0 0 16 12"><path d="M1 8.5h14"/><path d="M5 5.5h6"/></svg>DÜZLÜK · İŞLER</span>
           <i/>
           <span className="is-hot"><svg viewBox="0 0 16 12" className="is-solid"><circle cx="8" cy="6" r="6" className="xm-key-ring"/><circle cx="8" cy="6" r="3.3" className="xm-key-dot"/></svg>SONAR · {KRITIK > 0 ? KRITIK + ' GÜN VE ALTI' : 'BUGÜN'}</span>
           <span className="is-hot"><svg viewBox="0 0 16 12" className="is-solid"><circle cx="8" cy="6" r="4" className="xm-key-near"/></svg>MERCAN · {YAKLASAN} GÜN VE ALTI</span>

@@ -72,3 +72,62 @@ export function longDay(date: string) {
   const d = noon(date);
   return upper(WD[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()]);
 }
+
+// ── Rutinler (design 4 Ekim): names inside sentences, durations and day lists. ──
+
+export const DAY_NAMES = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+const HIGH = 'aıou', ROUND = 'ouöü';
+const endsInVowel = (word: string) => FRONT.includes(word.at(-1) ?? '') || BACK.includes(word.at(-1) ?? '');
+function fourWay(word: string) {
+  const v = lastVowel(word.toLocaleLowerCase('tr-TR'));
+  return HIGH.includes(v) ? (ROUND.includes(v) ? 'u' : 'ı') : ROUND.includes(v) ? 'ü' : 'i';
+}
+
+/** A name inside a sentence: “Yüz yogası” → “yüz yogası”. */
+export const lowerFirst = (s: string) => s.charAt(0).toLocaleLowerCase('tr-TR') + s.slice(1);
+
+/** Genitive of a common noun: “Yüz yogası” → “Yüz yogasının”, “Sabah sprinti” → “Sabah sprintinin”. */
+export function genitive(name: string) {
+  const v = fourWay(name);
+  return name + (endsInVowel(name.toLocaleLowerCase('tr-TR')) ? 'n' + v + 'n' : v + 'n');
+}
+
+/** “ile” as a suffix: “Boyun antrenmanı” → “Boyun antrenmanıyla”, “Gym” → “Gymle”. */
+export function withName(name: string) {
+  const back = HIGH.includes(lastVowel(name.toLocaleLowerCase('tr-TR')));
+  return name + (endsInVowel(name.toLocaleLowerCase('tr-TR')) ? 'y' : '') + (back ? 'la' : 'le');
+}
+
+/** Accusative: a day name “Cuma’yı”, “Pazar’ı”; a common noun (proper = false) “Pişirmeyi”. */
+export function accusative(name: string, proper = true) {
+  return name + (proper ? '’' : '') + (endsInVowel(name.toLocaleLowerCase('tr-TR')) ? 'y' : '') + fourWay(name);
+}
+
+/** Ablative after a clock time, as read aloud: “22:31’den beri”, “21:20’den”, “08:30’dan”. */
+export function sinceTime(hhmm: string) {
+  const word = timeWord(hhmm);
+  return hhmm + '’' + (VOICELESS.includes(word.at(-1) ?? '') ? 't' : 'd') + (FRONT.includes(lastVowel(word)) ? 'en' : 'an');
+}
+
+/** “Pzt, Çar, Cmt ve Paz”. */
+export function andList(items: string[]) {
+  return items.length < 2 ? items.join('') : items.slice(0, -1).join(', ') + ' ve ' + items.at(-1);
+}
+
+/** “32 dk”, “1 sa 50 dk”, “2 sa”. */
+export function minutesText(m: number) {
+  const n = Math.round(m), h = Math.floor(n / 60), r = n % 60;
+  return h ? `${h} sa${r ? ` ${r} dk` : ''}` : `${n} dk`;
+}
+
+/** Chips and section heads: “32 DK”, “1 SA 05 DK”. */
+export function minutesUpper(m: number) {
+  const n = Math.round(m), h = Math.floor(n / 60), r = n % 60;
+  return h ? `${h} SA${r ? ` ${String(r).padStart(2, '0')} DK` : ''}` : `${n} DK`;
+}
+
+/** “5 Ekim’de”, “1 Kasım’da”. */
+export function onDate(date: string) {
+  const d = noon(date), month = MONTHS[d.getUTCMonth()];
+  return d.getUTCDate() + ' ' + month + '’' + locative(month.toLocaleLowerCase('tr-TR'));
+}

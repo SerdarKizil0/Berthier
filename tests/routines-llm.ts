@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import {fresh} from '../lib/domain';
+import {parseDictation,type LlmConfig} from '../lib/llm';
+import {newRoutine} from '../lib/routines';
+// Rutinler (4 Ekim): the dictation kinds against the real provider. Calls the model and uses quota; run only when asked.
+process.loadEnvFile('.env.local');
+const config:LlmConfig={provider:'anthropic',key:process.env.ANTHROPIC_API_KEY!,workspaceId:process.env.ANTHROPIC_WORKSPACE_ID,model:process.env.ANTHROPIC_MODEL||'claude-sonnet-5'};
+const withYoga=fresh(),yoga=newRoutine('Yüz yogası',4,new Date());withYoga.routines={[yoga.id]:yoga};
+let p=await parseDictation('Yüz yogası yap.',fresh(),null,config);
+assert.equal(p.routines?.length??0,0);assert.ok(p.items.some(i=>i.alt==='routine'),'no routine yet: a move with “Rutin olsun”');console.log('Rule 4: a usually repeating action becomes a move with the routine guess.');
+p=await parseDictation('Yüz yogası yap.',withYoga,null,config);
+assert.equal(p.items.length,0);assert.ok(p.sessions?.some(x=>x.routineId===yoga.id&&!x.done&&!x.skip),'existing routine: a pointer, no new move');console.log('Rule 3: an existing routine opens nothing new.');
+p=await parseDictation('Her Pazartesi 14:00-17:00 Organik Kimya Lab var.',fresh(),null,config);
+assert.ok(p.events?.some(e=>e.weekly&&e.kind==='lab'));assert.equal(p.routines?.length??0,0);console.log('Rule 1: a time set by someone else is a date.');
+p=await parseDictation('Haftada 3 gyme gideceğim, gidiş 20 dakika sürüyor.',fresh(),null,config);
+assert.ok(p.routines?.some(x=>x.count===3&&x.travel===20));assert.equal(p.items.length,0);console.log('Rule 2: a frequency makes a routine; travel kept.');
+p=await parseDictation('Yogayı yaptım, 25 dakika sürdü.',withYoga,null,config);
+assert.ok(p.sessions?.some(x=>x.routineId===yoga.id&&x.done&&x.minutes===25));console.log('A session is recorded.');
+p=await parseDictation('Dün yoga yapamadım.',withYoga,null,config);
+assert.ok(p.sessions?.some(x=>x.routineId===yoga.id&&x.skip));console.log('A day put off is recorded.');
