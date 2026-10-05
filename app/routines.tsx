@@ -234,7 +234,7 @@ function Steps({state, r, now, busy, online, action, record}: Pick<Common, 'stat
   const waiting = current?.step.wait;
   // “Bu hafta değil” drops the rest of the week from its next open session (for a round over two days, the last
   // step's day); nothing slides.
-  const skipOn = weekPlan(state, r, dayKey(now)).upcoming[0];
+  const skipOn = state.running?.routineId === r.id ? undefined : weekPlan(state, r, dayKey(now)).upcoming[0];
   return <>
     <p className="rt-lead">Günün toplamına yalnız elinle geçen süre girer; bekleme girmez.</p>
     <div className="rt-steps">
@@ -259,11 +259,11 @@ export function RecordSheet({state, id, now, busy, online, why, action, close, o
   const off = busy || !online, run = runningInfo(state, date);
   if (!r) return null;
   const u = usual(state, r), n = weekDone(state, r, today), done = (state.sessions ?? []).filter(x => x.routineId === r.id && x.day === today);
-  const settled = r.status === 'settled' && !!r.pattern, skipped = (state.skips ?? []).some(k => k.routineId === r.id && k.day === today);
+  const settled = r.status === 'settled' && !!r.pattern, put = (state.skips ?? []).find(k => k.routineId === r.id && k.day === today), skipped = !!put;
   const slid = settled && !skipped && !done.length ? slideTarget(state, r, today, date) : undefined;
   const step = r.steps?.length ? stepsView(state, r).find(v => v.state === 'now' && !v.step.wait) : undefined;
   const meta = [
-    done.length ? `BUGÜN ${clock(startOf(done.at(-1)!))}` : skipped ? 'BUGÜN DEĞİL' : settled ? `SIRADA · ${r.pattern!.time}` : 'GÖZLEMDE',
+    done.length ? `BUGÜN ${clock(startOf(done.at(-1)!))}` : skipped ? (put!.week ? 'BU HAFTA DEĞİL' : 'BUGÜN DEĞİL') : settled ? `SIRADA · ${r.pattern!.time}` : 'GÖZLEMDE',
     durationChip(state, r),
     n ? `BU HAFTA ${n}/${r.count}` : settled ? 'HAFTANIN İLK SEANSI' : `HAFTADA ${r.count}`,
   ].filter(Boolean).join(' · ');

@@ -142,7 +142,8 @@ export function avoided(s: State, r: Routine, today: string): number[] {
   if (r.pattern) {
     const since = dayKey(new Date(r.pattern.approvedAt)), misses = new Map<number, number>();
     for (let d = addDays(weekStart(today), -28); d < weekStart(today); d = addDays(d, 1)) {
-      if (d < since || !r.pattern.days.includes(weekday(d)) || doneOn(s, r, d).length) continue;
+      // A day dropped with “Bu hafta değil” was not missed.
+      if (d < since || !r.pattern.days.includes(weekday(d)) || doneOn(s, r, d).length || (s.skips ?? []).some(k => k.routineId === r.id && k.week && k.day <= d && weekStart(k.day) === weekStart(d))) continue;
       misses.set(weekday(d), (misses.get(weekday(d)) ?? 0) + 1);
     }
     for (const [d, n] of misses) if (n >= 2) out.add(d);
@@ -162,7 +163,7 @@ export function weekPlan(s: State, r: Routine, today: string): WeekPlan {
   const week = weekOf(today), since = dayKey(new Date(p.approvedAt)), avoid = avoided(s, r, today), minutes = usualMinutes(s, r) ?? p.minutes;
   const done = (d: string) => doneOn(s, r, d).length > 0;
   const planned = new Set(week.filter(d => d >= since && p.days.includes(weekday(d)))), slid: Record<string, string> = {}, days: string[] = [];
-  const off = (s.skips ?? []).find(k => k.routineId === r.id && k.week && week.includes(k.day))?.day, open = (x: string) => !off || x < off;
+  const off = (s.skips ?? []).filter(k => k.routineId === r.id && k.week && week.includes(k.day)).map(k => k.day).sort()[0], open = (x: string) => !off || x < off;
   for (const d of week) {
     if (!planned.has(d) || !open(d)) continue;
     if (!skippedOn(s, r, d) && !(d < today && !done(d))) { days.push(d); continue; }
@@ -241,8 +242,9 @@ export function todayList(s: State, now: Date): TodayList {
   // Put off today: at the end, muted; no red, no cross.
   for (const r of settled) {
     if (!skippedOn(s, r, d)) continue;
-    const k = (s.skips ?? []).find(x => x.routineId === r.id && x.day === d)!;
-    rows.push({ key: 'skip:' + r.id, ids: [r.id], time: '—', title: r.title, sub: k.week ? 'Bu hafta değil' : `Bugün değil · ${k.slidTo ? `${DAY_NAMES[weekday(k.slidTo)]} ${untilTime(r.pattern!.time)} kaydı` : 'bu hafta kaymadı'}`, chip: '', tone: 'skip', at: 9999 });
+    // Where it slid now (a later “Bu hafta değil” may have dropped the day it slid to).
+    const k = (s.skips ?? []).find(x => x.routineId === r.id && x.day === d)!, to = Object.entries(plans.get(r.id)!.slid).find(([, from]) => from === d)?.[0];
+    rows.push({ key: 'skip:' + r.id, ids: [r.id], time: '—', title: r.title, sub: k.week ? 'Bu hafta değil' : `Bugün değil · ${to ? `${DAY_NAMES[weekday(to)]} ${untilTime(r.pattern!.time)} kaydı` : 'bu hafta kaymadı'}`, chip: '', tone: 'skip', at: 9999 });
   }
   const count = new Set(rows.filter(x => x.tone !== 'skip' && x.tone !== 'fixed').flatMap(x => x.ids)).size;
   return { rows: rows.map(x => ({ key: x.key, ids: x.ids, time: x.time, title: x.title, sub: x.sub, chip: x.chip, tone: x.tone })), count, left: Math.round(left), total, planned, next: rows.find(x => x.tone === 'next') ?? null };

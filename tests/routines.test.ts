@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {fresh,commitChanges,undo,type Front,type State} from '../lib/domain';
 import {act,applyParsed} from '../lib/reducer';
-import {type Routine,type Session,at,dayMin,weekStart,weekLine,pastDay,observation,readyToPropose,mirror,weekPlan,weekRows,todayList,reminderFor,routineAct,routineLabel,routineNotice,scaffolds,stepMinutes,stepsOf,trialResult,proposals,type RoutineCommand} from '../lib/routines';
+import {type Routine,type Session,at,dayMin,weekStart,weekLine,pastDay,observation,readyToPropose,mirror,weekPlan,weekRows,todayList,reminderFor,routineAct,routineLabel,routineNotice,scaffolds,stepMinutes,stepsOf,trialResult,proposals,avoided,type RoutineCommand} from '../lib/routines';
 import {addDays} from '../lib/calendar';
 import {placementsOf,effective,receiptTitle} from '../lib/kinds';
 import {checkRoutines,type Parsed} from '../lib/llm';
@@ -348,6 +348,19 @@ test('“geçen” days, open days for “Bugün değil”, a past week’s coun
  const wed=local('2026-10-07','09:00'),off=run(week(),{kind:'routineSkip',routineId:'book',day:'2026-10-07',week:true},wed);
  assert.deepEqual(weekPlan(off,off.routines!.book,'2026-10-07').upcoming,[]);
  assert.deepEqual(weekPlan(undo(off,off.changes.at(-1)!.id),off.routines!.book,'2026-10-07').upcoming,weekPlan(week(),week().routines!.book,'2026-10-07').upcoming);
+ // Two week skips: the earliest day counts, whatever order they were stored in; nothing slides.
+ const mon=local(MON,'09:00');let two=run(week(),{kind:'routineSkip',routineId:'yoga',day:'2026-10-07',week:true},mon);
+ two=run(two,{kind:'routineSkip',routineId:'yoga',day:MON,week:true},mon);
+ assert.deepEqual(weekPlan(two,two.routines!.yoga,MON),{days:[],slid:{},upcoming:[]});
+ // “Bugün değil” slid Monday to Tuesday; a later “Bu hafta değil” drops Tuesday, and today's row says so.
+ let slid=run(week(),{kind:'routineSkip',routineId:'yoga',day:MON},mon);assert.equal(slid.skips![0].slidTo,'2026-10-06');
+ slid=run(slid,{kind:'routineSkip',routineId:'yoga',day:'2026-10-06',week:true},mon);
+ assert.equal(todayList(slid,mon).rows.find(x=>x.key==='skip:yoga')!.sub,'Bugün değil · bu hafta kaymadı');
+ // Days dropped with “Bu hafta değil” are not missed days: Teftiş does not propose moving them.
+ const mask=settled('mask','Saç maskesi',[1,4],'20:00',25,{pattern:{days:[1,4],time:'20:00',minutes:25,approvedAt:'2026-09-07T05:40:00.000Z'}}),hist=week();hist.routines!.mask=mask;
+ for(const d of ['2026-09-07','2026-09-10','2026-09-21','2026-09-24'])hist.sessions!.push(session('mask',d,'20:00',25));
+ hist.skips=['2026-09-14','2026-09-28'].map(day=>({routineId:'mask',day,at:local(day,'09:00').toISOString(),week:true as const}));
+ assert.deepEqual(avoided(hist,mask,MON),[]);
 });
 
 test('60 days of routine use: the saved state grows linearly and stays far below the D1 row limit', ()=>{
