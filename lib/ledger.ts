@@ -26,6 +26,8 @@ function frontLine(before: Front | null, after: Front | null): OpLine {
   const edited = after.moves.filter(m => old.has(m.id) && old.get(m.id)!.text !== m.text);
   const removed = after.moves.filter(m => m.removedAt && !old.get(m.id)?.removedAt);
   if (before.type !== after.type) return { tag: 'TÜR', text: `${f.title}: ${typeNames[before.type]} → ${typeNames[after.type]}`, count: 'tür' };
+  // Bitti on an İş front's last move closes it in the same change (K7).
+  if (done.length && after.status === 'closed' && before.status !== 'closed') return { tag: 'HAMLE BİTTİ', text: `${f.title}: ${done[0].text} · cephe kapandı`, count: 'hamle' };
   if (before.status !== after.status) return { tag: 'DURUM', text: `${f.title}: ${STATUS[after.status]}`, count: 'durum' };
   if (done.length) return { tag: 'HAMLE BİTTİ', text: `${f.title}: ${done[0].text}`, count: 'hamle' };
   if (removed.length) return { tag: 'KALDIRILDI', text: `${f.title}: ${removed[0].text}`, count: 'hamle' };
@@ -183,9 +185,11 @@ export function changeNotice(change: Change, fronts: State['fronts'], routines: 
   return { title: change.label.replace(/[.]?$/, '.'), text: live > 1 ? breakdown(change, fronts, routines) : '' };
 }
 
-/** The status card after “Olduğu gibi ekle”, “Kaldır” and Harita › Seç (the reducer's labels): where the move
- *  went in its front's queue, which move left, which fronts closed. Null for any other change. */
-export function handNotice(change: Change): { title: string; text: string } | null {
+/** The status card after “Olduğu gibi ekle”, “Kaldır”, Harita › Seç, “Bitti” and “Berthier önersin” (the reducer's
+ *  labels): where the move went in its front's queue, which move left, which fronts closed. A Ders or Başvuru front
+ *  left without a next move names itself in `next` (the card offers “Berthier önersin” and “Olduğu gibi ekle”). Null
+ *  for any other change, and for a completion that leaves a next move (the usual card). */
+export function handNotice(change: Change): { title: string; text: string; next?: string } | null {
   const fronts = change.ops.filter(o => o.key.startsWith('front:')).map(o => ({ before: o.before as Front | null, after: o.after as Front | null }));
   const today = change.ops.some(o => o.key.startsWith('order:') && !!(o.after as Order | null)?.slots.some(x => fronts.some(f => f.after?.id === x.frontId) && !(o.before as Order | null)?.slots.some(y => y.frontId === x.frontId)));
   if (change.label === 'Hamle eklendi' && fronts[0]?.after) {
@@ -196,6 +200,15 @@ export function handNotice(change: Change): { title: string; text: string } | nu
   if (change.label === 'Hamle kaldırıldı' && fronts[0]?.after) {
     const { before, after } = fronts[0], m = after.moves.find(x => x.removedAt && !before?.moves.find(y => y.id === x.id)?.removedAt);
     return { title: 'Kaldırıldı.', text: m?.text ?? '' };
+  }
+  if (change.label === 'Hamle tamamlandı; cephe kapandı' && fronts[0]?.after) return { title: `${fronts[0].after.title} tamamlandı, cephe kapandı.`, text: '' };
+  if (change.label === 'Hamle tamamlandı' && fronts[0]?.after) {
+    const f = fronts[0].after;
+    return f.type !== 'lane' && f.status !== 'closed' && !openMoves(f).length ? { title: 'Hamle tamamlandı.', text: `${f.title}: sıradaki hamle yok.`, next: f.id } : null;
+  }
+  if (change.label === 'Berthier hamle önerdi' && fronts[0]?.after) {
+    const { before, after } = fronts[0], m = after.moves.find(x => !before?.moves.some(y => y.id === x.id));
+    return { title: 'Berthier önerdi.', text: m ? `${after.title}: ${m.text}` : after.title };
   }
   if (/ cephe kapatıldı$/.test(change.label)) return { title: change.label + '.', text: fronts.filter(f => f.after?.status === 'closed').map(f => f.after!.title).join(', ') };
   return null;

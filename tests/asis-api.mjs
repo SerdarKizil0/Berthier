@@ -26,9 +26,17 @@ await command({kind:'removeMove',frontId:ids[0],moveId:removed},503);
 // Harita › Seç: both close in one change and leave the route.
 data=await command({kind:'closeFronts',ids});assert.equal(data.summary,'2 cephe kapatıldı');
 assert.deepEqual(ids.map(id=>data.state.fronts[id].status),['closed','closed']);assert.equal(data.state.orders[day].slots.length,0);
+// Bitti without the model (5 Ekim): even an old client's skip:false completion of an İş front's last move closes it;
+// a Ders front stays open with no next move, and “Berthier önersin” says plainly that the model is not reachable.
+const more=[crypto.randomUUID(),crypto.randomUUID()];
+await command({kind:'addMove',frontId:more[0],title:'Dekanlık imzası',text:'Dilekçeyi dekanlığa götür.'});
+await command({kind:'addMove',frontId:more[1],title:'Fizik',text:'Vize konularını listele.'});data=await command({kind:'retype',frontId:more[1],type:'course'});
+data=await command({kind:'complete',frontId:more[0],skip:false});assert.equal(data.summary,'Hamle tamamlandı; cephe kapandı');assert.equal(data.state.fronts[more[0]].status,'closed');
+data=await command({kind:'complete',frontId:more[1]});assert.equal(data.summary,'Hamle tamamlandı');assert.equal(data.state.fronts[more[1]].status,'active');assert.ok(data.state.fronts[more[1]].moves.every(m=>m.doneAt));
+const refused=await command({kind:'suggest',frontId:more[1]},503);assert.match(refused.error,/öneremedi/);
 // No dictation was written (no model).
 assert.equal(data.dictations.length,rows);
 // Everything is taken back, newest first.
 for(const c of data.state.changes.slice(first).reverse())if(!c.ops.every(o=>o.undone))data=await command({kind:'undo',changeId:c.id});
-for(const id of ids)assert.equal(data.state.fronts[id],undefined);
-console.log('asis-api: add, replay, today, length, remove, close, undo passed');
+for(const id of [...ids,...more])assert.equal(data.state.fronts[id],undefined);
+console.log('asis-api: add, replay, today, length, remove, close, Bitti without the model, suggest, undo passed');

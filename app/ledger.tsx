@@ -10,7 +10,7 @@ import {Check, RotateCcw} from 'lucide-react';
 import {type Change, type Dictation, type State} from '@/lib/domain';
 import {clockText} from '@/lib/expedition/camps';
 import {changeLines, describeOp, ledgerDays, ledgerRoutines, undoBlock, type LedgerItem} from '@/lib/ledger';
-import {KIND_TAG, TARGETS, effective, placedOf} from '@/lib/kinds';
+import {KIND_TAG, TARGETS, effective, placedGone, placedOf} from '@/lib/kinds';
 
 type Action = (body: {kind: string; [key: string]: unknown}, options?: {quiet?: boolean; silent?: boolean}) => Promise<boolean | undefined>;
 type Queued = {id: string; kind?: unknown; text?: unknown};
@@ -82,9 +82,9 @@ export default function Ledger({state, dictations, outbox, now, busy, online, pr
           {placed.map(p => {
             const id = d.id + p.ref, open = opened === id, index = c && p.key ? c.ops.findIndex(o => o.key === p.key) : -1;
             const moved = p.changeId ? state.changes.find(x => x.id === p.changeId) : undefined, why = moved ? undoBlock(state, moved) : c && index >= 0 ? blocks.get(c.id + ':' + index) : null;
-            const gone = moved ? moved.ops.every(o => o.undone) : c && index >= 0 ? c.ops[index].undone : false;
+            const gone = moved ? moved.ops.every(o => o.undone) : c && index >= 0 ? c.ops[index].undone : false, left = gone ? null : placedGone(state, p.ref);
             return <div key={p.ref}>
-              <div className="ledger-place"><p><span>{KIND_TAG[p.kind]}</span> {p.kind === 'move' ? `${p.note}: ${p.text}` : p.text}</p>{movable(p.ref) && !gone && <button className="ledger-change" aria-expanded={open} onClick={() => { setOpened(open ? null : id); setCounting(null); }}>{open ? 'Kapat' : 'Değiştir'}</button>}{gone && <span className="ledger-undone">GERİ ALINDI</span>}</div>
+              <div className="ledger-place"><p><span>{KIND_TAG[p.kind]}</span> {p.kind === 'move' ? `${p.note}: ${p.text}` : p.text}</p>{movable(p.ref) && !gone && !left && <button className="ledger-change" aria-expanded={open} onClick={() => { setOpened(open ? null : id); setCounting(null); }}>{open ? 'Kapat' : 'Değiştir'}</button>}{gone && <span className="ledger-undone">GERİ ALINDI</span>}{left && <span className="ledger-undone">{left}</span>}</div>
               {open && <div className="ledger-kinds">
                 {TARGETS.map(([k, label]) => <button key={k} aria-pressed={p.kind === k} disabled={off || p.kind === k} onClick={() => k === 'routine' ? setCounting(counting === id ? null : id) : void action({kind: 'rekind', sourceId: d.id, ref: p.ref, to: k}).then(ok => { if (ok) setOpened(null); })}>{label}{p.kind === k && <Check size={14}/>}</button>)}
                 {p.alt?.to === 'merge' && <button disabled={off} onClick={() => void action({kind: 'routineMerge', routineId: p.ref.split(':')[1], targetId: p.alt!.targetId, sourceId: d.id, ref: p.ref}).then(ok => { if (ok) setOpened(null); })}>{p.alt.label}</button>}

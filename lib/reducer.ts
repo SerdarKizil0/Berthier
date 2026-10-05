@@ -1,6 +1,6 @@
 import {addIdeas,researchAct,type ResearchCommand} from './research';
 import {addDays,calendarDay,resolveDate,syncPlans,type CalendarEvent,type Profile,type EventKind,validDate,validTime} from './calendar';
-import {type State,type Front,type Order,type Move,type Moved,type Rhythm,uid,nextMove,isOpen,MOVE_LIMIT,moveText,normalize,canonicalTitle,similarity,fallbackMove,commitChanges,undo,dayKey,propose,replaceSlot,materializeOrder,validMove,directGoal} from './domain';
+import {type State,type Front,type Order,type Move,type Moved,type Rhythm,uid,nextMove,openMoves,isOpen,MOVE_LIMIT,moveText,normalize,canonicalTitle,similarity,fallbackMove,commitChanges,undo,dayKey,propose,replaceSlot,materializeOrder,validMove,directGoal} from './domain';
 import type {Parsed} from './llm';
 import {ROUTINE_KINDS,addSession,at,findRoutine,newRoutine,pastDay,routineAct,routineLabel,skipDay,stepsOf,usualMinutes,type RoutineCommand} from './routines';
 import {rekind,retype} from './kinds';
@@ -47,14 +47,23 @@ function addMove(n:State,c:Command){
  const id=UUID.test(c.frontId??'')?c.frontId!:uid(),f=n.fronts[c.frontId??'']??(title?Object.values(n.fronts).find(x=>x.status!=='closed'&&normalize(x.title)===normalize(title))??(n.fronts[id]={id,title,type:'general',status:'active',moves:[],where:'',question:'',notes:[],touched:at}):undefined);if(!f)throw Error('Cephe bulunamadı.');
  if(f.status==='closed'){f.status='active';delete f.closedAt;}
  f.moves.push({id:uid(),text,userEdited:true});f.touched=at;replaceSlot(n,f);
- if(c.today){const date=dayKey(),o=n.orders[date]??=propose(n,date),m=nextMove(f);if(f.status==='active'&&m&&!o.slots.some(x=>x.frontId===f.id))o.slots.push({frontId:f.id,moveId:m.id,text:m.text,reason:'Senin seçtiğin cephe.'});}
+ // A queued entry carries the day it was chosen for; past 04:00 that order is history and the move only joins its front.
+ if(c.today&&(!c.orderDate||c.orderDate===dayKey())){const date=dayKey(),o=n.orders[date]??=propose(n,date),m=nextMove(f);if(f.status==='active'&&m&&!o.slots.some(x=>x.frontId===f.id))o.slots.push({frontId:f.id,moveId:m.id,text:m.text,reason:'Senin seçtiğin cephe.'});}
+}
+// A completion asks the model only to read the user's note (a project's “Nerede kaldın?”); “Bitti” alone never does.
+export const needsModel=(c:{kind:string;skip?:boolean;text?:string})=>c.kind==='dictate'||(c.kind==='complete'&&!c.skip&&!!c.text?.trim());
+// “Berthier önersin” (5 Ekim): the model only on the user's tap, for one front left without a next move. Its moves for
+// that front go to the end of the queue (the first may carry a prerequisite); nothing else changes.
+export function applySuggestion(s:State,frontId:string,p:Parsed):State{
+ const f=s.fronts[frontId];if(!f||f.status==='closed')throw Error('Cephe bulunamadı.');const item=p.question?undefined:p.items.find(x=>x.id===frontId||canonicalTitle(x.title)===canonicalTitle(f.title)),moves=item?.moves??[];if(!moves.length)throw Error('Berthier bu cephe için somut bir hamle bulamadı. Olduğu gibi ekleyebilirsin.');
+ return commitChanges(s,'Berthier hamle önerdi',n=>{const front=n.fronts[frontId],open=new Set(front.moves.filter(isOpen).map(m=>normalize(m.text)));for(const text of moves)if(!open.has(normalize(text))){front.moves.push({id:uid(),text,...(text===moves[0]&&item!.prerequisite?{directGoal:item!.prerequisite.goal,prerequisiteReason:item!.prerequisite.reason}:{})});open.add(normalize(text));}front.touched=new Date().toISOString();replaceSlot(n,front);});
 }
 export function act(s:State,c:Command):State{
  if(c.kind==='undo')return undo(s,c.changeId!,c.index);
 const closing=c.kind==='closeFronts'?[...new Set(c.ids??[])].filter(id=>s.fronts[id]&&s.fronts[id].status!=='closed').length:0;
 const label=ROUTINE_KINDS.includes(c.kind)?routineLabel(c):c.kind==='rekind'?'Tür değiştirildi':c.kind==='retype'?'Cephe türü değiştirildi':c.kind==='closeFronts'?`${closing} cephe kapatıldı`:undefined;
  // A dictation item moved to another kind (or merged into a routine from the receipt) keeps the receipt's trail.
- let moved:Moved|undefined;
+ let moved:Moved|undefined,closed=false;
  const result=commitChanges(s,label??(c.kind==='seenConflict'&&c.seen===false?'Çakışma yeniden açıldı':({addMove:'Hamle eklendi',removeMove:'Hamle kaldırıldı',approve:'Günün emri onaylandı',select:'Günün emri değiştirildi',reorder:'Rotanın sırası değiştirildi',setup:'Aktif projeler seçildi',status:'Cephe durumu değiştirildi',skipPrerequisite:'Ön adım kaldırıldı',edit:'Hamle düzenlendi',complete:'Hamle tamamlandı',merge:'Cepheler birleştirildi',event:'Tarihli kalem düzenlendi',cancelEvent:'Tarihli kalem kaldırıldı',profile:'Mail imzası kaydedildi',rhythm:'Ritim ayarı değiştirildi',seenConflict:'Çakışma görüldü',reviewStart:'Teftiş başladı',reviewStep:'Teftiş adımı',reviewFinish:'Teftiş tamamlandı',reviewContinue:'Cephe sürdürülüyor',ideaAssign:'Depo kalemi projeye atandı',ideaDecide:c.decision==='discard'?'Depo kalemi atıldı':c.decision==='keep'?'Depo kalemi depoda kaldı':'Depo kalemi hamleye çevrildi'} as Record<string,string>)[c.kind]??'Değişiklik'),n=>{
  const f=c.frontId?n.fronts[c.frontId]:undefined;
  if(['status','edit','skipPrerequisite','complete','merge','removeMove'].includes(c.kind)&&!f)throw Error('Cephe bulunamadı.');
@@ -84,11 +93,14 @@ const label=ROUTINE_KINDS.includes(c.kind)?routineLabel(c):c.kind==='rekind'?'T�
  case 'removeMove':{const m=f!.moves.find(x=>x.id===c.moveId);if(!m||!isOpen(m))throw Error('Hamle bulunamadı; bitmiş ya da kaldırılmış olabilir.');m.removedAt=new Date().toISOString();f!.touched=m.removedAt;replaceSlot(n,f!);break;}
  // Harita › Seç: the chosen fronts close together (one change, one “Geri al”) and leave today's route; passed camps stay.
  case 'closeFronts':{const ids=[...new Set(c.ids??[])],at=new Date().toISOString();if(!ids.length)throw Error('Kapatılacak cepheyi seç.');for(const id of ids){const x=n.fronts[id];if(!x)throw Error('Cephe bulunamadı.');if(x.status==='closed')continue;x.status='closed';x.closedAt??=at;x.touched=at;if(n.review&&!n.review.completedAt)n.review.decisions.push(x.title+': kapatıldı');}const o=n.orders[dayKey()];if(o)o.slots=o.slots.filter(x=>!!x.doneAt||!ids.includes(x.frontId));break;}
- case 'complete':{const m=nextMove(f!);if(!m)throw Error('Tamamlanacak hamle yok.');materializeOrder(n,f!.id);m.doneAt=new Date().toISOString();if(c.where!==undefined)f!.where=c.where;if(c.question!==undefined)f!.question=c.question;f!.touched=new Date().toISOString();replaceSlot(n,f!,m);break;}
+ // Bitti (5 Ekim): no model. The next move in the queue moves up; an İş front with nothing left closes (K7: kısa, bitince
+ // kapanır) in the same change, so one “Geri al” reopens it. Ders and Başvuru stay open without a next move.
+ case 'complete':{const m=nextMove(f!);if(!m)throw Error('Tamamlanacak hamle yok.');materializeOrder(n,f!.id);m.doneAt=new Date().toISOString();if(c.where!==undefined)f!.where=c.where;if(c.question!==undefined)f!.question=c.question;f!.touched=new Date().toISOString();if(f!.type==='general'&&!openMoves(f!).length){f!.status='closed';f!.closedAt??=m.doneAt;closed=true;}replaceSlot(n,f!,m);break;}
  case 'merge':{const target=n.fronts[c.targetId??''];if(!target||target.id===f!.id)throw Error('Birleştirilecek cephe bulunamadı.');for(const i of Object.values(n.ideas??{}))if(i.laneId===f!.id)i.laneId=target.id;for(const e of Object.values(n.events??{}))if(e.frontId===f!.id)e.frontId=target.id;target.moves.push(...f!.moves);target.notes.push(...f!.notes);target.where=target.where||f!.where;target.question=target.question||f!.question;target.touched=new Date().toISOString();f!.status='closed';f!.closedAt??=new Date().toISOString();for(const o of Object.values(n.orders)){if(o.date!==dayKey())continue;const seen=new Set<string>();o.slots=o.slots.map(x=>x.frontId===f!.id?{...x,frontId:target.id}:x).filter(x=>!seen.has(x.frontId)&&!!seen.add(x.frontId));}break;}
  default:throw Error('İşlem tanınmadı.');
  }
  });
  if(moved&&result.changes.length>s.changes.length)result.changes.at(-1)!.moved=moved;
+ if(closed&&result.changes.length>s.changes.length)result.changes.at(-1)!.label='Hamle tamamlandı; cephe kapandı';
  return result;
 }

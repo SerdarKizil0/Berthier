@@ -1,10 +1,16 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {fresh,undo,dayKey,nextMove,openMoves,ensureOrder,propose,type State,type Front} from '../lib/domain';
-import {act,type Command} from '../lib/reducer';
+import {act,applySuggestion,needsModel,type Command} from '../lib/reducer';
 import {syncPlans,type CalendarEvent} from '../lib/calendar';
 import {describeOp,handNotice} from '../lib/ledger';
-import {parseDictation,Result} from '../lib/llm';
+import {logbook} from '../lib/logbook';
+import {placedGone} from '../lib/kinds';
+import {createElement} from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import AtlasOrder from '../app/atlas-order';
+import {StatusCard} from '../app/status';
+import {parseDictation,Result,type Parsed} from '../lib/llm';
 import {extractMedia} from '../lib/media';
 import {CREDIT_TEXT} from '../lib/provider';
 
@@ -116,7 +122,7 @@ test('Kaldır keeps a preparation removed when the plan is made again',()=>{
 });
 
 test('Harita › Seç: the chosen fronts close in one change and one undo brings them all back',()=>{
- let s=camp(front('a','Fizik',['Fizik sorularını çöz.']),front('b','Kimya',['Kimya özetini yaz.']),front('c','Kargo',['Paketi götür.']),front('d','Okuma',['Makaleyi oku.']));
+ let s=camp(front('a','Fizik',['Fizik sorularını çöz.']),front('b','Kimya',['Kimya özetini yaz.']),front('c','Kargo',['Paketi götür.','Kargo takibini yap.']),front('d','Okuma',['Makaleyi oku.']));
  s=run(s,{kind:'approve'});s=run(s,{kind:'complete',frontId:'c'});const date=dayKey(),before=structuredClone({fronts:s.fronts,orders:s.orders}),count=s.changes.length;
  const closed=run(s,{kind:'closeFronts',ids:['a','b','c']});
  assert.equal(closed.changes.length,count+1);assert.equal(last(closed).label,'3 cephe kapatıldı');
@@ -175,4 +181,66 @@ test('The empty values of the newer schema fields read as null, as before',()=>{
  assert.deepEqual(p.sessions![0],{routineId:null,title:'Yüz yogası',dayText:null,end:null,minutes:null,skip:false,done:true});
  // Older outputs with null still parse.
  assert.equal(Result.parse({items:[],question:null,summary:'',routines:[{id:null,title:'Gym',count:3,time:null,minutes:null,travel:null,ownWords:null,steps:null,alt:null}]}).routines![0].steps,null);
+});
+
+// Second round (5 Ekim): Bitti never waits on the model, the empty day keeps its map link, and Codex's three findings.
+const tomorrow=()=>new Date(Date.parse(dayKey()+'T12:00:00Z')+86400000).toISOString().slice(0,10);
+
+test('Bitti on the last move: an İş front closes in the same change, Ders and Başvuru stay open, no model call',async()=>{
+ const {value,calls}=await offline(()=>{let s=camp(front('kargo','Kargo iadesi',['PTT’ye götür.']),front('fizik','Fizik',['Vize konularını listele.'],{type:'course'}),front('era','Erasmus+',['Referans mailini gönder.'],{type:'application'}),front('imza','Dekanlık imzası',['Dilekçeyi yaz.','Dilekçeyi götür.']));
+  s=run(s,{kind:'approve'});const out:Record<string,State>={};for(const id of ['kargo','fizik','era','imza'])out[id]=run(s,{kind:'complete',frontId:id});return {s,out};});
+ assert.equal(calls,0);const {s,out}=value,date=dayKey();
+ // İş: the move is done, the front closed, the camp passed; one change, one undo.
+ const kargo=out.kargo,c=last(kargo);
+ assert.ok(kargo.fronts.kargo.moves[0].doneAt);assert.equal(kargo.fronts.kargo.status,'closed');assert.ok(kargo.fronts.kargo.closedAt);
+ assert.ok(kargo.orders[date].slots.find(x=>x.frontId==='kargo')!.doneAt);assert.equal(c.label,'Hamle tamamlandı; cephe kapandı');
+ assert.deepEqual(handNotice(c),{title:'Kargo iadesi tamamlandı, cephe kapandı.',text:''});
+ assert.deepEqual([describeOp(c.ops.find(o=>o.key==='front:kargo')!,kargo.fronts).tag,describeOp(c.ops.find(o=>o.key==='front:kargo')!,kargo.fronts).text],['HAMLE BİTTİ','Kargo iadesi: PTT’ye götür. · cephe kapandı']);
+ const back=undo(kargo,c.id);assert.equal(back.fronts.kargo.status,'active');assert.equal(back.fronts.kargo.closedAt,undefined);assert.equal(nextMove(back.fronts.kargo)!.text,'PTT’ye götür.');
+ // Ders and Başvuru: open, with no next move; the card offers the two ways on; tomorrow's proposal leaves them out.
+ for(const id of ['fizik','era']){const t=out[id];assert.equal(t.fronts[id].status,'active');assert.equal(nextMove(t.fronts[id]),undefined);assert.equal(last(t).label,'Hamle tamamlandı');
+  assert.deepEqual(handNotice(last(t)),{title:'Hamle tamamlandı.',text:`${t.fronts[id].title}: sıradaki hamle yok.`,next:id});
+  assert.ok(t.orders[date].slots.find(x=>x.frontId===id)!.doneAt,'today keeps the passed camp');assert.ok(!propose(t,tomorrow()).slots.some(x=>x.frontId===id));}
+ // A front with more moves: the next one moves up, the usual card.
+ assert.equal(nextMove(out.imza.fronts.imza)!.text,'Dilekçeyi götür.');assert.equal(out.imza.fronts.imza.status,'active');assert.equal(handNotice(last(out.imza)),null);
+ // Projects do not change: Atla on a project's last move keeps it open, the usual card.
+ const lane=run(camp(front('tez','Tez',['Bölüm 2’yi yaz.'],{type:'lane'})),{kind:'complete',frontId:'tez'});
+ assert.equal(lane.fronts.tez.status,'active');assert.equal(handNotice(last(lane)),null);
+ assert.equal(s.fronts.kargo.status,'active');
+});
+
+test('A completion asks the model only for a note; Bitti alone never does',()=>{
+ assert.equal(needsModel({kind:'complete'}),false);assert.equal(needsModel({kind:'complete',skip:true}),false);assert.equal(needsModel({kind:'complete',skip:false,text:'  '}),false);
+ assert.equal(needsModel({kind:'complete',text:'Yöntem bölümünde kaldım.'}),true,'a project’s “Nerede kaldın?” note');assert.equal(needsModel({kind:'complete',skip:true,text:'not'}),false);
+ assert.equal(needsModel({kind:'dictate',text:'Kargo'}),true);for(const kind of ['addMove','removeMove','closeFronts','suggest','approve'])assert.equal(needsModel({kind}),false);
+});
+
+test('Berthier önersin adds the model’s moves to that front only, on a tap',()=>{
+ const s=run(camp(front('fizik','Fizik',['Vize konularını listele.'],{type:'course'}),front('kim','Kimya',['Özet yaz.'])),{kind:'complete',frontId:'fizik'});
+ const p:Parsed={items:[{id:'fizik',title:'Fizik',type:'course',complete:false,completedMoveId:null,moves:['Geçen yılın vize sorularını çöz.','Vize konularını listele.'],where:null,question:null,prerequisite:null,alt:null},{id:'kim',title:'Kimya',type:'general',complete:false,completedMoveId:null,moves:['Başka bir şey.'],where:null,question:null,prerequisite:null,alt:null}],question:null,summary:''};
+ const t=applySuggestion(s,'fizik',p);
+ assert.deepEqual(openMoves(t.fronts.fizik).map(m=>m.text),['Geçen yılın vize sorularını çöz.','Vize konularını listele.']);assert.deepEqual(t.fronts.kim,s.fronts.kim);
+ assert.equal(last(t).label,'Berthier hamle önerdi');assert.deepEqual(handNotice(last(t)),{title:'Berthier önerdi.',text:'Fizik: Geçen yılın vize sorularını çöz.'});
+ assert.throws(()=>applySuggestion(s,'fizik',{...p,question:'Hangi ders?'}),/somut bir hamle bulamadı/);assert.throws(()=>applySuggestion(s,'fizik',{...p,items:[]}),/somut bir hamle bulamadı/);
+ assert.equal(undo(t,last(t).id).fronts.fizik.moves.length,1);
+});
+
+test('Karargâh keeps “Haritada aç” on a day without an order; the card offers both ways when no move is left',()=>{
+ const s=camp(front('fizik','Fizik',[],{type:'course'}),front('kargo','Kargo iadesi',['PTT’ye götür.']));let opened='';
+ const props={state:s,busy:false,online:true,why:'',open:(id:string)=>{opened=id;},complete:()=>{},edit:()=>{},select:()=>{},action:async()=>true,say:()=>{}};
+ const empty=renderToStaticMarkup(createElement(AtlasOrder,{...props,order:{date:dayKey(),slots:[]}}));
+ assert.match(empty,/Bugün açık emir yok\./);assert.match(empty,/ROTA · 0 CEPHE/);assert.match(empty,/HARİTADA AÇ/);
+ const full=renderToStaticMarkup(createElement(AtlasOrder,{...props,order:ensureOrder(s)}));assert.match(full,/ROTA · 1 CEPHE/);assert.match(full,/HARİTADA AÇ/);
+ assert.equal(opened,'');
+ const nop=()=>{},card=renderToStaticMarkup(createElement(StatusCard,{notice:{kind:'done',id:1,title:'Hamle tamamlandı.',text:'Fizik: sıradaki hamle yok.',changeId:'c1',next:'fizik'},error:'',online:true,processing:false,queued:0,busy:false,see:nop,undo:nop,retry:nop,dismiss:nop,clearError:nop,reply:nop,write:nop,running:null,reminder:null,finish:nop,fixEnd:nop,fix:nop,start:nop,skip:nop,hide:nop,alt:nop,keep:nop,suggest:nop,asIs:nop}));
+ for(const label of ['Fizik: sıradaki hamle yok.','Berthier önersin','Olduğu gibi ekle','Geri al'])assert.ok(card.includes(label),label);
+});
+
+test('Codex review: a queued “Bugünün emrine ekle” keeps its day; removals count; a removed placement cannot change kind',()=>{
+ let s=camp(front('a','Fizik',['Fizik sorularını çöz.']),front('b','Kimya',['Kimya özetini yaz.']));s=run(s,{kind:'select',ids:['a']});s=run(s,{kind:'approve'});const date=dayKey();
+ assert.deepEqual(run(s,{kind:'addMove',frontId:'b',title:'Kimya',text:'Raporu yaz.',today:true,orderDate:'2000-01-01'}).orders[date].slots.map(x=>x.frontId),['a'],'a past day’s choice does not reach today’s order');
+ assert.deepEqual(run(s,{kind:'addMove',frontId:'b',title:'Kimya',text:'Raporu yaz.',today:true,orderDate:date}).orders[date].slots.map(x=>x.frontId),['a','b']);
+ s.expedition={startedAt:date};const removed=run(run(s,{kind:'removeMove',frontId:'a',moveId:'a-m1'}),{kind:'edit',frontId:'b',text:'Kimya özetini bitir.'});
+ const metric=logbook(removed,date).metrics.find(m=>m.title==='Elle düzenleme ve ayar değişikliği')!;assert.match(metric.value,/^3 · /,'one selection, one edit and one removal');assert.match(metric.note,/1 emir değişikliği, 1 hamle düzenlemesi, 1 hamle kaldırma/);
+ assert.equal(placedGone(removed,'move:a:a-m1'),'KALDIRILDI');assert.equal(placedGone(run(s,{kind:'complete',frontId:'a'}),'move:a:a-m1'),'BİTTİ');assert.equal(placedGone(s,'move:a:a-m1'),null);assert.equal(placedGone(s,'idea:x'),null);
 });

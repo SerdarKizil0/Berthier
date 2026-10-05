@@ -73,6 +73,12 @@ export function placementsOf(before: State, after: State, p: Parsed, now = new D
   return out;
 }
 
+/** A placed move that left its queue later: “KALDIRILDI” or “BİTTİ” (it can no longer change kind); null otherwise. */
+export function placedGone(s: State, ref: string): string | null {
+  const [type, a, b] = ref.split(':'), m = type === 'move' ? s.fronts[a]?.moves.find(x => x.id === b) : undefined;
+  return m?.removedAt ? 'KALDIRILDI' : m?.doneAt ? 'BİTTİ' : null;
+}
+
 /** What a dictation placed, from its saved result (`placed`); older dictations have none. */
 export function placedOf(d?: { result: string | null }): Placement[] {
   try { return JSON.parse(d?.result ?? '{}').placed ?? []; } catch { return []; }

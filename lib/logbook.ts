@@ -124,7 +124,7 @@ export function logbook(s: State, today = dayKey()): Logbook {
     metrics: [
       { title: 'Emirdeki hamlelerin tamamlanma oranı', value: total ? `%${Math.round((100 * passed) / total)} · ${passed}/${total}` : 'henüz yok', note: '“Kilitlenmeler seyreldi mi?” sorusu için destek verisi.' },
       { title: 'Rapor açılışından onaya', value: waits.length ? 'ort. ' + duration(waits.reduce((a, b) => a + b, 0) / waits.length) : 'henüz yok', note: 'Hedef birkaç dakikadan kısa. Süre raporda sayılmaz, yalnız burada görünür.' },
-      { title: 'Elle düzenleme ve ayar değişikliği', value: `${reorders + selects + edits} · ${settings}`, note: manual.join(', ') + '. Hedef sıfıra yakın.' },
+      { title: 'Elle düzenleme ve ayar değişikliği', value: `${reorders + selects + edits + removals} · ${settings}`, note: manual.join(', ') + '. Hedef sıfıra yakın.' },
     ],
   };
 }
