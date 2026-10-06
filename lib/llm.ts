@@ -32,7 +32,8 @@ export type LlmConfig={key:string;model:string;workspaceId?:string;provider?:'ge
 // size limit (400 “The compiled grammar is too large”), although it is within the explicit limits (20 strict tools,
 // 24 optional, 16 union fields). It goes as a non-strict tool instead, which is not compiled. The tool is forced
 // (claude-sonnet-5 accepts that); a model that refuses a forced tool (Sonnet 5.5, Opus 5.5, Fable 5.1: a 400 naming
-// tool_choice) is asked again with auto, and so from then on in this worker. A text answer is still read as JSON.
+// tool_choice) is asked again with auto, and so from then on while this isolate lives (a new one learns it again with
+// one 400). A text answer is still read as JSON.
 export const DICTATION_TOOL='record_dictation';
 const toolPrompt=`\nYanıtı yalnız ${DICTATION_TOOL} aracını BİR KEZ çağırarak ver; aracın girdisi bu diktenin şemalı JSON'udur. Araç dışında metin yazma.`;
 export const dictationTool={name:DICTATION_TOOL,description:'Bu diktenin değişikliklerini Berthier’e kaydeder.',input_schema:jsonSchema(schema)};
@@ -41,18 +42,19 @@ const autoOnly=new Set<string>();
 function readJson(t:string):unknown{const bare=t.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');for(const x of [bare,bare.slice(bare.indexOf('{'),bare.lastIndexOf('}')+1)]){try{return JSON.parse(x);}catch{}}return undefined;}
 /** What strict mode guaranteed, by the schema the model was given. A required field left out, or null where the schema
  *  has no null, is “not said” (null, "", 0, false or [] by its type; an object stays missing and Zod says so); a number,
- *  yes/no, list or object sent as a string is read as such; a field the schema does not have is dropped. Dated items and
- *  preparation defaults pass as given: the reducer replaces a dated item whole, so a field left out there must fail Zod
- *  and be asked again, not erase the stored date or place. Values that are present are otherwise never changed. */
+ *  yes/no, list, object or null sent as a string is read as such; a field the schema does not have is dropped. Inside
+ *  dated items and preparation defaults nothing is filled in (fill=false): the reducer replaces a dated item whole, so a
+ *  field left out there must fail Zod and be asked again, not erase the stored date or place, and a preparation default
+ *  without its days is not 0 days. Values that are present are otherwise never changed. */
 type Node={type?:string|string[];properties?:Record<string,Node>;required?:string[];items?:Node};
 const asGiven=new Set(['events','prepDefaults']),typesOf=(n:Node)=>([] as string[]).concat(n.type??[]);
-export function conform(value:unknown,node:Node):unknown{
+export function conform(value:unknown,node:Node,fill=true):unknown{
  const types=typesOf(node);
- if(typeof value==='string'){const t=value.trim();if((types.includes('integer')||types.includes('number'))&&/^-?\d+(\.\d+)?$/.test(t))return Number(t);if(types.includes('boolean')&&/^(true|false)$/.test(t))return t==='true';if(node.items||node.properties){try{const v=JSON.parse(t);if(node.items?Array.isArray(v):v&&typeof v==='object'&&!Array.isArray(v))value=v;}catch{}}}
- if(node.items&&Array.isArray(value))return value.map(v=>conform(v,node.items!));
+ if(typeof value==='string'){const t=value.trim();if((types.includes('integer')||types.includes('number'))&&/^-?\d+(\.\d+)?$/.test(t))return Number(t);if(types.includes('boolean')&&/^(true|false)$/.test(t))return t==='true';if(node.items||node.properties){try{const v=JSON.parse(t);if(v===null&&types.includes('null'))return null;if(node.items?Array.isArray(v):v&&typeof v==='object'&&!Array.isArray(v))value=v;}catch{}}}
+ if(node.items&&Array.isArray(value))return value.map(v=>conform(v,node.items!,fill));
  if(!node.properties||!value||typeof value!=='object'||Array.isArray(value))return value;
  const out:Record<string,unknown>={},given=value as Record<string,unknown>;
- for(const [key,child] of Object.entries(node.properties)){const kinds=typesOf(child);if(key in given&&!(given[key]===null&&!kinds.includes('null'))){out[key]=asGiven.has(key)?given[key]:conform(given[key],child);continue;}if(!node.required?.includes(key))continue;const empty=kinds.includes('null')?null:kinds.includes('string')?'':kinds.includes('integer')||kinds.includes('number')?0:kinds.includes('boolean')?false:kinds.includes('array')?[]:undefined;if(empty!==undefined)out[key]=empty;}
+ for(const [key,child] of Object.entries(node.properties)){const kinds=typesOf(child);if(key in given&&!(fill&&given[key]===null&&!kinds.includes('null'))){out[key]=conform(given[key],child,fill&&!asGiven.has(key));continue;}if(!fill||!node.required?.includes(key))continue;const empty=kinds.includes('null')?null:kinds.includes('string')?'':kinds.includes('integer')||kinds.includes('number')?0:kinds.includes('boolean')?false:kinds.includes('array')?[]:undefined;if(empty!==undefined)out[key]=empty;}
  return out;
 }
 export function jsonSchema(node:Record<string,unknown>):Record<string,unknown>{const out:Record<string,unknown>={};for(const [key,value]of Object.entries(node)){if(key==='nullable')continue;if(key==='type'){out.type=node.nullable?[String(value).toLowerCase(),'null']:String(value).toLowerCase();}else if(key==='properties'){out.properties=Object.fromEntries(Object.entries(value as Record<string,Record<string,unknown>>).map(([k,v])=>[k,jsonSchema(v)]));out.additionalProperties=false;}else if(key==='items')out.items=jsonSchema(value as Record<string,unknown>);else out[key]=value;}return out;}
@@ -63,18 +65,19 @@ export async function parseDictation(raw:string,s:State,context:string|null,conf
  for(let attempt=0;attempt<2;attempt++){
  const prompt=JSON.stringify({today,external,map,routines:routinesOf(s).map(r=>({id:r.id,title:r.title,count:r.count,status:r.status,time:r.pattern?.time??r.estimate?.time??null})),kindPreferences:(s.kindPreferences??[]).slice(-30),typePreferences:(s.typePreferences??[]).slice(-30),movePreferences:(s.movePreferences??[]).slice(-30),ideasOnly,events:Object.values(s.events??{}),prepDefaults:s.prepDefaults??{},context,raw,completion:completion?{id:completion.id,completedMove:nextMove(completion),instruction:'Bu hamle kullanıcı tarafından bitirildi. Notunu sadeleştir, complete=true ve sıradaki somut hamleyi üret.'}:null,validationError:error});
  const anthropic=config.provider==='anthropic';
- const send=(forced:boolean)=>fetch(anthropic?'https://api.anthropic.com/v1/messages':`https://generativelanguage.googleapis.com/v1beta/models/${config.model}:generateContent`,{method:'POST',headers:anthropic?{'Content-Type':'application/json','x-api-key':config.key,'anthropic-version':'2023-06-01',...(config.workspaceId?{'anthropic-workspace-id':config.workspaceId}:{})}:{'Content-Type':'application/json','x-goog-api-key':config.key},body:JSON.stringify(anthropic?{model:config.model,max_tokens:10000,system:system+calendarPrompt+researchPrompt+actionPrompt+routinePrompt+(external?externalPrompt:'')+toolPrompt,messages:[{role:'user',content:prompt}],tools:[dictationTool],tool_choice:forced?{type:'tool',name:DICTATION_TOOL,disable_parallel_tool_use:true}:{type:'auto',disable_parallel_tool_use:true}}:{systemInstruction:{parts:[{text:system+calendarPrompt+researchPrompt+actionPrompt+routinePrompt+(external?externalPrompt:'')}]},contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json',responseSchema:schema,temperature:0.2,...(config.model==='gemini-2.5-flash'?{thinkingConfig:{thinkingBudget:1024}}:{}),maxOutputTokens:8000}}),signal:AbortSignal.timeout(45000)});
- let response=await send(anthropic&&!autoOnly.has(config.model));
- if(anthropic&&!autoOnly.has(config.model)&&response.status===400&&/tool_choice/.test(await response.clone().text().catch(()=>''))){autoOnly.add(config.model);response=await send(false);}
+ const send=(forced:boolean)=>fetch(anthropic?'https://api.anthropic.com/v1/messages':`https://generativelanguage.googleapis.com/v1beta/models/${config.model}:generateContent`,{method:'POST',headers:anthropic?{'Content-Type':'application/json','x-api-key':config.key,'anthropic-version':'2023-06-01',...(config.workspaceId?{'anthropic-workspace-id':config.workspaceId}:{})}:{'Content-Type':'application/json','x-goog-api-key':config.key},body:JSON.stringify(anthropic?{model:config.model,max_tokens:10000,system:system+calendarPrompt+researchPrompt+actionPrompt+routinePrompt+(external?externalPrompt:'')+toolPrompt,messages:[{role:'user',content:prompt}],tools:[dictationTool],tool_choice:forced?{type:'tool',name:DICTATION_TOOL,disable_parallel_tool_use:true}:{type:'auto',disable_parallel_tool_use:true}}:{systemInstruction:{parts:[{text:system+calendarPrompt+researchPrompt+actionPrompt+routinePrompt+(external?externalPrompt:'')}]},contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json',responseSchema:schema,temperature:0.2,...(config.model==='gemini-2.5-flash'?{thinkingConfig:{thinkingBudget:1024}}:{}),maxOutputTokens:8000}}),signal:AbortSignal.timeout(45000)}).catch((e:unknown)=>{const name=anthropic?'Anthropic':'Gemini';console.error(`${name} isteği: ${e instanceof Error?`${e.name}: ${e.message}`:String(e)}`);throw Error(e instanceof Error&&e.name==='TimeoutError'?`Yapay zekâ 45 saniyede yanıt vermedi (${name}). Metnin kaydedildi; tekrar deneyebilirsin.`:`Yapay zekâya ulaşılamadı (${name}). Metnin kaydedildi; tekrar deneyebilirsin.`);});
+ // Decided once per attempt: two dictations in flight before the first refusal both fall back.
+ const forced=anthropic&&!autoOnly.has(config.model);let response=await send(forced);
+ if(forced&&response.status===400&&/tool_choice/.test(await response.clone().text().catch(()=>''))){autoOnly.add(config.model);response=await send(false);}
  if(!response.ok){const name=anthropic?'Anthropic':'Gemini',failure=await providerFailure(response,name);throw Error(failure==='credit'?CREDIT_TEXT:failure==='limit'?'Yapay zekâ kullanım sınırına ulaşıldı. Metnin saklandı; kota yenilendiğinde tekrar dene.':failure==='key'?'Yapay zekâ anahtarı doğrulanamadı. Metnin saklandı.':`Dikte şu anda işlenemedi (${name} ${response.status}). Metnin kaydedildi; tekrar deneyebilirsin.`);}
  const data=await response.json() as {stop_reason?:string;content?:{type:string;text?:string;name?:string;input?:unknown}[];candidates?:{content?:{parts?:{text?:string;thought?:boolean}[]}}[]};
  const call=data.content?.find(p=>p.type==='tool_use'&&p.name===DICTATION_TOOL);
  const output:unknown=anthropic?call?(typeof call.input==='string'?readJson(call.input):call.input):readJson(data.content?.filter(p=>p.type==='text').map(p=>p.text??'').join('')??''):readJson(data.candidates?.[0]?.content?.parts?.filter(p=>!p.thought).map(p=>p.text??'').join('')??'');
  try{
- // A cut-off or refused answer is no dictation, however much of it came back; an answer without its own root (empty or
- // wrapped) is none either. Both are asked again, then said, instead of being filled in as an empty dictation.
+ // A cut-off or refused answer is no dictation, however much of it came back; an answer with none of the schema's root
+ // fields (empty or wrapped) is none either. Both are asked again, then said, instead of being filled in as an empty dictation.
  if(anthropic&&/^(max_tokens|model_context_window_exceeded|refusal)$/.test(data.stop_reason??''))throw Error(`Yanıt tamamlanmadı (${data.stop_reason}).`);
- if(!output||typeof output!=='object'||Array.isArray(output)||!('items' in output)||!('summary' in output))throw Error(anthropic&&!call?`${DICTATION_TOOL} aracını çağırmadın; yanıtı yalnız bu araçla ver.`:'Yanıtın kökünde items ve summary olmalı.');
+ if(!output||typeof output!=='object'||Array.isArray(output)||!Object.keys(dictationTool.input_schema.properties as object).some(k=>k in output))throw Error(anthropic&&!call?`${DICTATION_TOOL} aracını çağırmadın; yanıtı yalnız bu araçla ver.`:'Yanıtın kökünde şemanın alanları (items, summary…) yok.');
  const parsed=Result.parse(conform(output,dictationTool.input_schema as Node));
  if(external||ideasOnly){parsed.routines=[];parsed.sessions=[];}
  if(external){parsed.laneUpdates=[];parsed.prepDefaults=[];for(const item of parsed.items){item.complete=false;item.completedMoveId=null;item.where=null;item.question=null;}}
