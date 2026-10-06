@@ -141,14 +141,21 @@ Kullanıcı kararı (5 Ekim): görev eklemek ve kaldırmak kolaylaşsın, dikte 
 Kullanıcı bildirimi: önce “rutin ekle deyince işlenemedi hatası veriyor”, ardından “sıradan dikteler de hata veriyor”. Durum kartı: “İşlenemedi. Dikte şu anda işlenemedi. Metnin kaydedildi; tekrar deneyebilirsin.” PR #6 `main`'e alınıp yayınlanmıştı. Üretim ortamında `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL=claude-sonnet-5` ve `GEMINI_API_KEY` tanımlı; `ANTHROPIC_WORKSPACE_ID` yok.
 
 - **Asıl neden (Sites günlüğü, son 3 saatte 10 kayıt, son kayıt 15:47:33):** `Anthropic 400 invalid_request_error: The compiled grammar is too large, which would cause performance issues. Simplify your tool schemas or reduce the number of strict tools.`
-  - Katı `output_config` şeması bir dilbilgisine derlenir. Belgelenen sınırların (16 birleşik, 24 isteğe bağlı alan) ötesinde, derlenen dilbilgisi boyutu için yayımlanmamış bir iç sınır daha var. 14 birleşik alanlı dikte şeması bu sınırı aşıyordu.
-  - Bu yüzden rutin ya da sıradan, her dikte düşüyordu; şema hepsinde aynı. Hata yalnız gerçek API'de görülür, deterministik testler yakalayamazdı.
+  - Katı `output_config` şeması bir dilbilgisine derlenir. Belgelenen açık sınırlar 20 katı araç, 24 isteğe bağlı ve 16 birleşik alan. Bunların yanında, belgelerin de andığı ama eşiğini vermediği bir derlenmiş dilbilgisi boyutu sınırı var; katı olmayan araçlar buna girmez. 14 birleşik alanlı dikte şeması bu sınırı aşıyordu.
+  - Şema her diktede aynı olduğu için rutin ya da sıradan, her dikte düşüyordu. Hata yalnız gerçek API'de görülür; deterministik testler yakalayamazdı.
 - **Düzeltme (`lib/llm.ts`):**
-  - **İstek:** dikte şeması Anthropic'e derlenmeyen, katı olmayan bir araç olarak gider (`record_dictation`, `tool_choice: auto`, tek çağrı). İstemin sonu “yalnız bu aracı bir kez çağırarak ver” der. Araç zorlanmaz, çünkü Sonnet 5.5, Opus 5.5 ve Fable 5.1 zorunlu araç seçimini reddediyor.
-  - **Yanıt:** önce araç çağrısı okunur. Düz metin JSON yanıt da okunur (kod çiti dahil).
-  - **Katı modun güvenceleri (`conform`):** modele verilen şemaya göre çalışır. Eksik zorunlu alan “söylenmedi” sayılır (türüne göre null, "", 0, false, []); nesne eksik kalır ve Zod söyler. Şemada olmayan alan atılır. Var olan değer değişmez.
-  - **Değişmeyenler:** Zod denetimi ve hatayı söyleyen ikinci deneme aynen kalır. Gün özeti küçük şemasıyla katı kalır. Gemini yolu değişmedi.
-  - **Hata metni:** sağlayıcının diğer hataları kartta sağlayıcıyı ve durum kodunu söyler: “Dikte şu anda işlenemedi (Anthropic 400). …”. Gövde yine yalnız sunucu günlüğündedir.
+  - **İstek:** dikte şeması Anthropic'e derlenmeyen, katı olmayan bir araç olarak gider (`record_dictation`, tek çağrı). Araç zorlanır (`tool_choice: tool`); üretimdeki `claude-sonnet-5` bunu kabul eder. Sonnet 5.5, Opus 5.5 ve Fable 5.1 zorunlu seçimi 400 ile reddeder (`tool_choice` geçen gövde). O durumda istek `auto` ile yinelenir ve bu model için o Worker'da artık hep `auto` kullanılır; model değişince kırılmaz. İstemin sonu “yalnız bu aracı bir kez çağırarak ver” der.
+  - **Yanıt:** araç çağrısı okunur. Metne çevrilmiş girdi, düz ya da çitli JSON ve çevresinde söz olan JSON da okunur.
+  - **Yarım ya da köksüz yanıt:** `stop_reason` `max_tokens`, `model_context_window_exceeded` ya da `refusal` ise yanıt dikte sayılmaz. Kökünde `items` ve `summary` olmayan (boş ya da sarmalanmış) yanıt da dikte sayılmaz. Her ikisi nedeni söylenerek bir kez daha sorulur, sonra olağan hata metni çıkar. Boş dikte olarak kaydedilmez.
+  - **`conform`:** katı modun güvencelerinin yerini kısmen tutar.
+    - Eksik zorunlu alan ya da null almayan alanda null “söylenmedi” sayılır ve türüne göre null, "", 0, false ya da [] olur.
+    - Metin olarak gelen sayı, evet/hayır, liste ya da nesne okunur; şemada olmayan alan atılır.
+    - Tarihli kalemler (`events`) ve hazırlık varsayılanları (`prepDefaults`) olduğu gibi Zod'a gider. Reducer tarihli kalemi baştan kurduğu için eksik alan burada Zod'da düşmeli ve yeniden sorulmalı; aksi hâlde kayıtlı tarih, yer ve “yanına al” listesi silinirdi. Eksik `days` de 0 gün sayılmamalı.
+    - Eksik alan Zod'a ve ikinci denemeye ulaşmaz; yalnız yanlış tür, geçersiz değer ve tarihli kalemler ulaşır.
+  - **Değişmeyenler:** gün özeti küçük şemasıyla katı kalır. Gemini isteği değişmedi (`responseSchema`), ama yanıtı da `conform`'dan geçer.
+  - **Hata metni:** sağlayıcının diğer hataları kartta sağlayıcıyı ve durum kodunu söyler: “Dikte şu anda işlenemedi (Anthropic 400). …” ya da “(Gemini 500)”. Gövde yine yalnız sunucu günlüğündedir.
+  - **Arayüz:** nedeni boş gelen ön adım, rota satırının kendi nedenini gizlemez (`app/atlas-order.tsx`, `lib/report.ts`: `??` yerine `||`).
+- **Bağımsız inceleme:** değişiklik üç açıdan incelendi: API sözleşmesi, katı mod olmadan çıktı sağlamlığı, testler ve belgeler. Doğrulanan ya da yeniden üretilen bulgular düzeltildi: yarım yanıtın boş dikte olarak kaydedilmesi, `conform`'un tarihli kalemi silebilmesi, metin olarak sayı, eksik neden ve belgelerdeki yanlışlar. Denetçilerin çoğu oturum sınırına takıldığı için kalan bulgular elle ve yeniden üretilerek denetlendi.
 - **İkinci katman, rutin diktesi (`lib/llm.ts`, `lib/reducer.ts`; 80f3536):** sağlayıcı taklit edilerek, şemanın izin verdiği ama denetimlerin iki denemede de reddettiği cevaplar bulundu ve düzeltildi.
   - **Sıklık:** `count` 0 ya da boşsa “söylenmedi” sayılır. Yeni rutin haftada 1 ile gözleme başlar; “haftada 4” denince ya da haftalık düzen onaylanınca sayı değişir. Bilinen rutin kendi sayısını korur; 7'den fazlası “her gün” olur.
   - **Kimlik:** hiçbir rutine ait olmayan kimlik (bir cephenin kimliği ya da `routines` bağlamının kendisi) atılır ve ad karar verir. Kalemde bağlam kimliği de cephe kimliği sayılmaz.
@@ -156,8 +163,9 @@ Kullanıcı bildirimi: önce “rutin ekle deyince işlenemedi hatası veriyor�
   - **Seans:** bu diktede açılan rutin için daha uzun adla söylenen seans o rutine yazılır. Yalnız işaret edilen seans artık reddettirmez. Hiç rutini olmayan “yaptım” seansı eskisi gibi reddedilir.
   - **İstem:** sayı söylenmediyse `count` 0. Rutinler bağlamında tekrar eden eylem, sıklık söylenmese de rutindir.
   - **Günlük:** iki deneme de reddedilince son doğrulama hatası sunucu günlüğüne yazılır (`Dikte doğrulanamadı: …`).
-- **Doğrulama:** tip denetimi ve 94 deterministik test geçti; derleme ve anahtar taraması da geçti, lint değişmedi.
-  - `tests/asis.test.ts` isteğin biçimini denetler: `output_config` yok, katı araç yok, `tool_choice` auto. Ayrıca araç ve metin yanıtını, eksik ve fazla alanı, yeniden denemeyi ve üretimdeki 400 gövdesini sınar.
+- **Doğrulama:** tip denetimi ve 96 deterministik test geçti; derleme ve anahtar taraması da geçti, lint değişmedi.
+  - `tests/asis.test.ts` isteğin biçimini denetler: `output_config` yok, katı araç yok, `claude-sonnet-5`'te zorunlu araç, 5.5'te `auto`'ya düşüş. Yanıt yollarını da sınar: düşünme bloğundan sonra araç çağrısı, metin ve çitli JSON, eksik ve fazla alan, metin olarak sayı.
+  - Aynı dosya yeniden sorulan durumları da sınar: yarım yanıt (`max_tokens`, `refusal`), boş ya da sarmalanmış çağrı, tarihli kalemin kısmi güncellemesi. Üretimdeki 400 gövdesi ve rota satırının nedeni de sınanır. Yeni testler düzeltmeden önceki kodla kırılıyor.
   - `tests/routines.test.ts` rutin diktesinin uç durumlarını sınar.
   - Canlı Anthropic çağrısı bu ortamda yapılamadı. Asıl doğrulama, yayından sonra bir diktenin geçmesidir.
 

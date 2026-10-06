@@ -113,7 +113,7 @@ export function buildReport(s: State, dictations: Dictation[], outbox: QueuedRep
     const next = nextDated(s, f.id, cal), days = next?.days ?? null;
     const tone: Tone = x.doneAt ? 'done' : f.status === 'held' || days == null ? 'calm' : days <= KRITIK ? 'crit' : days <= YAKLASAN ? 'near' : 'calm';
     const current = f.moves.find(m => m.id === x.moveId);
-    const reason = current?.prerequisiteReason ?? (next && x.reason === DATED_REASON ? '' : x.reason);
+    const reason = current?.prerequisiteReason || (next && x.reason === DATED_REASON ? '' : x.reason);
     const why = x.doneAt
       ? `Bugün ${atTime(clockText(x.doneAt))} tamamlandı.`
       : [next ? datedSentence(next.event, next.days) : '', reason, f.type === 'lane' && f.where ? sentence(`Kaldığın yer: ${f.where}`) : ''].filter(Boolean).join(' ');
