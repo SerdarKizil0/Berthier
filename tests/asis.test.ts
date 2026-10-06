@@ -11,7 +11,7 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import AtlasOrder,{RouteHead} from '../app/atlas-order';
 import type {ReactElement} from 'react';
 import {StatusCard} from '../app/status';
-import {parseDictation,Result,type Parsed} from '../lib/llm';
+import {DICTATION_TOOL,jsonSchema,parseDictation,Result,schema,type Parsed} from '../lib/llm';
 import {extractMedia} from '../lib/media';
 import {CREDIT_TEXT} from '../lib/provider';
 
@@ -165,10 +165,49 @@ test('Out of credit says so; other provider errors keep their text and log the b
   assert.match(quota.value,/kullanım sınırına/);assert.equal(quota.logged.length,1);assert.match(quota.logged[0],/Gemini 429: .*RESOURCE_EXHAUSTED/);
   reply(500,'upstream exploded');
   const broken=await quietLog(()=>parseDictation('Kargo',fresh(),null,config).then(()=>'',e=>String((e as Error).message)));
-  assert.match(broken.value,/işlenemedi/);assert.doesNotMatch(broken.value,/exploded/);assert.deepEqual(broken.logged,['Anthropic 500: upstream exploded']);
+  assert.equal(broken.value,'Dikte şu anda işlenemedi (Anthropic 500). Metnin kaydedildi; tekrar deneyebilirsin.');assert.deepEqual(broken.logged,['Anthropic 500: upstream exploded']);
   // Transcription says it with the file kept on the device.
   reply(402,'{}');
   assert.equal((await quietLog(()=>extractMedia(new Uint8Array([1]),'image/png',{ANTHROPIC_API_KEY:'fixture'}).then(()=>'',e=>String((e as Error).message)))).value,'Yapay zekâ kredisi bitti. Dosyan cihazında saklı; kredi yükleyince tekrar dene.');
+ }finally{globalThis.fetch=original;}
+});
+
+// User report (6 Ekim): every dictation read “Dikte şu anda işlenemedi”. The Sites log had, ten times in three hours,
+// Anthropic 400 invalid_request_error “The compiled grammar is too large, which would cause performance issues.”: the
+// strict json_schema is compiled to a grammar with an internal size limit beyond the 16 union / 24 optional limits.
+test('Anthropic: the dictation schema goes as a non-strict tool, not as a compiled grammar',async()=>{
+ const original=globalThis.fetch,config={provider:'anthropic' as const,key:'fixture',model:'claude-sonnet-5'},sent:Record<string,unknown>[]=[];
+ const answer={items:[{id:null,title:'Kargo iadesi',type:'general',complete:false,completedMoveId:null,moves:['İade formunu doldur.'],where:null,question:null,prerequisite:null,alt:'none'}],question:null,summary:'1 cephe ve 1 hamle önerildi.',events:[],prepDefaults:[],ideas:[],laneUpdates:[],routines:[],sessions:[]};
+ const reply=(content:unknown[])=>{globalThis.fetch=(async(_url:unknown,init?:RequestInit)=>{sent.push(JSON.parse(String(init?.body)));return Response.json({content,stop_reason:'tool_use'});}) as typeof fetch;};
+ try{
+  reply([{type:'text',text:'Kaydediyorum.'},{type:'tool_use',id:'t1',name:DICTATION_TOOL,input:answer}]);
+  const p=await parseDictation('Kargo iadesi için formu doldur',fresh(),null,config);
+  assert.equal(sent.length,1);assert.deepEqual(p.items.map(i=>[i.id,i.title,i.moves]),[[null,'Kargo iadesi',['İade formunu doldur.']]]);
+  const body=sent[0] as {output_config?:unknown;tools:{name:string;strict?:boolean;input_schema:unknown}[];tool_choice:{type:string};system:string};
+  // Nothing is compiled: no output_config, no strict tool. The tool is not forced (Sonnet 5.5 and Opus 5.5 refuse that).
+  assert.equal(body.output_config,undefined);assert.deepEqual(body.tools.map(t=>[t.name,t.strict]),[[DICTATION_TOOL,undefined]]);
+  assert.deepEqual(body.tools[0].input_schema,jsonSchema(schema));assert.deepEqual(body.tool_choice,{type:'auto',disable_parallel_tool_use:true});assert.match(body.system,new RegExp(DICTATION_TOOL));
+  // Without strict mode the model may leave out what it has nothing for and add what the schema lacks: a left-out field
+  // is “not said”, an extra one is dropped, a present value is kept.
+  sent.length=0;reply([{type:'tool_use',id:'t2',name:DICTATION_TOOL,input:{items:[{title:'Kargo iadesi',type:'general',moves:['İade formunu doldur.'],note:'ek'}],summary:'1 hamle önerildi.',confidence:0.9}}]);
+  const sparse=await parseDictation('Kargo iadesi için formu doldur',fresh(),null,config);
+  assert.equal(sent.length,1);assert.deepEqual(sparse.items,[{prerequisite:null,id:null,title:'Kargo iadesi',type:'general',complete:false,completedMoveId:null,moves:['İade formunu doldur.'],where:null,question:null,alt:null}]);
+  assert.deepEqual([sparse.question,sparse.events,sparse.routines,sparse.sessions],[null,[],[],[]]);
+  // A plain JSON answer (in a code fence too) is read the same way.
+  sent.length=0;reply([{type:'text',text:'```json\n'+JSON.stringify(answer)+'\n```'}]);
+  assert.equal((await parseDictation('Kargo iadesi için formu doldur',fresh(),null,config)).items[0].title,'Kargo iadesi');assert.equal(sent.length,1);
+  // An answer that is neither: retried once with the reason, then the usual message; the reason goes to the log.
+  sent.length=0;reply([{type:'text',text:'Tamam.'}]);
+  const lost=await quietLog(()=>parseDictation('Kargo iadesi için formu doldur',fresh(),null,config).then(()=>'',e=>String((e as Error).message)));
+  assert.equal(sent.length,2);assert.match(lost.value,/güvenilir biçimde çözümlenemedi/);assert.match(lost.logged.join(' '),/Dikte doğrulanamadı/);
+  // The production refusal itself: named with provider and status on the card, the body only in the log.
+  const grammar=JSON.stringify({type:'error',error:{type:'invalid_request_error',message:'The compiled grammar is too large, which would cause performance issues. Simplify your tool schemas or reduce the number of strict tools.'}});
+  globalThis.fetch=(async()=>new Response(grammar,{status:400})) as typeof fetch;
+  const refused=await quietLog(()=>parseDictation('Kargo',fresh(),null,config).then(()=>'',e=>String((e as Error).message)));
+  assert.equal(refused.value,'Dikte şu anda işlenemedi (Anthropic 400). Metnin kaydedildi; tekrar deneyebilirsin.');assert.deepEqual(refused.logged,['Anthropic 400: '+grammar]);
+  // Gemini keeps its response schema.
+  let gemini:{generationConfig?:{responseSchema?:unknown}}={};globalThis.fetch=(async(_url:unknown,init?:RequestInit)=>{gemini=JSON.parse(String(init?.body));return Response.json({candidates:[{content:{parts:[{text:JSON.stringify(answer)}]}}]});}) as typeof fetch;
+  await parseDictation('Kargo',fresh(),null,{...config,provider:'gemini',model:'gemini-2.5-flash'});assert.deepEqual(gemini.generationConfig?.responseSchema,schema);
  }finally{globalThis.fetch=original;}
 });
 

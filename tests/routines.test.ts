@@ -5,7 +5,7 @@ import {act,applyParsed} from '../lib/reducer';
 import {type Routine,type Session,at,dayMin,weekStart,weekLine,pastDay,observation,readyToPropose,mirror,weekPlan,weekRows,todayList,reminderFor,routineAct,routineLabel,routineNotice,scaffolds,stepMinutes,stepsOf,trialResult,proposals,avoided,type RoutineCommand} from '../lib/routines';
 import {addDays} from '../lib/calendar';
 import {placementsOf,effective,receiptTitle} from '../lib/kinds';
-import {checkRoutines,parseDictation,type Parsed} from '../lib/llm';
+import {DICTATION_TOOL,checkRoutines,parseDictation,type Parsed} from '../lib/llm';
 import {describeOp,breakdown,changeNotice,changeLines,ledgerRoutines} from '../lib/ledger';
 import {placeCamps} from '../lib/expedition/camps';
 import {type CalendarEvent} from '../lib/calendar';
@@ -262,20 +262,18 @@ test('the model output keeps rule 3 and quotes own words only', ()=>{
 const answer=(x:Record<string,unknown[]>)=>({items:[],question:null,summary:'Bir rutin eklendi.',events:[],prepDefaults:[],ideas:[],laneUpdates:[],routines:[],sessions:[],...x});
 const said=(x:object)=>({id:'',title:'Yüz yogası',count:4,time:'',minutes:0,travel:0,ownWords:'',steps:[],alt:'',...x});
 const told=(x:object)=>({routineId:'',title:'Yüz yogası',dayText:'',end:'',minutes:0,skip:false,done:false,...x});
-/** parseDictation with the provider answering `answers` in turn (the last one repeats); the calls made and the schema sent. */
+/** parseDictation with the provider calling the dictation tool with `answers` in turn (the last one repeats); the calls made. */
 async function model(answers:object[],raw:string,s:State){
- const original=globalThis.fetch,error=console.error,sent:{output_config:{format:{schema:unknown}}}[]=[],logged:string[]=[];
- globalThis.fetch=(async(_url:unknown,init?:RequestInit)=>{sent.push(JSON.parse(String(init?.body)));return Response.json({content:[{type:'text',text:JSON.stringify(answers[Math.min(sent.length,answers.length)-1])}]});}) as typeof fetch;
+ const original=globalThis.fetch,error=console.error,sent:unknown[]=[],logged:string[]=[];
+ globalThis.fetch=(async(_url:unknown,init?:RequestInit)=>{sent.push(JSON.parse(String(init?.body)));return Response.json({content:[{type:'tool_use',id:'t'+sent.length,name:DICTATION_TOOL,input:answers[Math.min(sent.length,answers.length)-1]}]});}) as typeof fetch;
  console.error=(...args:unknown[])=>{logged.push(args.map(String).join(' '));};
- try{const parsed=await parseDictation(raw,s,'routines',{provider:'anthropic',key:'fixture',model:'fixture'}).catch((e:unknown)=>e as Error);return {parsed,calls:sent.length,schema:sent[0]?.output_config.format.schema,logged};}
+ try{const parsed=await parseDictation(raw,s,'routines',{provider:'anthropic',key:'fixture',model:'fixture'}).catch((e:unknown)=>e as Error);return {parsed,calls:sent.length,logged};}
  finally{globalThis.fetch=original;console.error=error;}
 }
-async function routineSaid(answers:object[],raw:string,s=fresh()){const r=await model(answers,raw,s);assert.equal(r.calls,1);assert.ok(!(r.parsed instanceof Error),String(r.parsed));const p=r.parsed as Parsed,n=applyParsed(s,p,raw,undefined,'d1');return {p,n,placed:placementsOf(s,n,p).map(x=>[x.kind,x.text,x.note]),schema:r.schema};}
+async function routineSaid(answers:object[],raw:string,s=fresh()){const r=await model(answers,raw,s);assert.equal(r.calls,1);assert.ok(!(r.parsed instanceof Error),String(r.parsed));const p=r.parsed as Parsed,n=applyParsed(s,p,raw,undefined,'d1');return {p,n,placed:placementsOf(s,n,p).map(x=>[x.kind,x.text,x.note])};}
 
-test('Rutinler › +: a routine dictation goes out within Anthropic’s limits and becomes a routine',async()=>{
- const {n,placed,schema}=await routineSaid([answer({routines:[said({time:'22:30'})]})],'Haftada 4 yüz yogası, akşamları 22:30');
- let unions=0;const walk=(x:unknown)=>{if(!x||typeof x!=='object')return;const node=x as {type?:unknown;properties?:Record<string,unknown>;items?:unknown};if(Array.isArray(node.type)&&node.type.length>1)unions++;if(node.properties)Object.values(node.properties).forEach(walk);if(node.items)walk(node.items);};walk(schema);
- assert.ok(unions<=16,`${unions} union-typed fields sent`);
+test('Rutinler › +: a routine dictation becomes a routine',async()=>{
+ const {n,placed}=await routineSaid([answer({routines:[said({time:'22:30'})]})],'Haftada 4 yüz yogası, akşamları 22:30');
  assert.deepEqual(Object.values(n.routines??{}).map(x=>[x.title,x.count,x.status,x.estimate]),[['Yüz yogası',4,'observing',{time:'22:30'}]]);
  assert.deepEqual(placed,[['routine','Yüz yogası · haftada 4','Gözlem başladı']]);
 });
