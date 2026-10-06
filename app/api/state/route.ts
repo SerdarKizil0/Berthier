@@ -73,7 +73,11 @@ export async function POST(req:Request){
  }else{n=applyParsed(state,parsed,raw,undefined,input.id);if(!parsed.question)placed=placementsOf(state,n,parsed);}
  summary=parsed.question||parsed.summary;catchConflicts(state,n);
  n.receipts.push(input.id);await save(user.userId,n,revision,{id:input.id,status:parsed.question?'question':'done',result:JSON.stringify({summary,question:parsed.question,kind:input.kind,replyTo:input.replyTo??null,source:input.source??'dictation',...(placed?{placed}:{})}),replyTo:input.replyTo});
- }else{n=act(state,input as Command);catchConflicts(state,n);n.receipts.push(input.id);await save(user.userId,n,revision);summary=n.changes.length>state.changes.length?n.changes.at(-1)!.label:input.kind==='undo'?n.changes.at(-1)?.label??'Kaydedildi.':'Kaydedildi.';}
+ }else{n=act(state,input as Command);catchConflicts(state,n);n.receipts.push(input.id);summary=n.changes.length>state.changes.length?n.changes.at(-1)!.label:input.kind==='undo'?n.changes.at(-1)?.label??'Kaydedildi.':'Kaydedildi.';
+ // A resent older “Bitti” row (stored with the placeholder note, failed or left queued before Bitti stopped asking the
+ // model) is closed here with its change, so it leaves Bekleyen and Kayıt defteri shows what it did.
+ const old=input.kind==='complete'&&!!input.text?.trim();if(old&&n.changes.length>state.changes.length)n.changes.at(-1)!.sourceId=input.id;
+ await save(user.userId,n,revision,old?{id:input.id,status:'done',result:JSON.stringify({summary,kind:'complete',replyTo:null,source:'dictation'})}:undefined);}
  return respond({state:n,revision:revision+1,dictations:await list(user.userId),summary});
  }catch(e){const message=e instanceof Error?e.message:'İşlem kaydedilemedi; tekrar dene.';try{if(processing)await db().prepare("UPDATE dictations SET status = 'failed', result = ? WHERE id = ? AND owner = ? AND status IN ('queued','failed')").bind(JSON.stringify({summary:message,kind:input.kind==='enqueue'?'dictate':input.kind,replyTo:input.replyTo??null,source:input.source??'dictation'}),input.id,user.userId).run();}catch{}return respond({error:message},503);}
 }

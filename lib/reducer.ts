@@ -1,6 +1,6 @@
 import {addIdeas,researchAct,type ResearchCommand} from './research';
 import {addDays,calendarDay,resolveDate,syncPlans,type CalendarEvent,type Profile,type EventKind,validDate,validTime} from './calendar';
-import {type State,type Front,type Order,type Move,type Moved,type Rhythm,uid,nextMove,openMoves,isOpen,MOVE_LIMIT,moveText,normalize,canonicalTitle,similarity,fallbackMove,commitChanges,undo,dayKey,propose,replaceSlot,materializeOrder,validMove,directGoal} from './domain';
+import {type State,type Front,type Order,type Move,type Moved,type Rhythm,uid,nextMove,openMoves,isOpen,reopen,MOVE_LIMIT,moveText,normalize,canonicalTitle,similarity,fallbackMove,commitChanges,undo,dayKey,propose,replaceSlot,materializeOrder,validMove,directGoal} from './domain';
 import type {Parsed} from './llm';
 import {ROUTINE_KINDS,addSession,at,findRoutine,newRoutine,pastDay,routineAct,routineLabel,skipDay,stepsOf,usualMinutes,type RoutineCommand} from './routines';
 import {rekind,retype} from './kinds';
@@ -13,7 +13,8 @@ export function applyParsed(s:State,p:Parsed,raw:string,today=calendarDay(),sour
  if(!f){f={id:uid(),title:item.title,type:item.type,status:item.type==='lane'?'held':'active',moves:[],where:'',question:'',notes:[],touched:new Date().toISOString()};n.fronts[f.id]=f;}
  let done:Move|undefined;if(item.complete){const m=item.completedMoveId?f.moves.find(m=>m.id===item.completedMoveId):nextMove(f);if(m){materializeOrder(n,f.id);m.doneAt=new Date().toISOString();done=m;}}
  if(item.where!==null)f.where=item.where;if(item.question!==null)f.question=item.question;
- if(item.moves.length){const existing=new Set(f.moves.filter(isOpen).map(m=>normalize(m.text)));for(const text of item.moves)if(!existing.has(normalize(text))){f.moves.push({id:uid(),text,...(text===item.moves[0]&&item.prerequisite?{directGoal:item.prerequisite.goal,prerequisiteReason:item.prerequisite.reason}:{})});existing.add(normalize(text));}}
+ // A closed front (an İş closed by Bitti) that is spoken of again with a new move opens again; a project stays the user's call.
+ if(item.moves.length){const existing=new Set(f.moves.filter(isOpen).map(m=>normalize(m.text)));let added=false;for(const text of item.moves)if(!existing.has(normalize(text))){f.moves.push({id:uid(),text,...(text===item.moves[0]&&item.prerequisite?{directGoal:item.prerequisite.goal,prerequisiteReason:item.prerequisite.reason}:{})});existing.add(normalize(text));added=true;}if(added&&f.type!=='lane')reopen(f);}
  if(!f.moves.length&&!(p.events??[]).some(e=>e.frontTitle===f!.title&&resolveDate(e.dateText,today)))f.moves.push({id:uid(),text:fallbackMove(f)});
  f.notes.push(raw);f.touched=new Date().toISOString();if(item.complete)replaceSlot(n,f,done);
  }
@@ -45,18 +46,21 @@ const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function addMove(n:State,c:Command){
  const text=moveText(c.text??''),title=moveText(c.title??'').slice(0,90),at=new Date().toISOString();if(!text)throw Error('Önce eklemek istediğini yaz.');if(text.length>MOVE_LIMIT)throw Error(`Hamle en fazla ${MOVE_LIMIT} karakter olabilir.`);
  const id=UUID.test(c.frontId??'')?c.frontId!:uid(),f=n.fronts[c.frontId??'']??(title?Object.values(n.fronts).find(x=>x.status!=='closed'&&normalize(x.title)===normalize(title))??(n.fronts[id]={id,title,type:'general',status:'active',moves:[],where:'',question:'',notes:[],touched:at}):undefined);if(!f)throw Error('Cephe bulunamadı.');
- if(f.status==='closed'){f.status='active';delete f.closedAt;}
+ reopen(f);
  f.moves.push({id:uid(),text,userEdited:true});f.touched=at;replaceSlot(n,f);
  // A queued entry carries the day it was chosen for; past 04:00 that order is history and the move only joins its front.
  if(c.today&&(!c.orderDate||c.orderDate===dayKey())){const date=dayKey(),o=n.orders[date]??=propose(n,date),m=nextMove(f);if(f.status==='active'&&m&&!o.slots.some(x=>x.frontId===f.id))o.slots.push({frontId:f.id,moveId:m.id,text:m.text,reason:'Senin seçtiğin cephe.'});}
 }
 // A completion asks the model only to read the user's note (a project's “Nerede kaldın?”); “Bitti” alone never does.
-export const needsModel=(c:{kind:string;skip?:boolean;text?:string})=>c.kind==='dictate'||(c.kind==='complete'&&!c.skip&&!!c.text?.trim());
+// Older “Bitti” requests were stored with the server's own placeholder; resent (Tekrar dene, recovery) they carry no note.
+export const COMPLETE_PLACEHOLDER='Hamleyi tamamladım.';
+export const needsModel=(c:{kind:string;skip?:boolean;text?:string})=>{const note=c.text?.trim();return c.kind==='dictate'||(c.kind==='complete'&&!c.skip&&!!note&&note!==COMPLETE_PLACEHOLDER);};
 // “Berthier önersin” (5 Ekim): the model only on the user's tap, for one front left without a next move. Its moves for
 // that front go to the end of the queue (the first may carry a prerequisite); nothing else changes.
 export function applySuggestion(s:State,frontId:string,p:Parsed):State{
- const f=s.fronts[frontId];if(!f||f.status==='closed')throw Error('Cephe bulunamadı.');const item=p.question?undefined:p.items.find(x=>x.id===frontId||canonicalTitle(x.title)===canonicalTitle(f.title)),moves=item?.moves??[];if(!moves.length)throw Error('Berthier bu cephe için somut bir hamle bulamadı. Olduğu gibi ekleyebilirsin.');
- return commitChanges(s,'Berthier hamle önerdi',n=>{const front=n.fronts[frontId],open=new Set(front.moves.filter(isOpen).map(m=>normalize(m.text)));for(const text of moves)if(!open.has(normalize(text))){front.moves.push({id:uid(),text,...(text===moves[0]&&item!.prerequisite?{directGoal:item!.prerequisite.goal,prerequisiteReason:item!.prerequisite.reason}:{})});open.add(normalize(text));}front.touched=new Date().toISOString();replaceSlot(n,front);});
+ // A move the front already has — open, just finished or taken out with Kaldır — is not brought back.
+ const f=s.fronts[frontId];if(!f||f.status==='closed')throw Error('Cephe bulunamadı.');const item=p.question?undefined:p.items.find(x=>x.id===frontId||canonicalTitle(x.title)===canonicalTitle(f.title)),known=new Set(f.moves.map(m=>normalize(m.text))),moves=(item?.moves??[]).filter(text=>!known.has(normalize(text))&&!!known.add(normalize(text)));if(!moves.length)throw Error('Berthier bu cephe için yeni bir hamle bulamadı. Olduğu gibi ekleyebilirsin.');
+ return commitChanges(s,'Berthier hamle önerdi',n=>{const front=n.fronts[frontId];for(const text of moves)front.moves.push({id:uid(),text,...(text===item!.moves[0]&&item!.prerequisite?{directGoal:item!.prerequisite.goal,prerequisiteReason:item!.prerequisite.reason}:{})});front.touched=new Date().toISOString();replaceSlot(n,front);});
 }
 export function act(s:State,c:Command):State{
  if(c.kind==='undo')return undo(s,c.changeId!,c.index);
@@ -86,7 +90,7 @@ const label=ROUTINE_KINDS.includes(c.kind)?routineLabel(c):c.kind==='rekind'?'T�
  case 'reorder':{const date=dayKey(),old=n.orders[date]??propose(n);if(c.orderDate!==date||c.orderSnapshot!==JSON.stringify(old))throw Error('Günün emri değişti. Güncel sırayı açıp yeniden dene.');const ids=c.ids??[];if(ids.length!==old.slots.length||new Set(ids).size!==ids.length||ids.some(id=>!old.slots.some(x=>x.frontId===id)))throw Error('Sıra, emirdeki tüm cepheleri birer kez içermeli.');if(old.slots.some((x,i)=>x.doneAt&&ids[i]!==x.frontId))throw Error('Geçilen kampların yeri değişmez.');n.orders[date]={...old,slots:ids.map(id=>old.slots.find(x=>x.frontId===id)!)};break;}
  case 'select':{const date=dayKey(),old=n.orders[date]??propose(n),passed=old.slots.filter(x=>x.doneAt);const ids=[...new Set(c.ids??[])].filter(id=>!passed.some(x=>x.frontId===id));const chosen=ids.map(id=>{const front=n.fronts[id];if(!front||front.status!=='active'||!nextMove(front))throw Error('Yalnızca aktif, açık hamlesi olan cepheler seçilebilir.');const previous=old.slots.find(x=>x.frontId===id);return {frontId:id,moveId:nextMove(front)!.id,text:nextMove(front)!.text,reason:previous?.reason??'Senin seçtiğin cephe.'};});const slots=old.slots.flatMap(x=>x.doneAt?[x]:chosen.length?[chosen.shift()!]:[]);n.orders[date]={...old,slots:slots.concat(chosen)};break;}
  case 'status':if(c.status==='held'&&f!.type!=='lane')throw Error('Bekletme yalnız projeler için kullanılır.');if(!['active','held','closed'].includes(c.status??''))throw Error('Geçersiz durum.');f!.status=c.status!;if(c.status==='closed')f!.closedAt??=new Date().toISOString();else delete f!.closedAt;if(n.review&&!n.review.completedAt)n.review.decisions.push(f!.title+': '+({active:'aktif',held:'bekletildi',closed:'kapatıldı'}[c.status!]));f!.touched=new Date().toISOString();break;
- case 'skipPrerequisite':case 'edit':{const text=c.kind==='skipPrerequisite'?directGoal(f!):c.text?.trim();if(!text||!validMove(text))throw Error('Nesnesi belli, en fazla 120 karakterlik bir eylem yaz.');const m=nextMove(f!);if(m){if(m.text!==text)(n.movePreferences??=[]).push({frontTitle:f!.title,before:m.text,after:text,at:new Date().toISOString()});m.text=text;m.userEdited=true;delete m.directGoal;delete m.prerequisiteReason;}else f!.moves.push({id:uid(),text});f!.touched=new Date().toISOString();replaceSlot(n,f!);break;}
+ case 'skipPrerequisite':case 'edit':{const text=c.kind==='skipPrerequisite'?directGoal(f!):c.text?.trim();if(!text||!validMove(text))throw Error('Nesnesi belli, en fazla 120 karakterlik bir eylem yaz.');const m=nextMove(f!);if(m){if(m.text!==text)(n.movePreferences??=[]).push({frontTitle:f!.title,before:m.text,after:text,at:new Date().toISOString()});m.text=text;m.userEdited=true;delete m.directGoal;delete m.prerequisiteReason;}else{f!.moves.push({id:uid(),text});reopen(f!);}f!.touched=new Date().toISOString();replaceSlot(n,f!);break;}
  case 'addMove':addMove(n,c);break;
  // Kaldır (5 Ekim): nothing is deleted. The move keeps its place on record with removedAt; today's slot takes the
  // front's next move (or leaves the route when none is left). The change takes it back.
@@ -95,7 +99,7 @@ const label=ROUTINE_KINDS.includes(c.kind)?routineLabel(c):c.kind==='rekind'?'T�
  case 'closeFronts':{const ids=[...new Set(c.ids??[])],at=new Date().toISOString();if(!ids.length)throw Error('Kapatılacak cepheyi seç.');for(const id of ids){const x=n.fronts[id];if(!x)throw Error('Cephe bulunamadı.');if(x.status==='closed')continue;x.status='closed';x.closedAt??=at;x.touched=at;if(n.review&&!n.review.completedAt)n.review.decisions.push(x.title+': kapatıldı');}const o=n.orders[dayKey()];if(o)o.slots=o.slots.filter(x=>!!x.doneAt||!ids.includes(x.frontId));break;}
  // Bitti (5 Ekim): no model. The next move in the queue moves up; an İş front with nothing left closes (K7: kısa, bitince
  // kapanır) in the same change, so one “Geri al” reopens it. Ders and Başvuru stay open without a next move.
- case 'complete':{const m=nextMove(f!);if(!m)throw Error('Tamamlanacak hamle yok.');materializeOrder(n,f!.id);m.doneAt=new Date().toISOString();if(c.where!==undefined)f!.where=c.where;if(c.question!==undefined)f!.question=c.question;f!.touched=new Date().toISOString();if(f!.type==='general'&&!openMoves(f!).length){f!.status='closed';f!.closedAt??=m.doneAt;closed=true;}replaceSlot(n,f!,m);break;}
+ case 'complete':{const m=nextMove(f!);if(!m)throw Error('Tamamlanacak hamle yok.');materializeOrder(n,f!.id);m.doneAt=new Date().toISOString();if(c.where!==undefined)f!.where=c.where;if(c.question!==undefined)f!.question=c.question;f!.touched=new Date().toISOString();if(f!.type==='general'&&f!.status!=='closed'&&!openMoves(f!).length){f!.status='closed';f!.closedAt??=m.doneAt;closed=true;}replaceSlot(n,f!,m);break;}
  case 'merge':{const target=n.fronts[c.targetId??''];if(!target||target.id===f!.id)throw Error('Birleştirilecek cephe bulunamadı.');for(const i of Object.values(n.ideas??{}))if(i.laneId===f!.id)i.laneId=target.id;for(const e of Object.values(n.events??{}))if(e.frontId===f!.id)e.frontId=target.id;target.moves.push(...f!.moves);target.notes.push(...f!.notes);target.where=target.where||f!.where;target.question=target.question||f!.question;target.touched=new Date().toISOString();f!.status='closed';f!.closedAt??=new Date().toISOString();for(const o of Object.values(n.orders)){if(o.date!==dayKey())continue;const seen=new Set<string>();o.slots=o.slots.map(x=>x.frontId===f!.id?{...x,frontId:target.id}:x).filter(x=>!seen.has(x.frontId)&&!!seen.add(x.frontId));}break;}
  default:throw Error('İşlem tanınmadı.');
  }

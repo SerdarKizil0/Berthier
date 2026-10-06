@@ -43,7 +43,7 @@ export default function AtlasOrder({state,order,busy,online,why,open,complete,ed
   </section>
   {/* The route head stays on a day without an order (0 CEPHE): “Haritada aç” is the way to the map and the front list. */}
   <section className="hq-route" aria-label="Rota">
-   <div className="hq-route-head"><h2>ROTA · {slots.length} CEPHE{order.approvedAt?' · ONAYLI':''}</h2><button onClick={()=>open('map')}>HARİTADA AÇ<ArrowUpRight size={14}/></button></div>
+   <RouteHead count={slots.length} approved={!!order.approvedAt} open={open}/>
    {slots.length>0&&<>   <div className="hq-strip" aria-hidden="true"><span className="mr-hq">✳</span>{slots.map((s,i)=><Fragment key={s.frontId}><span className={s.doneAt&&(i===0||slots[i-1].doneAt)?'hq-line is-sealed':'mr-dots'}/><span className={`mr-node is-${tag(s.frontId,s.doneAt).tone}${slot?.frontId===s.frontId&&!allDone?' is-current':''}`}>{s.doneAt?<Check size={14}/>:pad(i+1)}</span></Fragment>)}</div>
    {slots.map((s,i)=>{const t=tag(s.frontId,s.doneAt),title=state.fronts[s.frontId]?.title;return <div className="hq-item" key={s.frontId}><button className={['hq-row',s.doneAt?'is-done':'',s===firstOpen?'is-next':'',slot?.frontId===s.frontId&&!allDone?'is-current':''].join(' ').trim()} aria-current={slot?.frontId===s.frontId&&!allDone?'true':undefined} onClick={()=>pick(s.frontId)}><span className="hq-num">{s.doneAt?'✓':pad(i+1)}</span><span className="hq-row-body"><small>{title}</small><span>{s.text}</span></span>{t.chip&&<span className={`hq-chip is-${t.tone}`}>{t.chip}</span>}</button>{!s.doneAt&&openMove(s.frontId,s.moveId)&&<button className="hq-remove" aria-label={`Kaldır: ${title} · ${s.text}`} disabled={busy||!online} onClick={()=>remove(s.frontId,s.moveId)}>Kaldır</button>}</div>;})}
    {!order.approvedAt&&<button className="hq-approve" disabled={busy||!online||!state.setup} onClick={()=>action({kind:'approve'})}><span>Emri onayla</span><span>{slots.length} CEPHE</span></button>}
@@ -53,6 +53,9 @@ export default function AtlasOrder({state,order,busy,online,why,open,complete,ed
   {reorder.dialog}
  </>;
 }
+
+// The route head: the count and “Haritada aç”, also on a day with no order (0 CEPHE).
+export function RouteHead({count,approved,open}:{count:number;approved:boolean;open:(id:string)=>void}){return <div className="hq-route-head"><h2>ROTA · {count} CEPHE{approved?' · ONAYLI':''}</h2><button onClick={()=>open('map')}>HARİTADA AÇ<ArrowUpRight size={14}/></button></div>;}
 
 // The “Sırayı düzenle” dialog. Karargâh and the morning report open the same one.
 export function useReorder({state,order,busy,online,action,saved}:{state:State;order:Order;busy:boolean;online:boolean;action:Action;saved?:(ids:string[])=>void}){

@@ -42,6 +42,8 @@ export function directGoal(f:Front):string|undefined {
  return [...f.notes].reverse().find(raw=>raw.length<=120&&!/[\n?!]/.test(raw)&&/\b(yap|al|git|oku|yaz|pişir|gönder|ara|temizle|öde)[.!]?$/iu.test(raw.trim())&&similarity(raw,f.title)>=.2&&normalize(raw)!==normalize(m.text));
 }
 export const isOpen=(m:Move)=>!m.doneAt&&!m.removedAt;
+// A closed front that takes a new move opens again (in the same change, so one undo closes it again).
+export function reopen(f:Front){if(f.status==='closed'){f.status='active';delete f.closedAt;}}
 const byTurn=(a:Move,b:Move)=>Number(!!b.eventId)-Number(!!a.eventId)||(a.prepareAt??'').localeCompare(b.prepareAt??'')||Number(!!b.dependent)-Number(!!a.dependent);
 export const nextMove=(f:Front,date=dayKey())=>f.moves.filter(m=>isOpen(m)&&(!m.prepareAt||m.prepareAt<=date)).sort(byTurn)[0];
 // The front's queue in the order Berthier takes it: the open moves due now (the first is nextMove), then the preparations still ahead.

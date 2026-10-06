@@ -1,14 +1,15 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {fresh,undo,dayKey,nextMove,openMoves,ensureOrder,propose,type State,type Front} from '../lib/domain';
-import {act,applySuggestion,needsModel,type Command} from '../lib/reducer';
+import {act,applyParsed,applySuggestion,needsModel,type Command} from '../lib/reducer';
 import {syncPlans,type CalendarEvent} from '../lib/calendar';
 import {describeOp,handNotice} from '../lib/ledger';
 import {logbook} from '../lib/logbook';
 import {placedGone} from '../lib/kinds';
 import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
-import AtlasOrder from '../app/atlas-order';
+import AtlasOrder,{RouteHead} from '../app/atlas-order';
+import type {ReactElement} from 'react';
 import {StatusCard} from '../app/status';
 import {parseDictation,Result,type Parsed} from '../lib/llm';
 import {extractMedia} from '../lib/media';
@@ -212,6 +213,8 @@ test('Bitti on the last move: an İş front closes in the same change, Ders and 
 test('A completion asks the model only for a note; Bitti alone never does',()=>{
  assert.equal(needsModel({kind:'complete'}),false);assert.equal(needsModel({kind:'complete',skip:true}),false);assert.equal(needsModel({kind:'complete',skip:false,text:'  '}),false);
  assert.equal(needsModel({kind:'complete',text:'Yöntem bölümünde kaldım.'}),true,'a project’s “Nerede kaldın?” note');assert.equal(needsModel({kind:'complete',skip:true,text:'not'}),false);
+ // An older Bitti row stored with the server's placeholder and resent later (Tekrar dene, recovery) has no note either.
+ assert.equal(needsModel({kind:'complete',text:'Hamleyi tamamladım.'}),false);
  assert.equal(needsModel({kind:'dictate',text:'Kargo'}),true);for(const kind of ['addMove','removeMove','closeFronts','suggest','approve'])assert.equal(needsModel({kind}),false);
 });
 
@@ -219,19 +222,24 @@ test('Berthier önersin adds the model’s moves to that front only, on a tap',(
  const s=run(camp(front('fizik','Fizik',['Vize konularını listele.'],{type:'course'}),front('kim','Kimya',['Özet yaz.'])),{kind:'complete',frontId:'fizik'});
  const p:Parsed={items:[{id:'fizik',title:'Fizik',type:'course',complete:false,completedMoveId:null,moves:['Geçen yılın vize sorularını çöz.','Vize konularını listele.'],where:null,question:null,prerequisite:null,alt:null},{id:'kim',title:'Kimya',type:'general',complete:false,completedMoveId:null,moves:['Başka bir şey.'],where:null,question:null,prerequisite:null,alt:null}],question:null,summary:''};
  const t=applySuggestion(s,'fizik',p);
- assert.deepEqual(openMoves(t.fronts.fizik).map(m=>m.text),['Geçen yılın vize sorularını çöz.','Vize konularını listele.']);assert.deepEqual(t.fronts.kim,s.fronts.kim);
+ // The move just finished is not brought back; nor is one taken out with Kaldır.
+ assert.deepEqual(openMoves(t.fronts.fizik).map(m=>m.text),['Geçen yılın vize sorularını çöz.']);assert.deepEqual(t.fronts.kim,s.fronts.kim);
+ const withCard=run(s,{kind:'addMove',frontId:'fizik',title:'Fizik',text:'Formül kartını yaz.'}),removed=run(withCard,{kind:'removeMove',frontId:'fizik',moveId:openMoves(withCard.fronts.fizik)[0].id});
+ assert.throws(()=>applySuggestion(removed,'fizik',{...p,items:[{...p.items[0],moves:['Formül kartını yaz.','Vize konularını listele.']}]}),/yeni bir hamle bulamadı/);
  assert.equal(last(t).label,'Berthier hamle önerdi');assert.deepEqual(handNotice(last(t)),{title:'Berthier önerdi.',text:'Fizik: Geçen yılın vize sorularını çöz.'});
- assert.throws(()=>applySuggestion(s,'fizik',{...p,question:'Hangi ders?'}),/somut bir hamle bulamadı/);assert.throws(()=>applySuggestion(s,'fizik',{...p,items:[]}),/somut bir hamle bulamadı/);
+ assert.throws(()=>applySuggestion(s,'fizik',{...p,question:'Hangi ders?'}),/yeni bir hamle bulamadı/);assert.throws(()=>applySuggestion(s,'fizik',{...p,items:[]}),/yeni bir hamle bulamadı/);
  assert.equal(undo(t,last(t).id).fronts.fizik.moves.length,1);
 });
 
 test('Karargâh keeps “Haritada aç” on a day without an order; the card offers both ways when no move is left',()=>{
- const s=camp(front('fizik','Fizik',[],{type:'course'}),front('kargo','Kargo iadesi',['PTT’ye götür.']));let opened='';
- const props={state:s,busy:false,online:true,why:'',open:(id:string)=>{opened=id;},complete:()=>{},edit:()=>{},select:()=>{},action:async()=>true,say:()=>{}};
+ const s=camp(front('fizik','Fizik',[],{type:'course'}),front('kargo','Kargo iadesi',['PTT’ye götür.']));
+ const props={state:s,busy:false,online:true,why:'',open:()=>{},complete:()=>{},edit:()=>{},select:()=>{},action:async()=>true,say:()=>{}};
  const empty=renderToStaticMarkup(createElement(AtlasOrder,{...props,order:{date:dayKey(),slots:[]}}));
  assert.match(empty,/Bugün açık emir yok\./);assert.match(empty,/ROTA · 0 CEPHE/);assert.match(empty,/HARİTADA AÇ/);
  const full=renderToStaticMarkup(createElement(AtlasOrder,{...props,order:ensureOrder(s)}));assert.match(full,/ROTA · 1 CEPHE/);assert.match(full,/HARİTADA AÇ/);
- assert.equal(opened,'');
+ // The head's button opens the map (the same RouteHead AtlasOrder renders above).
+ let opened='';const head=RouteHead({count:0,approved:false,open:id=>{opened=id;}}) as ReactElement<{children:ReactElement<{onClick?:()=>void}>[]}>;
+ head.props.children.find(c=>typeof c.props.onClick==='function')!.props.onClick!();assert.equal(opened,'map');
  const nop=()=>{},card=renderToStaticMarkup(createElement(StatusCard,{notice:{kind:'done',id:1,title:'Hamle tamamlandı.',text:'Fizik: sıradaki hamle yok.',changeId:'c1',next:'fizik'},error:'',online:true,processing:false,queued:0,busy:false,see:nop,undo:nop,retry:nop,dismiss:nop,clearError:nop,reply:nop,write:nop,running:null,reminder:null,finish:nop,fixEnd:nop,fix:nop,start:nop,skip:nop,hide:nop,alt:nop,keep:nop,suggest:nop,asIs:nop}));
  for(const label of ['Fizik: sıradaki hamle yok.','Berthier önersin','Olduğu gibi ekle','Geri al'])assert.ok(card.includes(label),label);
 });
@@ -243,4 +251,22 @@ test('Codex review: a queued “Bugünün emrine ekle” keeps its day; removals
  s.expedition={startedAt:date};const removed=run(run(s,{kind:'removeMove',frontId:'a',moveId:'a-m1'}),{kind:'edit',frontId:'b',text:'Kimya özetini bitir.'});
  const metric=logbook(removed,date).metrics.find(m=>m.title==='Elle düzenleme ve ayar değişikliği')!;assert.match(metric.value,/^3 · /,'one selection, one edit and one removal');assert.match(metric.note,/1 emir değişikliği, 1 hamle düzenlemesi, 1 hamle kaldırma/);
  assert.equal(placedGone(removed,'move:a:a-m1'),'KALDIRILDI');assert.equal(placedGone(run(s,{kind:'complete',frontId:'a'}),'move:a:a-m1'),'BİTTİ');assert.equal(placedGone(s,'move:a:a-m1'),null);assert.equal(placedGone(s,'idea:x'),null);
+});
+
+test('Review round: a closed İş front that takes a new move opens again; an already closed one is not relabelled',()=>{
+ let s=camp(front('kargo','Kargo iadesi',['PTT’ye götür.']),front('tez','Tez',['Bölüm 2’yi yaz.'],{type:'lane'}));
+ s=run(s,{kind:'complete',frontId:'kargo'});assert.equal(s.fronts.kargo.status,'closed');
+ // Dictation about it again: the move lands on an open front, in today's proposal; one undo closes it again.
+ const told=applyParsed(s,{items:[{id:'kargo',title:'Kargo iadesi',type:'general',complete:false,completedMoveId:null,moves:['Kargo şirketini ara.'],where:null,question:null,prerequisite:null,alt:null}],question:null,summary:'İşlendi'},'Kargo geri döndü, kargo şirketini ara.');
+ assert.equal(told.fronts.kargo.status,'active');assert.equal(told.fronts.kargo.closedAt,undefined);assert.ok(propose(told,dayKey()).slots.some(x=>x.frontId==='kargo'));
+ assert.equal(describeOp(last(told).ops.find(o=>o.key==='front:kargo')!,told.fronts).text,'Kargo iadesi: Kargo şirketini ara. · cephe yeniden açıldı');
+ assert.equal(undo(told,last(told).id).fronts.kargo.status,'closed');
+ // Düzenle on the closed front's page (no next move) opens it too.
+ const edited=run(s,{kind:'edit',frontId:'kargo',text:'Dilekçenin kopyasını al.'});assert.equal(edited.fronts.kargo.status,'active');assert.equal(nextMove(edited.fronts.kargo)!.text,'Dilekçenin kopyasını al.');
+ // A closed project spoken of again stays the user's call.
+ const lane=applyParsed(run(s,{kind:'status',frontId:'tez',status:'closed'}),{items:[{id:'tez',title:'Tez',type:'lane',complete:false,completedMoveId:null,moves:['Bölüm 3’ü yaz.'],where:null,question:null,prerequisite:null,alt:null}],question:null,summary:''},'Tez bölüm 3');
+ assert.equal(lane.fronts.tez.status,'closed');
+ // Bitti on an İş front closed by hand: done, but nothing closes in this change, so no “cephe kapandı”.
+ const byHand=run(run(camp(front('imza','Dekanlık imzası',['Dilekçeyi götür.'])),{kind:'status',frontId:'imza',status:'closed'}),{kind:'complete',frontId:'imza'});
+ assert.equal(last(byHand).label,'Hamle tamamlandı');assert.equal(handNotice(last(byHand)),null);
 });

@@ -28,6 +28,8 @@ function frontLine(before: Front | null, after: Front | null): OpLine {
   if (before.type !== after.type) return { tag: 'TÜR', text: `${f.title}: ${typeNames[before.type]} → ${typeNames[after.type]}`, count: 'tür' };
   // Bitti on an İş front's last move closes it in the same change (K7).
   if (done.length && after.status === 'closed' && before.status !== 'closed') return { tag: 'HAMLE BİTTİ', text: `${f.title}: ${done[0].text} · cephe kapandı`, count: 'hamle' };
+  // A closed front that took a new move opened again in the same change.
+  if (added.length && before.status === 'closed' && after.status !== 'closed') return { tag: 'YENİ HAMLE', text: `${f.title}: ${added[0].text} · cephe yeniden açıldı`, count: 'hamle' };
   if (before.status !== after.status) return { tag: 'DURUM', text: `${f.title}: ${STATUS[after.status]}`, count: 'durum' };
   if (done.length) return { tag: 'HAMLE BİTTİ', text: `${f.title}: ${done[0].text}`, count: 'hamle' };
   if (removed.length) return { tag: 'KALDIRILDI', text: `${f.title}: ${removed[0].text}`, count: 'hamle' };

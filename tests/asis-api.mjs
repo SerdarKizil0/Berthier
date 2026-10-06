@@ -33,10 +33,12 @@ await command({kind:'addMove',frontId:more[0],title:'Dekanlık imzası',text:'Di
 await command({kind:'addMove',frontId:more[1],title:'Fizik',text:'Vize konularını listele.'});data=await command({kind:'retype',frontId:more[1],type:'course'});
 data=await command({kind:'complete',frontId:more[0],skip:false});assert.equal(data.summary,'Hamle tamamlandı; cephe kapandı');assert.equal(data.state.fronts[more[0]].status,'closed');
 data=await command({kind:'complete',frontId:more[1]});assert.equal(data.summary,'Hamle tamamlandı');assert.equal(data.state.fronts[more[1]].status,'active');assert.ok(data.state.fronts[more[1]].moves.every(m=>m.doneAt));
-const refused=await command({kind:'suggest',frontId:more[1]},503);assert.match(refused.error,/öneremedi/);
-// No dictation was written (no model).
-assert.equal(data.dictations.length,rows);
+const before=data.state;const refused=await command({kind:'suggest',frontId:more[1]},503);assert.match(refused.error,/öneremedi/);
+// The refused suggestion changed nothing and wrote no dictation row (read again after it).
+data=await read();assert.equal(data.dictations.length,rows);assert.equal(data.state.changes.length,before.changes.length);assert.deepEqual(data.state.fronts[more[1]],before.fronts[more[1]]);
+// An older Bitti resent with the server's placeholder note is model-free too.
+await command({kind:'addMove',frontId:more[1],title:'Fizik',text:'Geçen yılın sorularını çöz.'});data=await command({kind:'complete',frontId:more[1],text:'Hamleyi tamamladım.'});assert.equal(data.summary,'Hamle tamamlandı');assert.equal(data.dictations.length,rows);
 // Everything is taken back, newest first.
 for(const c of data.state.changes.slice(first).reverse())if(!c.ops.every(o=>o.undone))data=await command({kind:'undo',changeId:c.id});
 for(const id of [...ids,...more])assert.equal(data.state.fronts[id],undefined);
-console.log('asis-api: add, replay, today, length, remove, close, Bitti without the model, suggest, undo passed');
+console.log('asis-api: add, replay, today, length, remove, close, Bitti without the model (old placeholder too), suggest, undo passed');
