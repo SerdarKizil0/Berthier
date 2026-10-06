@@ -5,7 +5,7 @@
 import {Fragment, useEffect, useEffectEvent, useRef, useState} from 'react';
 import {ArrowDownUp, ArrowLeft, Check, ChevronRight} from 'lucide-react';
 import {type CalendarEvent} from '@/lib/calendar';
-import {type Dictation, type Order, type State} from '@/lib/domain';
+import {type Dictation, type Order, type State, isOpen} from '@/lib/domain';
 import {clockText} from '@/lib/expedition/camps';
 import {buildReport, type QueuedReply} from '@/lib/report';
 import {useReorder} from './atlas-order';
@@ -44,6 +44,8 @@ export default function MorningReport({state, dictations, outbox, now, online, b
   const approved = report.order.approvedAt;
   // “Geri al” after approval undoes exactly the change that approved today's order.
   const approval = approved ? [...state.changes].reverse().find(c => c.ops.some(o => !o.undone && o.key === 'order:' + report.day && !!(o.after as Order | null)?.approvedAt && !(o.before as Order | null)?.approvedAt)) : undefined;
+  // Kaldır (5 Ekim): a row's open move leaves its front's queue; the front's next move takes its place.
+  const openMove = (frontId: string) => { const slot = report.order.slots.find(x => x.frontId === frontId), m = slot && !slot.doneAt ? state.fronts[frontId]?.moves.find(x => x.id === slot.moveId) : undefined; return m && isOpen(m) ? m : undefined; };
   const mailConflict = report.warnings.find(w => w.id === mailId)?.conflict ?? report.drafts.find(d => d.conflict.id === mailId)?.conflict;
 
   return <div className="morning-report">
@@ -69,7 +71,8 @@ export default function MorningReport({state, dictations, outbox, now, online, b
           {report.rows.map(r => <div className={r.tone === 'done' ? 'mr-row is-done' : 'mr-row'} key={r.frontId}>
             <span className="mr-num">{r.num}</span>
             <div className="mr-row-body"><span className="mr-row-head">{r.head}</span><span className="mr-move">{r.move}</span><span className="mr-why">↳ {r.why}</span></div>
-            <span className={`mr-chip is-${r.tone}`}>{r.tone === 'done' ? 'GEÇİLDİ' : r.chip}</span>
+            <span className="mr-side"><span className={`mr-chip is-${r.tone}`}>{r.tone === 'done' ? 'GEÇİLDİ' : r.chip}</span>
+              {openMove(r.frontId) && <button className="mr-remove" aria-label={`Kaldır: ${r.move}`} disabled={off} onClick={() => action({kind: 'removeMove', frontId: r.frontId, moveId: openMove(r.frontId)!.id})}>Kaldır</button>}</span>
           </div>)}
           <div className="mr-links">
             {orders > 1 && <button className="text-button" disabled={busy} onClick={reorder.begin}><ArrowDownUp size={16}/>Sırayı düzenle</button>}

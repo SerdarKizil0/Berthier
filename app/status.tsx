@@ -13,7 +13,7 @@ import {sinceTime} from '@/lib/turkish';
 
 export type ReceiptLine = Placement & {changeId?: string};
 export type NoticeBody =
-  | {kind: 'done'; title: string; text: string; changeId?: string; lines?: ReceiptLine[]; sourceId?: string; fix?: string}
+  | {kind: 'done'; title: string; text: string; changeId?: string; lines?: ReceiptLine[]; sourceId?: string; fix?: string; next?: string}
   | {kind: 'question'; dictation: Dictation; question: string; choices: string[]};
 export type Notice = NoticeBody & {id: number};
 
@@ -26,6 +26,8 @@ type Props = {
   start: (r: Reminder) => void; skip: (r: Reminder) => void; hide: (key: string) => void;
   /** A receipt line's second guess; a move becoming a routine asks “haftada kaç?” first. */
   alt: (line: ReceiptLine, sourceId: string, count?: number) => void; keep: () => void;
+  /** A front left without a next move (`next`): the model on a tap, or Söyle with that front's context. */
+  suggest: (frontId: string) => void; asIs: (frontId: string) => void;
 };
 
 const COUNTS: [number, string][] = [[1, '1'], [2, '2'], [3, '3'], [4, '4'], [7, 'Her gün']];
@@ -40,7 +42,7 @@ function Elapsed({start}: {start: string}) {
 }
 
 export function StatusCard(props: Props) {
-  const {notice, error, online, processing, queued, busy, see, undo, retry, dismiss, clearError, reply, write, running, reminder, finish, fixEnd, fix, start, skip, hide, alt, keep} = props;
+  const {notice, error, online, processing, queued, busy, see, undo, retry, dismiss, clearError, reply, write, running, reminder, finish, fixEnd, fix, start, skip, hide, alt, keep, suggest, asIs} = props;
   const [asking, setAsking] = useState<string | null>(null), off = busy || !online;
   if (error) return <div className="status-card is-error" role="alert">
     <span className="status-icon"><AlertTriangle size={18}/></span>
@@ -79,6 +81,19 @@ export function StatusCard(props: Props) {
       </div>)}
     </div>;
   }
+  // 5 Ekim · Bitti on a Ders or Başvuru front's last move: it stays open; the next move comes from Berthier only on a
+  // tap, or in the user's own words (Söyle with the front as context).
+  if (notice?.kind === 'done' && notice.next) return <div className="status-card is-done is-question" role="status">
+    <div className="status-line">
+      <span className="status-icon"><Check size={18} strokeWidth={2.4}/></span>
+      <p><strong>{notice.title}</strong>{notice.text && ' ' + notice.text}</p>
+      {notice.changeId && <button className="status-action is-plain" disabled={off} onClick={() => undo(notice.changeId!)}>Geri al</button>}
+    </div>
+    <div className="status-choices">
+      <button disabled={off} onClick={() => suggest(notice.next!)}>Berthier önersin</button>
+      <button onClick={() => asIs(notice.next!)}>Olduğu gibi ekle</button>
+    </div>
+  </div>;
   if (notice?.kind === 'done') return <div className="status-card is-done" role="status">
     <span className="status-icon"><Check size={18} strokeWidth={2.4}/></span>
     <p><strong>{notice.title}</strong>{notice.text && ' ' + notice.text}</p>
@@ -118,7 +133,7 @@ export function StatusCard(props: Props) {
   </div>;
   if (!online && queued) return <div className="status-card" role="status">
     <span className="status-icon"><WifiOff size={18}/></span>
-    <p><strong>Çevrimdışı.</strong> {queued} dikte cihazda; bağlantı gelince kaydedilir.</p>
+    <p><strong>Çevrimdışı.</strong> {queued} girdi cihazda; bağlantı gelince kaydedilir.</p>
     <button className="status-action" onClick={see}>Ayrıntı</button>
   </div>;
   return null;

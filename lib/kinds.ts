@@ -73,6 +73,12 @@ export function placementsOf(before: State, after: State, p: Parsed, now = new D
   return out;
 }
 
+/** A placed move that left its queue later: “KALDIRILDI” or “BİTTİ” (it can no longer change kind); null otherwise. */
+export function placedGone(s: State, ref: string): string | null {
+  const [type, a, b] = ref.split(':'), m = type === 'move' ? s.fronts[a]?.moves.find(x => x.id === b) : undefined;
+  return m?.removedAt ? 'KALDIRILDI' : m?.doneAt ? 'BİTTİ' : null;
+}
+
 /** What a dictation placed, from its saved result (`placed`); older dictations have none. */
 export function placedOf(d?: { result: string | null }): Placement[] {
   try { return JSON.parse(d?.result ?? '{}').placed ?? []; } catch { return []; }
@@ -117,7 +123,7 @@ export function rekind(n: State, c: { sourceId?: string; ref?: string; to?: stri
   let text = '', from: Kind, frontId: string | null = null, remove = () => {};
   switch (type) {
     case 'move': {
-      const f = n.fronts[a], m = f?.moves.find(x => x.id === b && !x.doneAt);
+      const f = n.fronts[a], m = f?.moves.find(x => x.id === b && !x.doneAt && !x.removedAt);
       if (!f || !m) throw Error('Hamle bulunamadı ya da tamamlandı.');
       text = m.text; from = 'move'; frontId = f.id;
       if (born('front:' + f.id, v => !!(v as Front | null)?.moves.some(x => x.id === b))) remove = () => {

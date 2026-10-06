@@ -2,7 +2,7 @@
 // or an action (“3 değişiklik. 1 yeni cephe, 1 hamle, 1 tarih.”) and by the change log rows.
 // Read-only: nothing here changes the state.
 
-import { type Change, type Dictation, type Front, type Op, type Order, type State, typeNames, undo } from './domain';
+import { type Change, type Dictation, type Front, type Op, type Order, type State, openMoves, typeNames, undo } from './domain';
 import { addDays, calendarDay, type CalendarEvent } from './calendar';
 import { clockText } from './expedition/camps';
 import { type Idea } from './research';
@@ -24,9 +24,15 @@ function frontLine(before: Front | null, after: Front | null): OpLine {
   const added = after.moves.filter(m => !old.has(m.id) && !m.doneAt);
   const done = after.moves.filter(m => m.doneAt && !old.get(m.id)?.doneAt);
   const edited = after.moves.filter(m => old.has(m.id) && old.get(m.id)!.text !== m.text);
+  const removed = after.moves.filter(m => m.removedAt && !old.get(m.id)?.removedAt);
   if (before.type !== after.type) return { tag: 'TÜR', text: `${f.title}: ${typeNames[before.type]} → ${typeNames[after.type]}`, count: 'tür' };
+  // Bitti on an İş front's last move closes it in the same change (K7).
+  if (done.length && after.status === 'closed' && before.status !== 'closed') return { tag: 'HAMLE BİTTİ', text: `${f.title}: ${done[0].text} · cephe kapandı`, count: 'hamle' };
+  // A closed front that took a new move opened again in the same change.
+  if (added.length && before.status === 'closed' && after.status !== 'closed') return { tag: 'YENİ HAMLE', text: `${f.title}: ${added[0].text} · cephe yeniden açıldı`, count: 'hamle' };
   if (before.status !== after.status) return { tag: 'DURUM', text: `${f.title}: ${STATUS[after.status]}`, count: 'durum' };
   if (done.length) return { tag: 'HAMLE BİTTİ', text: `${f.title}: ${done[0].text}`, count: 'hamle' };
+  if (removed.length) return { tag: 'KALDIRILDI', text: `${f.title}: ${removed[0].text}`, count: 'hamle' };
   if (added.length) return { tag: 'YENİ HAMLE', text: `${f.title}: ${added[0].text}${added.length > 1 ? ` (+${added.length - 1})` : ''}`, count: 'hamle' };
   if (edited.length) return { tag: 'HAMLE', text: `${f.title}: ${edited[0].text}`, count: 'hamle' };
   if (before.where !== after.where && after.where) return { tag: 'KALDIĞIN YER', text: `${f.title}: ${after.where}`, count: 'not' };
@@ -46,6 +52,9 @@ function orderLine(before: Order | null, after: Order | null, fronts: State['fro
     const parts = [...added.map(id => `${title(id)} eklendi`), ...removed.map(id => `${title(id)} çıkarıldı`)];
     return { tag: 'GÜNÜN EMRİ', text: parts.join(', ') + '.', count: 'emir' };
   }
+  // The same camps in the same order: a camp's move changed (edited, or taken out and the next one moved up).
+  const moved = after?.slots.find((x, i) => !x.doneAt && before?.slots[i]?.frontId === x.frontId && (before.slots[i].moveId !== x.moveId || before.slots[i].text !== x.text));
+  if (moved && before?.slots.every((x, i) => after?.slots[i]?.frontId === x.frontId)) return { tag: 'GÜNÜN EMRİ', text: `${title(moved.frontId)}: ${moved.text}`, count: 'emir', quiet: true };
   return { tag: 'SIRA', text: 'Rotanın sırası değişti.', count: 'sıra' };
 }
 
@@ -176,6 +185,35 @@ export function changeNotice(change: Change, fronts: State['fronts'], routines: 
   const live = liveLines(change, fronts, routines).length;
   if (change.sourceId) return { title: `${live} değişiklik.`, text: breakdown(change, fronts, routines) };
   return { title: change.label.replace(/[.]?$/, '.'), text: live > 1 ? breakdown(change, fronts, routines) : '' };
+}
+
+/** The status card after “Olduğu gibi ekle”, “Kaldır”, Harita › Seç, “Bitti” and “Berthier önersin” (the reducer's
+ *  labels): where the move went in its front's queue, which move left, which fronts closed. A Ders or Başvuru front
+ *  left without a next move names itself in `next` (the card offers “Berthier önersin” and “Olduğu gibi ekle”). Null
+ *  for any other change, and for a completion that leaves a next move (the usual card). */
+export function handNotice(change: Change): { title: string; text: string; next?: string } | null {
+  const fronts = change.ops.filter(o => o.key.startsWith('front:')).map(o => ({ before: o.before as Front | null, after: o.after as Front | null }));
+  const today = change.ops.some(o => o.key.startsWith('order:') && !!(o.after as Order | null)?.slots.some(x => fronts.some(f => f.after?.id === x.frontId) && !(o.before as Order | null)?.slots.some(y => y.frontId === x.frontId)));
+  if (change.label === 'Hamle eklendi' && fronts[0]?.after) {
+    const { before, after } = fronts[0], m = after.moves.find(x => !before?.moves.some(y => y.id === x.id));
+    const i = m ? openMoves(after).indexOf(m) : -1;
+    return { title: 'Eklendi.', text: [after.title, !before ? 'yeni cephe' : i === 0 ? 'sıradaki hamle' : i > 0 ? `${i + 1}. sırada` : '', today ? 'bugünün emrinde' : ''].filter(Boolean).join(' · ') };
+  }
+  if (change.label === 'Hamle kaldırıldı' && fronts[0]?.after) {
+    const { before, after } = fronts[0], m = after.moves.find(x => x.removedAt && !before?.moves.find(y => y.id === x.id)?.removedAt);
+    return { title: 'Kaldırıldı.', text: m?.text ?? '' };
+  }
+  if (change.label === 'Hamle tamamlandı; cephe kapandı' && fronts[0]?.after) return { title: `${fronts[0].after.title} tamamlandı, cephe kapandı.`, text: '' };
+  if (change.label === 'Hamle tamamlandı' && fronts[0]?.after) {
+    const f = fronts[0].after;
+    return f.type !== 'lane' && f.status !== 'closed' && !openMoves(f).length ? { title: 'Hamle tamamlandı.', text: `${f.title}: sıradaki hamle yok.`, next: f.id } : null;
+  }
+  if (change.label === 'Berthier hamle önerdi' && fronts[0]?.after) {
+    const { before, after } = fronts[0], m = after.moves.find(x => !before?.moves.some(y => y.id === x.id));
+    return { title: 'Berthier önerdi.', text: m ? `${after.title}: ${m.text}` : after.title };
+  }
+  if (/ cephe kapatıldı$/.test(change.label)) return { title: change.label + '.', text: fronts.filter(f => f.after?.status === 'closed').map(f => f.after!.title).join(', ') };
+  return null;
 }
 
 /** A change row's lines: the quiet ones only when nothing else is left. */

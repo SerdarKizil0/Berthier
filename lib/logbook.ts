@@ -64,7 +64,7 @@ export type Entry = { day: string; date: string; tag: string; gold: boolean; nod
 export type Metric = { title: string; value: string; note: string };
 export type Logbook = { window: Window | null; sub: string; cells: Cell[]; camps: number; closed: number; entries: Entry[]; metrics: Metric[] };
 
-const REORDER = 'Rotanın sırası değiştirildi', SELECT = 'Günün emri değiştirildi', EDIT = 'Hamle düzenlendi';
+const REORDER = 'Rotanın sırası değiştirildi', SELECT = 'Günün emri değiştirildi', EDIT = 'Hamle düzenlendi', REMOVE = 'Hamle kaldırıldı';
 const SETTINGS = ['Aktif projeler seçildi', 'Aktif kulvarlar seçildi', 'Mail imzası kaydedildi', 'Ritim ayarı değiştirildi'];
 
 function duration(seconds: number) {
@@ -110,9 +110,9 @@ export function logbook(s: State, today = dayKey()): Logbook {
   });
   const inWindow = s.changes.filter(c => { const d = dayKey(new Date(c.at)); return d >= w.start && d <= today && !c.ops.every(o => o.undone); });
   const count = (labels: string[]) => inWindow.filter(c => labels.includes(c.label)).length;
-  const reorders = count([REORDER]), selects = count([SELECT]), edits = count([EDIT]), settings = count(SETTINGS);
+  const reorders = count([REORDER]), selects = count([SELECT]), edits = count([EDIT]), removals = count([REMOVE]), settings = count(SETTINGS);
   const manual = [
-    `${reorders} sıra düzenlemesi`, ...(selects ? [`${selects} emir değişikliği`] : []), ...(edits ? [`${edits} hamle düzenlemesi`] : []), `${settings} ayar değişikliği`,
+    `${reorders} sıra düzenlemesi`, ...(selects ? [`${selects} emir değişikliği`] : []), ...(edits ? [`${edits} hamle düzenlemesi`] : []), ...(removals ? [`${removals} hamle kaldırma`] : []), `${settings} ayar değişikliği`,
   ];
 
   return {
@@ -124,7 +124,7 @@ export function logbook(s: State, today = dayKey()): Logbook {
     metrics: [
       { title: 'Emirdeki hamlelerin tamamlanma oranı', value: total ? `%${Math.round((100 * passed) / total)} · ${passed}/${total}` : 'henüz yok', note: '“Kilitlenmeler seyreldi mi?” sorusu için destek verisi.' },
       { title: 'Rapor açılışından onaya', value: waits.length ? 'ort. ' + duration(waits.reduce((a, b) => a + b, 0) / waits.length) : 'henüz yok', note: 'Hedef birkaç dakikadan kısa. Süre raporda sayılmaz, yalnız burada görünür.' },
-      { title: 'Elle düzenleme ve ayar değişikliği', value: `${reorders + selects + edits} · ${settings}`, note: manual.join(', ') + '. Hedef sıfıra yakın.' },
+      { title: 'Elle düzenleme ve ayar değişikliği', value: `${reorders + selects + edits + removals} · ${settings}`, note: manual.join(', ') + '. Hedef sıfıra yakın.' },
     ],
   };
 }

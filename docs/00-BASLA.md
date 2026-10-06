@@ -14,7 +14,7 @@ Berthier:
 - tarihli yükümlülükleri önceden görür, çakışmaları yakalar, hazırlığı zamanında başlatır,
 - bütün bu düzenin bakımını kullanıcı yerine yapar.
 
-Kullanıcının işi üç şey: dikte etmek, onaylamak, hamleyi yapmak.
+Kullanıcının işi üç şey: dikte etmek (ya da işi yazdığı gibi eklemek), onaylamak, hamleyi yapmak. Gereksizleşen hamleyi ya da cepheyi tek dokunuşla kaldırır; kaldırma geri alınır, kayıt silinmez.
 
 ## Neden
 

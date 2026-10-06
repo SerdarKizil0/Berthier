@@ -99,7 +99,7 @@ export function horizonBrief(s: State, now: Date) {
   const today = calendarDay(now), all = Object.values(s.events ?? {}).filter(e => !e.cancelled);
   const items = occurrences(all, today, addDays(today, 13)).filter(e => e.kind !== 'class' && !e.weekly);
   const unseen = conflicts(all, today).filter(c => c.severity === 'hard' && !s.seenConflicts?.includes(c.id));
-  const moves = (e: CalendarEvent) => Object.values(s.fronts).flatMap(f => f.moves).filter(m => m.eventId === e.id);
+  const moves = (e: CalendarEvent) => Object.values(s.fronts).flatMap(f => f.moves).filter(m => m.eventId === e.id && !m.removedAt);
   const rows = items.map(e => { const m = moves(e); return { event: e, when: upper(shortDay(e.date!)) + (e.time ? ' ' + e.time : ''), done: m.filter(x => x.doneAt).length, total: m.length }; });
   return { items: rows, conflicts: unseen, unprepared: rows.filter(r => r.total > 0 && r.done === 0).length };
 }

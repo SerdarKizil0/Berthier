@@ -28,6 +28,8 @@ Tasarımdaki renk, metin ve ölçüler nihaidir. Koddaki renk tokenları `app/at
 
 Claude Design'ın 2 Ekim arayüz incelemesi (1a, 1d, 1f, 1g, 1h, 1i–1m, K2) bu pakettekinden sonra gelir ve kodda uygulandı; kararlar ve sapmalar `docs/DURUM.md` › "2 Ekim arayüz incelemesi" bölümünde. Ekran başına tek ana eylem `.btn-main` sınıfıdır (K2).
 
+5 Ekim kullanıcı kararı (ayrı tasarım turu yok): Söyle'de ikincil eylem "Olduğu gibi ekle", görev satırlarında "Kaldır", Harita listesinde "Seç" ile toplu kapatma ve kredi hatası metni; ayrıntı ve kararlar `docs/DURUM.md` › "5 Ekim".
+
 4 Ekim "Rutinler ve dikte türleri" turu `design-reference/rutinler/` altındadır: `Berthier Rutinler.dc.html` (A1–A7, B1–B4, C1–C4, D1–D3, R1–R4, kararlar K6–K10) ve `devir/rutinler-devir.md` (veri, komutlar, model, kurallar, ölçüler). Önerilen seçenekler (R1a–R4a) uygulandı; ayrıntı ve sapmalar `docs/DURUM.md` › "4 Ekim: Rutinler ve dikte türleri".
 
 ## Teknoloji
@@ -48,6 +50,7 @@ Claude Design'ın 2 Ekim arayüz incelemesi (1a, 1d, 1f, 1g, 1h, 1i–1m, K2) bu
   - Defter (1h): `app/book.tsx` (teftiş kartı, sefer defteri özeti, depo ve kayıt defteri satırları). Altındaki sayfalar: `app/review.tsx` (tam ekran Teftiş, 1j), `app/research.tsx` (Fikir deposu, 1k), `app/ledger.tsx` (Kayıt defteri, 1l), `app/settings.tsx` (Tercihler, 1m), `app/logbook.tsx` (Sefer defteri).
   - `app/page-head.tsx`: iç sayfaların ortak başlığı (geri bağlantısı, serif başlık, mono özet satırı). Marka başlığı yok.
   - `app/say-sheet.tsx`: alttan açılan, `visualViewport` ile klavyenin üstüne yapışan yazı sayfası (dikte, yanıt, "Nerede kaldın?", hamle düzenleme).
+  - `app/as-is.tsx`: Söyle › "Olduğu gibi ekle" adımı (cephe seçimi, yeni cephe, "Bugünün emrine ekle"). Model çağırmaz; `addMove` cihaz kuyruğundan `flushAdds` ile, diktelerin önünden gider.
   - `app/status.tsx`: Söyle'nin üstünde yüzen tek durum kartı ve çevrimdışı şeridi. Öncelik (K10): hata › soru › sonuç (dikte makbuzu, K8) › sayaç › rutin hatırlatması › işleniyor › çevrimdışı kuyruk.
   - `app/media-input.tsx`: ses ve dosya girişi, dikte sayfasındaki kayıt paneli.
 - `lib/routines.ts`: rutin tipleri, hafta (Pzt 04:00), süre ortancası, kayma, gözlem → öneri (`mirror`), Bugün/Bu hafta satırları, `reminderFor(state, now)` (bildirim dalı da bunu kullanacak), iskele ve deneme, `routineAct` (komutlar).
@@ -62,9 +65,10 @@ Claude Design'ın 2 Ekim arayüz incelemesi (1a, 1d, 1f, 1g, 1h, 1i–1m, K2) bu
 - `lib/book.ts`: teftiş zamanı ve kartı, teftişte cephe kararları, Ufuk özeti, Defter satırları.
 - `lib/ledger.ts`: değişikliklerin insan dilinde anlatımı, Kayıt defterinin gün grupları ve geri alınamama nedeni (`undo` kuralları aynen kullanılır).
 - `lib/turkish.ts`: saat ve sayılardan sonraki Türkçe ekler ("08:14’te", "17:00’ye", "2’si") ve kısa tarih biçimleri.
-- `app/api/state/route.ts`: tek komut ucu (zod `Input`, kimlik ve aynı kaynak denetimi, idempotent istek kimliği).
+- `app/api/state/route.ts`: tek komut ucu (zod `Input`, kimlik ve aynı kaynak denetimi, idempotent istek kimliği). Model yalnız dikte, projenin “Nerede kaldın?” notu (`needsModel`), eski dikteden fikir aktarma, gün özeti ve “Berthier önersin” (`suggest`, yalnız dokununca) için çağrılır; “Bitti” ve kullanıcının kendi eylemleri modelsizdir.
 - `app/api/media/route.ts`: döküm.
-- `lib/domain.ts`: tipler, `propose`/`ensureOrder`, `commitChanges`/`undo`. `State.rhythm` (Tercihler › Ritim) kendi anahtarıyla geri alınabilir. Rutin kayıtları değişiklik kaydında kayıt başına anahtar taşır: `routine:<id>`, `session:<id>`, `skip:<rutin>:<gün>`, `running`, `reminderTrial` (front:/order: gibi). Bir komut yalnız dokunduğu kaydı saklar; bütün durum tek D1 satırında (2 MB sınırı) olduğu için koleksiyonun tamamını tek anahtara koyma. Tür düzeltmeleri `learned` anahtarında. `labels`/`typeNames`: Ders, Proje (lane), Başvuru, İş (general).
+- `lib/provider.ts`: sağlayıcı hata eşlemesi (402 ya da kredi/bakiye → kredi metni; diğer 4xx/5xx gövdesi sunucu günlüğüne). `lib/llm.ts` şeması Anthropic sınırının (16 birleşik türlü, 24 isteğe bağlı alan) altında kalmalı: yeni alanlarda null yerine boş değer kullan, Zod'da `orNull` ile null'a çevir; `tests/domain.test.ts` denetler.
+- `lib/domain.ts`: tipler, `propose`/`ensureOrder`, `commitChanges`/`undo`. Kaldırılan hamle silinmez, `Move.removedAt` taşır: açık hamle için `isOpen`, sıra için `openMoves` kullan (`!m.doneAt` tek başına yetmez). Kapalı cepheye yeni hamle ekleyen yol cepheyi aynı değişiklikte `reopen` ile açar (dikteyle kapalı proje hariç); “Bitti” son hamlede İş cephesini kapatır. `State.rhythm` (Tercihler › Ritim) kendi anahtarıyla geri alınabilir. Rutin kayıtları değişiklik kaydında kayıt başına anahtar taşır: `routine:<id>`, `session:<id>`, `skip:<rutin>:<gün>`, `running`, `reminderTrial` (front:/order: gibi). Bir komut yalnız dokunduğu kaydı saklar; bütün durum tek D1 satırında (2 MB sınırı) olduğu için koleksiyonun tamamını tek anahtara koyma. Tür düzeltmeleri `learned` anahtarında. `labels`/`typeNames`: Ders, Proje (lane), Başvuru, İş (general).
 - `lib/reducer.ts`: `act`, `applyParsed`.
 - `lib/calendar.ts`, `lib/research.ts`.
 - `lib/notebook.ts`: D1 erişimi.
@@ -82,7 +86,7 @@ Claude Design'ın 2 Ekim arayüz incelemesi (1a, 1d, 1f, 1g, 1h, 1i–1m, K2) bu
   - `npm run dev`: 5173 portu.
 - Tip denetimi: `node node_modules/typescript/bin/tsc --noEmit`.
 - `npm run lint`: uygulama kodunda eskiden kalan 5 hata (React hook kuralları) var. Yeni hata ekleme.
-- Testler: `node scripts/check.mjs`, ayrıca `--calendar`, `--research`, `--flow`, `--media`, `--map`, `--p5`, `--ui`, `--routines` bayraklarıyla.
+- Testler: `node scripts/check.mjs`, ayrıca `--calendar`, `--research`, `--flow`, `--media`, `--map`, `--p5`, `--ui`, `--routines`, `--asis` bayraklarıyla.
   - `--llm`, `--p2-llm`, `--p3-llm`, `--flow-llm`, `--routines-llm` ve `--media-live` gerçek sağlayıcıyı çağırır ve kota tüketir; istenmeden çalıştırma.
   - `tests/*-api.mjs`, derlenmiş Worker'a karşı ayrı QA kimlikleriyle çalışır.
 
