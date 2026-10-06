@@ -5,7 +5,7 @@ import {act,applyParsed} from '../lib/reducer';
 import {type Routine,type Session,at,dayMin,weekStart,weekLine,pastDay,observation,readyToPropose,mirror,weekPlan,weekRows,todayList,reminderFor,routineAct,routineLabel,routineNotice,scaffolds,stepMinutes,stepsOf,trialResult,proposals,avoided,type RoutineCommand} from '../lib/routines';
 import {addDays} from '../lib/calendar';
 import {placementsOf,effective,receiptTitle} from '../lib/kinds';
-import {checkRoutines,type Parsed} from '../lib/llm';
+import {checkRoutines,parseDictation,type Parsed} from '../lib/llm';
 import {describeOp,breakdown,changeNotice,changeLines,ledgerRoutines} from '../lib/ledger';
 import {placeCamps} from '../lib/expedition/camps';
 import {type CalendarEvent} from '../lib/calendar';
@@ -254,6 +254,54 @@ test('the model output keeps rule 3 and quotes own words only', ()=>{
  assert.deepEqual([p.routines![0].ownWords,p.routines![0].alt],[null,null]);
  const q=parsed({routines:[],sessions:[{routineId:null,title:'Pilates',dayText:null,end:null,minutes:null,skip:false,done:true}]});
  assert.throws(()=>checkRoutines(q,s,'Pilates yaptım'),/mevcut ya da bu diktede/);
+});
+
+// User report (6 Ekim): “rutin ekle deyince işlenemedi”. Rutinler › + sends the dictation with the “routines” context.
+// Answers the schema allows but the checks refused, so that both attempts failed: no number said (count 0), more than 7
+// a week, an id that names no routine (the context itself), “22.30”, a session only pointed at. Each goes through now.
+const answer=(x:Record<string,unknown[]>)=>({items:[],question:null,summary:'Bir rutin eklendi.',events:[],prepDefaults:[],ideas:[],laneUpdates:[],routines:[],sessions:[],...x});
+const said=(x:object)=>({id:'',title:'Yüz yogası',count:4,time:'',minutes:0,travel:0,ownWords:'',steps:[],alt:'',...x});
+const told=(x:object)=>({routineId:'',title:'Yüz yogası',dayText:'',end:'',minutes:0,skip:false,done:false,...x});
+/** parseDictation with the provider answering `answers` in turn (the last one repeats); the calls made and the schema sent. */
+async function model(answers:object[],raw:string,s:State){
+ const original=globalThis.fetch,error=console.error,sent:{output_config:{format:{schema:unknown}}}[]=[],logged:string[]=[];
+ globalThis.fetch=(async(_url:unknown,init?:RequestInit)=>{sent.push(JSON.parse(String(init?.body)));return Response.json({content:[{type:'text',text:JSON.stringify(answers[Math.min(sent.length,answers.length)-1])}]});}) as typeof fetch;
+ console.error=(...args:unknown[])=>{logged.push(args.map(String).join(' '));};
+ try{const parsed=await parseDictation(raw,s,'routines',{provider:'anthropic',key:'fixture',model:'fixture'}).catch((e:unknown)=>e as Error);return {parsed,calls:sent.length,schema:sent[0]?.output_config.format.schema,logged};}
+ finally{globalThis.fetch=original;console.error=error;}
+}
+async function routineSaid(answers:object[],raw:string,s=fresh()){const r=await model(answers,raw,s);assert.equal(r.calls,1);assert.ok(!(r.parsed instanceof Error),String(r.parsed));const p=r.parsed as Parsed,n=applyParsed(s,p,raw,undefined,'d1');return {p,n,placed:placementsOf(s,n,p).map(x=>[x.kind,x.text,x.note]),schema:r.schema};}
+
+test('Rutinler › +: a routine dictation goes out within Anthropic’s limits and becomes a routine',async()=>{
+ const {n,placed,schema}=await routineSaid([answer({routines:[said({time:'22:30'})]})],'Haftada 4 yüz yogası, akşamları 22:30');
+ let unions=0;const walk=(x:unknown)=>{if(!x||typeof x!=='object')return;const node=x as {type?:unknown;properties?:Record<string,unknown>;items?:unknown};if(Array.isArray(node.type)&&node.type.length>1)unions++;if(node.properties)Object.values(node.properties).forEach(walk);if(node.items)walk(node.items);};walk(schema);
+ assert.ok(unions<=16,`${unions} union-typed fields sent`);
+ assert.deepEqual(Object.values(n.routines??{}).map(x=>[x.title,x.count,x.status,x.estimate]),[['Yüz yogası',4,'observing',{time:'22:30'}]]);
+ assert.deepEqual(placed,[['routine','Yüz yogası · haftada 4','Gözlem başladı']]);
+});
+
+test('Rutinler › +: answers the checks used to refuse twice go through on the first call',async()=>{
+ // No number said: haftada 1 (the routine is only observed; the weekly pattern sets the number later); “7.05” is 07:05.
+ let r=await routineSaid([answer({routines:[said({count:0,time:'7.05'})]})],'Yüz yogası ekle');
+ assert.deepEqual(Object.values(r.n.routines??{}).map(x=>[x.count,x.estimate]),[[1,{time:'07:05'}]]);assert.deepEqual(r.placed,[['routine','Yüz yogası · haftada 1','Gözlem başladı']]);
+ // Twice a day is every day; the “routines” context taken for an id names nothing; “sabah” is no clock time.
+ r=await routineSaid([answer({routines:[said({id:'routines',title:'Diş ipi',count:14,time:'sabah'})]})],'Günde iki kez diş ipi, sabah ve akşam');
+ assert.deepEqual(Object.values(r.n.routines??{}).map(x=>[x.title,x.count,x.estimate]),[['Diş ipi',7,undefined]]);
+ // A move said on the same page: the context is not a front id either.
+ r=await routineSaid([answer({items:[{id:'routines',title:'Kargo iadesi',type:'general',complete:false,completedMoveId:null,moves:['İade formunu doldur.'],where:null,question:null,prerequisite:null,alt:'none'}]})],'Kargo iadesi için formu doldur');
+ assert.deepEqual(Object.values(r.n.fronts).map(f=>[f.title,f.moves.map(m=>m.text)]),[['Kargo iadesi',['İade formunu doldur.']]]);
+ // A known routine with no number said keeps its own; only the time changes.
+ r=await routineSaid([answer({routines:[said({id:'yoga',count:0,time:'22.45'})]})],'Yüz yogasını 22.45’e al',week());
+ assert.deepEqual([r.n.routines!.yoga.count,r.n.routines!.yoga.estimate],[4,{time:'22:45'}]);
+ // A session done for the routine opened here, under a longer name, is written to it; one only pointed at changes nothing.
+ r=await routineSaid([answer({routines:[said({})],sessions:[told({title:'Yüz yogası seansı',done:true,dayText:'bugün',minutes:20}),told({title:'Meditasyon'})]})],'Haftada 4 yüz yogası; bugün 20 dakika yaptım, meditasyon da yap');
+ const opened=Object.values(r.n.routines??{})[0];assert.deepEqual(r.n.sessions?.map(x=>[x.routineId,x.minutes]),[[opened.id,20]]);
+ // An invented id for a known routine: the name decides.
+ r=await routineSaid([answer({sessions:[told({routineId:'yoga-1',done:true,minutes:25})]})],'Yüz yogası yaptım, 25 dakika',week());
+ assert.deepEqual(r.n.sessions?.filter(x=>x.source==='dictation').map(x=>[x.routineId,x.minutes]),[['yoga',25]]);
+ // Still refused: a session done for no routine at all. The retry is told why, and the server log keeps the reason.
+ const refused=await model([answer({sessions:[told({title:'Pilates',done:true})]})],'Pilates yaptım',fresh());
+ assert.equal(refused.calls,2);assert.match(String(refused.parsed),/güvenilir biçimde çözümlenemedi/);assert.ok(refused.logged.some(x=>/mevcut ya da bu diktede/.test(x)),refused.logged.join('\n'));
 });
 
 test('each routine record keeps its own change-log key; undo keeps a routine and its records together', ()=>{

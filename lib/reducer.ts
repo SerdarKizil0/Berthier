@@ -24,12 +24,12 @@ export function applyParsed(s:State,p:Parsed,raw:string,today=calendarDay(),sour
  for(const change of p.laneUpdates??[]){const lane=change.id?n.fronts[change.id]:Object.values(n.fronts).find(f=>f.type==='lane'&&canonicalTitle(f.title)===canonicalTitle(change.title));if(!lane||lane.type!=='lane')throw Error('Proje bulunamadı.');lane.status=change.status;lane.touched=new Date().toISOString();}
  if(p.prepDefaults?.length){n.prepDefaults??={};for(const d of p.prepDefaults)n.prepDefaults[d.kind]=d.days;}
  if(p.events?.length||p.prepDefaults?.length)syncPlans(n,today);
- // Rutinler: a new routine starts observing; a known one takes the new number. A session said done is written,
- // one put off slides like “Bugün değil”; a routine only pointed at (“yüz yogası yap”) changes nothing.
+ // Rutinler: a new routine starts observing (haftada 1 when no number was said); a known one takes a number only if said.
+ // A session said done is written, one put off slides like “Bugün değil”; one only pointed at (“yüz yogası yap”) changes nothing.
  const now=new Date(),day=dayKey(now);
  for(const x of p.routines??[]){const known=x.id?n.routines?.[x.id]:findRoutine(n,x.title);const estimate={...(x.minutes?{minutes:x.minutes}:{}),...(x.time?{time:x.time}:{})};
- if(known){known.count=x.count;if(x.travel)known.travel=x.travel;if(Object.keys(estimate).length)known.estimate={...known.estimate,...estimate};if(x.ownWords&&sourceId)known.ownWords={text:x.ownWords,show:true,sourceId};continue;}
- const r=newRoutine(x.title,x.count,now,{...(Object.keys(estimate).length?{estimate}:{}),...(x.travel?{travel:x.travel}:{}),...(x.ownWords&&sourceId?{ownWords:{text:x.ownWords,show:true,sourceId}}:{}),...(x.steps?.length?{steps:stepsOf(x.steps)}:{})});(n.routines??={})[r.id]=r;}
+ if(known){if(x.count)known.count=x.count;if(x.travel)known.travel=x.travel;if(Object.keys(estimate).length)known.estimate={...known.estimate,...estimate};if(x.ownWords&&sourceId)known.ownWords={text:x.ownWords,show:true,sourceId};continue;}
+ const r=newRoutine(x.title,x.count??1,now,{...(Object.keys(estimate).length?{estimate}:{}),...(x.travel?{travel:x.travel}:{}),...(x.ownWords&&sourceId?{ownWords:{text:x.ownWords,show:true,sourceId}}:{}),...(x.steps?.length?{steps:stepsOf(x.steps)}:{})});(n.routines??={})[r.id]=r;}
  for(const x of p.sessions??[]){if(!x.done&&!x.skip)continue;const r=x.routineId?n.routines?.[x.routineId]:findRoutine(n,x.title);if(!r||r.status==='paused')continue;const when=pastDay(x.dayText,day);if(when<addDays(day,-7))continue;
  if(x.skip){if(!(n.skips??[]).some(k=>k.routineId===r.id&&k.day===when))skipDay(n,r,when,now);continue;}
  const minutes=x.minutes??usualMinutes(n,r)??30,end=x.end?at(when,x.end).toISOString():when===day?now.toISOString():new Date(at(when,r.pattern?.time??r.estimate?.time??'12:00').getTime()+minutes*60000).toISOString();
