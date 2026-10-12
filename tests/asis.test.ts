@@ -11,7 +11,7 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import AtlasOrder,{RouteHead} from '../app/atlas-order';
 import type {ReactElement} from 'react';
 import {StatusCard} from '../app/status';
-import {parseDictation,Result,type Parsed} from '../lib/llm';
+import {DICTATION_TOOL,jsonSchema,parseDictation,Result,schema,type LlmConfig,type Parsed} from '../lib/llm';
 import {extractMedia} from '../lib/media';
 import {CREDIT_TEXT} from '../lib/provider';
 
@@ -165,11 +165,99 @@ test('Out of credit says so; other provider errors keep their text and log the b
   assert.match(quota.value,/kullanım sınırına/);assert.equal(quota.logged.length,1);assert.match(quota.logged[0],/Gemini 429: .*RESOURCE_EXHAUSTED/);
   reply(500,'upstream exploded');
   const broken=await quietLog(()=>parseDictation('Kargo',fresh(),null,config).then(()=>'',e=>String((e as Error).message)));
-  assert.match(broken.value,/işlenemedi/);assert.doesNotMatch(broken.value,/exploded/);assert.deepEqual(broken.logged,['Anthropic 500: upstream exploded']);
+  assert.equal(broken.value,'Dikte şu anda işlenemedi (Anthropic 500). Metnin kaydedildi; tekrar deneyebilirsin.');assert.deepEqual(broken.logged,['Anthropic 500: upstream exploded']);
   // Transcription says it with the file kept on the device.
   reply(402,'{}');
   assert.equal((await quietLog(()=>extractMedia(new Uint8Array([1]),'image/png',{ANTHROPIC_API_KEY:'fixture'}).then(()=>'',e=>String((e as Error).message)))).value,'Yapay zekâ kredisi bitti. Dosyan cihazında saklı; kredi yükleyince tekrar dene.');
  }finally{globalThis.fetch=original;}
+});
+
+// User report (6 Ekim): every dictation read “Dikte şu anda işlenemedi”. The Sites log had, ten times in three hours,
+// Anthropic 400 invalid_request_error “The compiled grammar is too large, which would cause performance issues.”: the
+// strict json_schema is compiled to a grammar whose size is limited beyond the 20 strict tool / 24 optional / 16 union limits.
+const dictated={items:[{id:null,title:'Kargo iadesi',type:'general',complete:false,completedMoveId:null,moves:['İade formunu doldur.'],where:null,question:null,prerequisite:null,alt:'none'}],question:null,summary:'1 cephe ve 1 hamle önerildi.',events:[],prepDefaults:[],ideas:[],laneUpdates:[],routines:[],sessions:[]};
+const sonnet:LlmConfig={provider:'anthropic',key:'fixture',model:'claude-sonnet-5'};
+// claude-sonnet-5 thinks by default (adaptive), so a thinking block comes before the call.
+const toolCall=(input:unknown,stop='tool_use')=>Response.json({content:[{type:'thinking',thinking:'',signature:'x'},{type:'tool_use',id:'t',name:DICTATION_TOOL,input}],stop_reason:stop});
+const textAnswer=(text:string)=>Response.json({content:[{type:'text',text}],stop_reason:'end_turn'});
+/** parseDictation against answers given in turn (the last one repeats): the request bodies, the result or error text, the log. */
+async function dictate(answers:(()=>Response)[],config=sonnet,s=fresh()){
+ const original=globalThis.fetch,sent:Record<string,unknown>[]=[];
+ globalThis.fetch=(async(_url:unknown,init?:RequestInit)=>{sent.push(JSON.parse(String(init?.body)));return answers[Math.min(sent.length,answers.length)-1]();}) as typeof fetch;
+ try{const r=await quietLog(()=>parseDictation('Kargo iadesi için formu doldur',s,null,config).then(p=>p as Parsed|string,e=>String((e as Error).message)));return {sent,result:r.value,logged:r.logged};}
+ finally{globalThis.fetch=original;}
+}
+const retried=(body:Record<string,unknown>)=>(JSON.parse((body.messages as {content:string}[])[0].content) as {validationError:string}).validationError;
+
+test('Anthropic: the dictation schema goes as a forced non-strict tool, not as a compiled grammar',async()=>{
+ let r=await dictate([()=>toolCall(dictated)]);
+ assert.equal(r.sent.length,1);assert.deepEqual((r.result as Parsed).items.map(i=>[i.id,i.title,i.moves]),[[null,'Kargo iadesi',['İade formunu doldur.']]]);
+ const body=r.sent[0] as {output_config?:unknown;tools:{name:string;strict?:boolean;input_schema:unknown}[];tool_choice:unknown;system:string};
+ // Nothing is compiled: no output_config, no strict tool. claude-sonnet-5 takes a forced tool.
+ assert.equal(body.output_config,undefined);assert.deepEqual(body.tools.map(t=>[t.name,t.strict]),[[DICTATION_TOOL,undefined]]);
+ assert.deepEqual(body.tools[0].input_schema,jsonSchema(schema));assert.deepEqual(body.tool_choice,{type:'tool',name:DICTATION_TOOL,disable_parallel_tool_use:true});assert.match(body.system,new RegExp(DICTATION_TOOL));
+ // A model that refuses a forced tool (Sonnet 5.5, Opus 5.5, Fable 5.1) is asked again with auto, and so from then on.
+ const forcedNo=()=>new Response(JSON.stringify({type:'error',error:{type:'invalid_request_error',message:'tool_choice: type "tool" and "any" are not supported for this model.'}}),{status:400});
+ const newer={...sonnet,model:'claude-test-'+crypto.randomUUID()},kinds=(x:typeof r)=>x.sent.map(b=>(b.tool_choice as {type:string}).type);
+ r=await dictate([forcedNo,()=>toolCall(dictated)],newer);assert.deepEqual(kinds(r),['tool','auto']);assert.equal((r.result as Parsed).items.length,1);assert.deepEqual(r.logged,[]);
+ r=await dictate([()=>toolCall(dictated)],newer);assert.deepEqual(kinds(r),['auto']);
+ r=await dictate([()=>toolCall(dictated)]);assert.deepEqual(kinds(r),['tool']);
+ // Two dictations in flight before the first refusal both fall back (the choice is made once per attempt).
+ const racing={...sonnet,model:'claude-test-'+crypto.randomUUID()},original=globalThis.fetch,choices:string[]=[];
+ globalThis.fetch=(async(_url:unknown,init?:RequestInit)=>{const type=(JSON.parse(String(init?.body)) as {tool_choice:{type:string}}).tool_choice.type;choices.push(type);if(type==='auto')return toolCall(dictated);await new Promise(done=>setTimeout(done,choices.length*20));return forcedNo();}) as typeof fetch;
+ try{const both=await Promise.all([parseDictation('a',fresh(),null,racing),parseDictation('b',fresh(),null,racing)]);assert.deepEqual(both.map(p=>p.items.length),[1,1]);assert.deepEqual(choices.sort(),['auto','auto','tool','tool']);}
+ finally{globalThis.fetch=original;}
+ // No answer in 45 seconds, or no connection: said in Turkish, the cause in the log, not retried.
+ r=await dictate([()=>{throw new DOMException('The operation was aborted due to timeout','TimeoutError');}]);
+ assert.equal(r.result,'Yapay zekâ 45 saniyede yanıt vermedi (Anthropic). Metnin kaydedildi; tekrar deneyebilirsin.');assert.equal(r.sent.length,1);assert.match(r.logged.join(' '),/Anthropic isteği: TimeoutError/);
+ r=await dictate([()=>{throw new TypeError('fetch failed');}]);assert.equal(r.result,'Yapay zekâya ulaşılamadı (Anthropic). Metnin kaydedildi; tekrar deneyebilirsin.');
+ // The production refusal itself: named with provider and status on the card, the body only in the log, not retried.
+ const grammar=JSON.stringify({type:'error',error:{type:'invalid_request_error',message:'The compiled grammar is too large, which would cause performance issues. Simplify your tool schemas or reduce the number of strict tools.'}});
+ r=await dictate([()=>new Response(grammar,{status:400})]);
+ assert.equal(r.result,'Dikte şu anda işlenemedi (Anthropic 400). Metnin kaydedildi; tekrar deneyebilirsin.');assert.deepEqual(r.logged,['Anthropic 400: '+grammar]);assert.equal(r.sent.length,1);
+ // Gemini keeps its response schema.
+ r=await dictate([()=>Response.json({candidates:[{content:{parts:[{text:JSON.stringify(dictated)}]}}]})],{...sonnet,provider:'gemini',model:'gemini-2.5-flash'});
+ assert.deepEqual((r.sent[0] as {generationConfig?:{responseSchema?:unknown}}).generationConfig?.responseSchema,schema);assert.equal((r.result as Parsed).items.length,1);
+});
+
+test('Without strict mode: what is left out reads as not said; a cut-off, empty or wrapped answer is asked again',async()=>{
+ // Left out, null for a list, a number or yes/no as text, a list as JSON text, an extra field: read as strict mode had them.
+ let r=await dictate([()=>toolCall({items:[{title:'Kargo iadesi',type:'general',moves:null,complete:'false',prerequisite:'null',note:'ek'}],summary:'1 hamle önerildi.',routines:JSON.stringify([{title:'Yüz yogası',count:'4'}]),confidence:0.9})]);
+ assert.equal(r.sent.length,1);const p=r.result as Parsed;
+ assert.deepEqual(p.items,[{prerequisite:null,id:null,title:'Kargo iadesi',type:'general',complete:false,completedMoveId:null,moves:[],where:null,question:null,alt:null}]);
+ assert.deepEqual(p.routines?.map(x=>[x.title,x.count,x.time,x.steps]),[['Yüz yogası',4,null,null]]);assert.deepEqual([p.question,p.events,p.sessions],[null,[],[]]);
+ // A cut-off or refused answer is no dictation even when what came back would pass: asked again with the reason, then said.
+ for(const stop of ['max_tokens','model_context_window_exceeded','refusal']){
+  r=await dictate([()=>toolCall(dictated,stop)]);
+  assert.equal(r.sent.length,2);assert.match(retried(r.sent[1]),new RegExp(stop));assert.match(String(r.result),/güvenilir biçimde çözümlenemedi/);assert.match(r.logged.join(' '),new RegExp(`Yanıt tamamlanmadı \\(${stop}\\)`));
+ }
+ // An empty or wrapped call has none of the schema's root fields: asked again, and the next answer is used.
+ for(const bad of [{},{dictation:dictated},JSON.stringify(dictated).slice(0,40)]){r=await dictate([()=>toolCall(bad),()=>toolCall(dictated)]);assert.equal(r.sent.length,2,JSON.stringify(bad));assert.match(retried(r.sent[1]),/şemanın alanları/);assert.equal((r.result as Parsed).items[0].title,'Kargo iadesi');}
+ // A root with only some of its fields is an answer: ideas alone (an idea-only dictation), or items without a summary.
+ r=await dictate([()=>toolCall({ideas:[{text:'Belki mikrobiyom verisine ikinci bir yöntem denenir.',kind:'idea',laneId:null}],summary:'1 fikir kaydedildi.'})]);
+ assert.equal(r.sent.length,1);assert.deepEqual([(r.result as Parsed).items,(r.result as Parsed).ideas?.length],[[],1]);
+ r=await dictate([()=>toolCall({items:dictated.items})]);assert.equal(r.sent.length,1);assert.equal((r.result as Parsed).summary,'');
+ // The whole input as JSON text is read.
+ r=await dictate([()=>toolCall(JSON.stringify(dictated))]);assert.equal(r.sent.length,1);assert.equal((r.result as Parsed).items[0].title,'Kargo iadesi');
+ // Text: fenced or with words around it is read; no JSON at all is asked again, saying the tool was not called.
+ r=await dictate([()=>textAnswer('Kaydediyorum:\n```json\n'+JSON.stringify(dictated)+'\n```\nTamam.')]);assert.equal(r.sent.length,1);assert.equal((r.result as Parsed).items[0].title,'Kargo iadesi');
+ r=await dictate([()=>textAnswer('Tamam.')]);assert.equal(r.sent.length,2);assert.match(retried(r.sent[1]),/aracını çağırmadın/);assert.match(String(r.result),/güvenilir biçimde/);
+});
+
+test('A dated item is never filled in: a partial update is asked again, so the stored date and place stay',async()=>{
+ const s=fresh();s.events={lab:{id:'lab',title:'Fizik labı',kind:'lab',frontId:null,date:'2026-10-14',time:'14:00',endTime:'17:00',location:'B201',bring:['Önlük'],weekly:false,prepDays:null,documents:[],institution:'',program:'',portal:''}};
+ const full={id:'lab',title:'Fizik labı',kind:'lab',frontTitle:null,dateText:'2026-10-14',time:'13:00',endTime:'17:00',location:'B201',bring:['Önlük'],weekly:false,prepDays:null,documents:[],institution:'',program:'',portal:''};
+ // Only what changed, or the stored shape (date, frontId): neither reaches the reducer, which would rebuild the item from it.
+ for(const partial of [{id:'lab',title:'Fizik labı',kind:'lab',time:'13:00'},{...s.events.lab,time:'13:00'}]){
+  const r=await dictate([()=>toolCall({...dictated,items:[],events:[partial]}),()=>toolCall({...dictated,items:[],events:[full]})],sonnet,s);
+  assert.equal(r.sent.length,2);assert.match(retried(r.sent[1]),/events/);assert.deepEqual((r.result as Parsed).events?.map(e=>[e.time,e.location,e.bring]),[['13:00','B201',['Önlük']]]);
+ }
+ // A whole item with the stored shape's extra keys, or yes/no and numbers as text, is read in one call (nothing is filled).
+ let r=await dictate([()=>toolCall({...dictated,items:[],events:[{...full,date:'2026-10-14',frontId:null,weekly:'false',prepDays:'3'}],prepDefaults:[{kind:'exam',days:'14'}]})],sonnet,s);
+ assert.equal(r.sent.length,1);assert.deepEqual((r.result as Parsed).events?.map(e=>[e.time,e.weekly,e.prepDays,e.location]),[['13:00',false,3,'B201']]);assert.deepEqual((r.result as Parsed).prepDefaults,[{kind:'exam',days:14}]);
+ // A preparation default left without its days is not read as 0 days.
+ r=await dictate([()=>toolCall({...dictated,prepDefaults:[{kind:'exam'}]}),()=>toolCall({...dictated,prepDefaults:[{kind:'exam',days:5}]})]);
+ assert.equal(r.sent.length,2);assert.deepEqual((r.result as Parsed).prepDefaults,[{kind:'exam',days:5}]);
 });
 
 test('The empty values of the newer schema fields read as null, as before',()=>{
@@ -237,6 +325,9 @@ test('Karargâh keeps “Haritada aç” on a day without an order; the card off
  const empty=renderToStaticMarkup(createElement(AtlasOrder,{...props,order:{date:dayKey(),slots:[]}}));
  assert.match(empty,/Bugün açık emir yok\./);assert.match(empty,/ROTA · 0 CEPHE/);assert.match(empty,/HARİTADA AÇ/);
  const full=renderToStaticMarkup(createElement(AtlasOrder,{...props,order:ensureOrder(s)}));assert.match(full,/ROTA · 1 CEPHE/);assert.match(full,/HARİTADA AÇ/);
+ // A prerequisite that came without its reason (no strict mode since 6 Ekim) keeps the route's own reason line.
+ const bare=camp(front('kargo','Kargo iadesi',['PTT’ye götür.'])),order=ensureOrder(bare);bare.fronts.kargo.moves[0].prerequisiteReason='';
+ assert.ok(order.slots[0].reason);assert.ok(renderToStaticMarkup(createElement(AtlasOrder,{...props,state:bare,order})).includes(order.slots[0].reason));
  // The head's button opens the map (the same RouteHead AtlasOrder renders above).
  let opened='';const head=RouteHead({count:0,approved:false,open:id=>{opened=id;}}) as ReactElement<{children:ReactElement<{onClick?:()=>void}>[]}>;
  head.props.children.find(c=>typeof c.props.onClick==='function')!.props.onClick!();assert.equal(opened,'map');

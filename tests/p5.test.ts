@@ -45,6 +45,13 @@ test('Turkish suffixes follow how the number is read aloud',()=>{
  assert.equal(longDay(DAY),'CMT 26 EYLÜL');
 });
 
+// 6 Ekim: without strict mode a prerequisite may come without its reason (""); the row keeps the order's own reason.
+test('A prerequisite that came without its reason keeps the order row’s reason',()=>{
+ const s=fresh();s.setup=true;const kar=front('kar','Kargo iadesi','general',[{id:'kar-m1',text:'İade paketini PTT şubesine götür.'}]);kar.moves[0].prerequisiteReason='';s.fronts.kar=kar;
+ s.orders[DAY]={date:DAY,slots:[{...slot(kar),reason:'Bugün sırada.'}]};
+ assert.equal(buildReport(s,[],[],NOW).rows[0].why,'Bugün sırada.');
+});
+
 test('A busy morning fills the four sections in a fixed order',()=>{
  const {s,dictations}=busyDay();s.conflictCaughtAt={};
  const caughtState=structuredClone(s);delete caughtState.events!.e9;catchConflicts(caughtState,s,new Date(at(DAY,'02:14')));
